@@ -45,10 +45,13 @@ Images come from `image_picker`: camera and gallery on mobile, a file dialog on 
    flutter run -d linux
    ```
 
-5. Run the tests:
+5. Run the tests. The unit and widget tests run headless. The end-to-end test
+   builds the Linux app, OCRs `test/fixtures/ja_sample.png` with Tesseract,
+   taps a word and checks the JMdict entry:
 
    ```sh
    flutter test
+   flutter test integration_test -d linux   # prefix with `xvfb-run -a` on a headless machine
    ```
 
 ## Run it on Android
@@ -73,24 +76,23 @@ The `pod install` step happens automatically.
 
 ## Dictionary
 
-The lookup database is `assets/dict/jmdict.db.gz`. On first run the app gunzips it into the app-support directory and opens it with SQLite.
+The lookup database is `assets/dict/jmdict.db.gz`, with its fingerprint in `assets/dict/jmdict.version`. On first run the app gunzips the database into the app-support directory and opens it with SQLite. On later launches it reads only the small version file and re-extracts when that changes.
 
-The bundled file is currently built from the `jamdict-data` 1.5 PyPI package. That is JMdict data from about 2020-05, about 190k entries. The official source was not reachable from the build environment, so this is a stand-in.
+The bundled file is currently built from the `jamdict-data` 1.5 PyPI package: full JMdict data from about 2020-05, with 191,541 entries (18 MB gzipped). The official source wasn't reachable from the build environment, so this is a stand-in.
 
 To refresh it from the official EDRDG file:
 
 ```sh
+flutter pub get
 curl -LO https://www.edrdg.org/pub/Nihongo/JMdict_e.gz
 dart run tool/build_jmdict.dart --jmdict-xml JMdict_e.gz
 ```
 
-Options:
+The first `dart run` downloads a prebuilt SQLite library for the `sqlite3` package, so it needs network access. Options:
 
-- `--out assets/dict/jmdict.db.gz` sets the output path.
+- `--out assets/dict/jmdict.db.gz` sets the output path. The version file is written next to it.
 - `--common-only` keeps only entries marked as common.
 - `--jamdict-db <path>` builds from a jamdict SQLite database instead of the XML.
-
-This command may be refined. The builder's own `--help` output and doc comment in `tool/build_jmdict.dart` are authoritative.
 
 ## Project layout
 
@@ -108,16 +110,17 @@ lib/
   widgets/     word overlay, lookup sheet, tokenized text
 assets/
   tessdata/    jpn.traineddata for the Tesseract backend
-  dict/        jmdict.db.gz
+  dict/        jmdict.db.gz, jmdict.version
 tool/
   build_jmdict.dart   builds assets/dict/jmdict.db.gz
-test/
-.github/workflows/flutter.yml   CI: Linux analyze/test/build, Android APK, iOS (manual)
+test/                 unit and widget tests, fixtures
+integration_test/     end-to-end OCR → tap → dictionary test on the desktop app
+.github/workflows/flutter.yml   CI: Linux analyze/test/e2e/build, Android APK, iOS (manual)
 ```
 
 ## Continuous integration
 
-`.github/workflows/flutter.yml` runs on pushes to `main` and `claude/**`, on pull requests, and on manual dispatch. The `linux` job runs `flutter analyze`, `flutter test` and a release build. The `android` job builds a debug APK. The `ios` job runs only when dispatched by hand, to save macOS minutes.
+`.github/workflows/flutter.yml` runs on pushes to `main` and `claude/**`, on pull requests, and on manual dispatch. The `linux` job runs `flutter analyze`, `flutter test`, the end-to-end test under Xvfb, and a release build. The `android` job builds a debug APK. The `ios` job runs only when dispatched by hand, to save macOS minutes.
 
 ## Licences and attribution
 
