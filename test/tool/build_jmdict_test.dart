@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqlite3/sqlite3.dart';
 import 'package:yominow/models/dictionary_entry.dart';
 
 import '../../tool/src/jmdict_builder.dart';
-import '../../tool/src/sha256.dart';
 
 const _fixture = 'test/fixtures/jmdict_sample.xml';
 
@@ -186,7 +186,7 @@ void main() {
 
   test('writes a version file with the gzip SHA-256 and length', () {
     final gzBytes = File(gzPath).readAsBytesSync();
-    final line = '${sha256Hex(gzBytes)} ${gzBytes.length}';
+    final line = '${sha256.convert(gzBytes)} ${gzBytes.length}';
     final versionFile = File(versionPathFor(gzPath));
 
     expect(versionFile.path, p.join(tmp.path, 'jmdict.version'));
@@ -221,7 +221,7 @@ void main() {
     final gz = File('assets/dict/jmdict.db.gz').readAsBytesSync();
     expect(
       File('assets/dict/jmdict.version').readAsStringSync(),
-      '${sha256Hex(gz)} ${gz.length}\n',
+      '${sha256.convert(gz)} ${gz.length}\n',
     );
   });
 

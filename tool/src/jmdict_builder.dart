@@ -17,12 +17,11 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:crypto/crypto.dart';
 import 'package:sqlite3/sqlite3.dart';
 import 'package:xml/xml.dart';
 import 'package:xml/xml_events.dart';
 import 'package:yominow/models/dictionary_entry.dart';
-
-import 'sha256.dart';
 
 const _license =
     'JMdict © Electronic Dictionary Research and Development Group, '
@@ -71,7 +70,7 @@ String versionPathFor(String gzPath) =>
 /// the asset itself.
 Future<String> writeVersionFile(String gzPath) async {
   final bytes = await File(gzPath).readAsBytes();
-  final fingerprint = '${sha256Hex(bytes)} ${bytes.length}';
+  final fingerprint = '${sha256.convert(bytes)} ${bytes.length}';
   await File(versionPathFor(gzPath)).writeAsString('$fingerprint\n');
   return fingerprint;
 }
