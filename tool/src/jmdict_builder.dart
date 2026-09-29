@@ -22,6 +22,8 @@ import 'package:xml/xml.dart';
 import 'package:xml/xml_events.dart';
 import 'package:yominow/models/dictionary_entry.dart';
 
+import 'sha256.dart';
+
 const _license =
     'JMdict © Electronic Dictionary Research and Development Group, '
     'CC BY-SA 4.0';
@@ -36,6 +38,7 @@ class BuildStats {
     required this.terms,
     required this.dbBytes,
     required this.gzBytes,
+    required this.fingerprint,
   });
 
   /// Rows written to `entries`.
@@ -49,10 +52,33 @@ class BuildStats {
 
   /// Size of the gzipped database file.
   final int gzBytes;
+
+  /// The gzip's fingerprint, as written to its version file.
+  final String fingerprint;
+}
+
+/// The version file that belongs to the gzipped database at [gzPath]: same
+/// directory, `.version` instead of `.db.gz` (`jmdict.db.gz` becomes
+/// `jmdict.version`).
+String versionPathFor(String gzPath) =>
+    '${gzPath.replaceFirst(RegExp(r'(\.db)?\.gz$'), '')}.version';
+
+/// Writes the version file for the gzip at [gzPath] and returns its content:
+/// the file's SHA-256 in hex and its length in bytes, on one line.
+///
+/// The app compares this line with the one stored when it last extracted the
+/// database, so it can tell whether the bundled asset changed without loading
+/// the asset itself.
+Future<String> writeVersionFile(String gzPath) async {
+  final bytes = await File(gzPath).readAsBytes();
+  final fingerprint = '${sha256Hex(bytes)} ${bytes.length}';
+  await File(versionPathFor(gzPath)).writeAsString('$fingerprint\n');
+  return fingerprint;
 }
 
 /// Builds the database from the official `JMdict_e` XML file (plain or
-/// `.gz`), writing the raw SQLite file to [dbPath] and its gzip to [gzPath].
+/// `.gz`), writing the raw SQLite file to [dbPath] and its gzip to [gzPath],
+/// with the gzip's version file next to it (see [writeVersionFile]).
 ///
 /// The XML is stream-parsed one `<entry>` at a time. Entities declared in the
 /// file's DOCTYPE (`<!ENTITY n "noun (common) (futsuumeishi)">`) are expanded
@@ -74,8 +100,9 @@ Future<BuildStats> buildFromJmdictXml(
 );
 
 /// Builds the database from a jamdict-data SQLite file, writing the raw
-/// SQLite file to [dbPath] and its gzip to [gzPath]. The output is the same
-/// as [buildFromJmdictXml] would produce from the same JMdict release.
+/// SQLite file to [dbPath], its gzip to [gzPath] and the gzip's version file
+/// next to it. The output is the same as [buildFromJmdictXml] would produce
+/// from the same JMdict release.
 Future<BuildStats> buildFromJamdict(
   String jamdictPath, {
   required String dbPath,
@@ -113,6 +140,7 @@ Future<BuildStats> _build({
     terms: writer.terms,
     dbBytes: File(dbPath).lengthSync(),
     gzBytes: File(gzPath).lengthSync(),
+    fingerprint: await writeVersionFile(gzPath),
   );
 }
 

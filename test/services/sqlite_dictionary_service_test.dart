@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show FlutterError;
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
@@ -181,14 +183,14 @@ void main() {
   });
 
   group('bundled asset', () {
-    const assetKey = 'assets/dict/jmdict.db.gz';
     late Directory support;
     late File extracted;
     late File marker;
+    late _FakeBundle bundle;
 
-    /// Opens a default-constructed service and closes it again.
-    Future<List<DictionaryEntry>> useBundled() async {
-      final bundled = SqliteDictionaryService();
+    /// Opens a default-constructed service on [bundle] and closes it again.
+    Future<List<DictionaryEntry>> useBundled([AssetBundle? assets]) async {
+      final bundled = SqliteDictionaryService(bundle: assets ?? bundle);
       try {
         return await bundled.lookup('食べる');
       } finally {
@@ -201,6 +203,10 @@ void main() {
       support = Directory.systemTemp.createTempSync('support_dir');
       extracted = File(p.join(support.path, 'dict', 'jmdict.db'));
       marker = File('${extracted.path}.version');
+      bundle = _FakeBundle(
+        File(p.join(tmp.path, 'jmdict.db.gz')).readAsBytesSync(),
+        'version-1',
+      );
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(
             const MethodChannel('plugins.flutter.io/path_provider'),
@@ -217,43 +223,101 @@ void main() {
       support.deleteSync(recursive: true);
     });
 
-    test('is extracted on first use and reused afterwards', () async {
-      final entries = await useBundled();
-      expect(entries.single.senses.first.glosses, contains('to eat'));
-      expect(extracted.existsSync(), isTrue);
-      expect(File('${extracted.path}.partial').existsSync(), isFalse);
+    test(
+      'is extracted on first use, and the version becomes the marker',
+      () async {
+        final entries = await useBundled();
+        expect(entries.single.senses.first.glosses, contains('to eat'));
+        expect(extracted.existsSync(), isTrue);
+        expect(File('${extracted.path}.partial').existsSync(), isFalse);
+        expect(marker.readAsStringSync(), 'version-1');
+        expect(bundle.loaded, [_versionKey, _assetKey]);
+      },
+    );
 
-      final assetLength = (await rootBundle.load(assetKey)).lengthInBytes;
-      expect(marker.readAsStringSync(), startsWith('$assetLength:'));
-
-      // A second start must not extract again.
+    test('loads only the version file while the marker matches', () async {
+      await useBundled();
+      bundle.loaded.clear();
       final longAgo = DateTime(2000);
       extracted.setLastModifiedSync(longAgo);
+
       expect(_ids(await useBundled()), [1358280]);
+      expect(bundle.loaded, [_versionKey]);
       expect(extracted.lastModifiedSync(), longAgo);
     });
 
-    test('is extracted again when the marker does not match', () async {
+    test('is extracted again when the version file changes', () async {
       await useBundled();
-      final fingerprint = marker.readAsStringSync();
-
+      bundle
+        ..version = 'version-2'
+        ..loaded.clear();
       extracted.setLastModifiedSync(DateTime(2000));
-      marker.writeAsStringSync('12345:0000000000000000');
+
       expect(_ids(await useBundled()), [1358280]);
+      expect(bundle.loaded, [_versionKey, _assetKey]);
       expect(extracted.lastModifiedSync().year, greaterThan(2000));
-      expect(marker.readAsStringSync(), fingerprint);
+      expect(marker.readAsStringSync(), 'version-2');
     });
 
     test('is extracted again when the database or marker is missing', () async {
       await useBundled();
       extracted.deleteSync();
       expect(_ids(await useBundled()), [1358280]);
+      expect(extracted.existsSync(), isTrue);
 
       marker.deleteSync();
       extracted.setLastModifiedSync(DateTime(2000));
       expect(_ids(await useBundled()), [1358280]);
       expect(extracted.lastModifiedSync().year, greaterThan(2000));
-      expect(marker.existsSync(), isTrue);
+      expect(marker.readAsStringSync(), 'version-1');
+    });
+
+    test('keeps the old marker when extraction fails', () async {
+      await useBundled();
+      bundle
+        ..version = 'version-2'
+        ..failAsset = true;
+      await expectLater(useBundled(), throwsA(isA<FlutterError>()));
+      expect(marker.readAsStringSync(), 'version-1');
+
+      bundle.failAsset = false;
+      expect(_ids(await useBundled()), [1358280]);
+      expect(marker.readAsStringSync(), 'version-2');
+    });
+
+    test('works with the real bundled asset', () async {
+      final entries = await useBundled(rootBundle);
+      expect(entries.single.senses.first.glosses, contains('to eat'));
+      expect(
+        marker.readAsStringSync(),
+        (await rootBundle.loadString(_versionKey)).trim(),
+      );
     });
   });
+}
+
+const _assetKey = 'assets/dict/jmdict.db.gz';
+const _versionKey = 'assets/dict/jmdict.version';
+
+/// Serves [gz] and [version] as the dictionary assets and records the keys
+/// that were loaded.
+class _FakeBundle extends CachingAssetBundle {
+  _FakeBundle(this.gz, this.version);
+
+  final Uint8List gz;
+  String version;
+  bool failAsset = false;
+  final loaded = <String>[];
+
+  @override
+  Future<ByteData> load(String key) async {
+    loaded.add(key);
+    switch (key) {
+      case _versionKey:
+        return ByteData.sublistView(utf8.encode('$version\n'));
+      case _assetKey when !failAsset:
+        return ByteData.sublistView(gz);
+    }
+    throw FlutterError('Unable to load asset: $key');
+  }
 }

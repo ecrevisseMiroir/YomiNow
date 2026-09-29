@@ -7,6 +7,7 @@ import 'package:sqlite3/sqlite3.dart';
 import 'package:yominow/models/dictionary_entry.dart';
 
 import '../../tool/src/jmdict_builder.dart';
+import '../../tool/src/sha256.dart';
 
 const _fixture = 'test/fixtures/jmdict_sample.xml';
 
@@ -181,6 +182,47 @@ void main() {
     expect(copy.select('PRAGMA integrity_check').single.columnAt(0), 'ok');
     expect(copy.select('SELECT COUNT(*) FROM entries').single.columnAt(0), 8);
     expect(copy.select('SELECT COUNT(*) FROM terms').single.columnAt(0), 22);
+  });
+
+  test('writes a version file with the gzip SHA-256 and length', () {
+    final gzBytes = File(gzPath).readAsBytesSync();
+    final line = '${sha256Hex(gzBytes)} ${gzBytes.length}';
+    final versionFile = File(versionPathFor(gzPath));
+
+    expect(versionFile.path, p.join(tmp.path, 'jmdict.version'));
+    expect(versionFile.readAsStringSync(), '$line\n');
+    expect(stats.fingerprint, line);
+    expect(line, matches(RegExp(r'^[0-9a-f]{64} \d+$')));
+    expect(line, endsWith(' ${stats.gzBytes}'));
+  });
+
+  test('the version file sits next to the gzip', () {
+    expect(
+      versionPathFor('assets/dict/jmdict.db.gz'),
+      'assets/dict/jmdict.version',
+    );
+    expect(versionPathFor('out/JMdict_e.gz'), 'out/JMdict_e.version');
+  });
+
+  test('writeVersionFile fingerprints an existing gzip', () async {
+    final existing = File(p.join(tmp.path, 'existing.db.gz'))
+      ..writeAsBytesSync([1, 2, 3]);
+    const line =
+        '039058c6f2c0cb492c533b0a4d14ef77cc0f78abccced5287d84a1a2011cfb81 3';
+
+    expect(await writeVersionFile(existing.path), line);
+    expect(
+      File(p.join(tmp.path, 'existing.version')).readAsStringSync(),
+      '$line\n',
+    );
+  });
+
+  test('the bundled asset matches its committed version file', () {
+    final gz = File('assets/dict/jmdict.db.gz').readAsBytesSync();
+    expect(
+      File('assets/dict/jmdict.version').readAsStringSync(),
+      '${sha256Hex(gz)} ${gz.length}\n',
+    );
   });
 
   test('reads gzipped XML', () async {

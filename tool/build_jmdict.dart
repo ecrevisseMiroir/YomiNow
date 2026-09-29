@@ -6,7 +6,9 @@
 ///     dart run tool/build_jmdict.dart --jmdict-xml JMdict_e.gz
 ///     dart run tool/build_jmdict.dart --jamdict-db jamdict.db --common-only
 ///
-/// The uncompressed intermediate is kept in `tool/.cache/jmdict.db`.
+/// The uncompressed intermediate is kept in `tool/.cache/jmdict.db`. Next to
+/// the `.gz` a one-line `.version` file (SHA-256 and length of the gzip) is
+/// written; commit both, the app reads the small one to detect a new asset.
 library;
 
 import 'dart:io';
@@ -75,7 +77,8 @@ Future<void> main(List<String> args) async {
     ..writeln('Entries: ${stats.entries}')
     ..writeln('Terms:   ${stats.terms}')
     ..writeln('Raw db:  ${_megabytes(stats.dbBytes)} ($dbPath)')
-    ..writeln('Gzipped: ${_megabytes(stats.gzBytes)} ($out)');
+    ..writeln('Gzipped: ${_megabytes(stats.gzBytes)} ($out)')
+    ..writeln('Version: ${stats.fingerprint} (${versionPathFor(out)})');
 }
 
 String _valueOf(List<String> args, int index) => index < args.length

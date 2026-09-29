@@ -3,7 +3,7 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
 
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/services.dart' show AssetBundle, rootBundle;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/sqlite3.dart';
@@ -12,6 +12,7 @@ import '../models/dictionary_entry.dart';
 import 'dictionary_service.dart';
 
 const _assetKey = 'assets/dict/jmdict.db.gz';
+const _versionKey = 'assets/dict/jmdict.version';
 
 /// Entries of one term, best first: common forms, then by entry id.
 const _lookupSql = '''
@@ -27,10 +28,15 @@ LIMIT ?
 /// `tool/build_jmdict.dart`.
 class SqliteDictionaryService implements DictionaryService {
   /// Uses the database at [databasePath] when given. By default the bundled
-  /// `assets/dict/jmdict.db.gz` is extracted to the application support
-  /// directory, again whenever the asset changes.
-  SqliteDictionaryService({Future<String> Function()? databasePath})
-    : _databasePath = databasePath ?? _extractBundledDatabase;
+  /// `assets/dict/jmdict.db.gz` (read from [bundle], `rootBundle` unless
+  /// given) is extracted to the application support directory, again whenever
+  /// its `jmdict.version` file changes.
+  SqliteDictionaryService({
+    Future<String> Function()? databasePath,
+    AssetBundle? bundle,
+  }) : _databasePath =
+           databasePath ??
+           (() => _extractBundledDatabase(bundle ?? rootBundle));
 
   final Future<String> Function() _databasePath;
   Database? _db;
@@ -112,22 +118,25 @@ List<DictionaryEntry> _entries(ResultSet rows) => [
 ];
 
 /// Extracts the bundled database to
-/// `<application support>/dict/jmdict.db` and returns its path. Extraction
-/// is skipped when a marker file next to the database says it came from the
-/// current asset.
-Future<String> _extractBundledDatabase() async {
-  final asset = await rootBundle.load(_assetKey);
-  final gz = asset.buffer.asUint8List(asset.offsetInBytes, asset.lengthInBytes);
-  final fingerprint = _fingerprint(gz);
+/// `<application support>/dict/jmdict.db` and returns its path.
+///
+/// The small `jmdict.version` asset identifies the bundled database. It is
+/// stored next to the extracted file as a marker once extraction succeeded,
+/// so as long as the two match, the large `.gz` asset is not even loaded.
+Future<String> _extractBundledDatabase(AssetBundle bundle) async {
+  final version = (await bundle.loadString(_versionKey, cache: false)).trim();
 
   final support = await getApplicationSupportDirectory();
   final database = File(p.join(support.path, 'dict', 'jmdict.db'));
   final marker = File('${database.path}.version');
   if (await database.exists() &&
       await marker.exists() &&
-      await marker.readAsString() == fingerprint) {
+      await marker.readAsString() == version) {
     return database.path;
   }
+
+  final asset = await bundle.load(_assetKey);
+  final gz = asset.buffer.asUint8List(asset.offsetInBytes, asset.lengthInBytes);
 
   // Extract beside the target and rename, so an interrupted run never leaves
   // a truncated database that the marker vouches for.
@@ -135,20 +144,8 @@ Future<String> _extractBundledDatabase() async {
   final partial = '${database.path}.partial';
   await _gunzipInBackground(gz, partial);
   await File(partial).rename(database.path);
-  await marker.writeAsString(fingerprint);
+  await marker.writeAsString(version);
   return database.path;
-}
-
-/// Identifies a gzip file without decompressing it: its length plus the
-/// CRC-32 and size of the uncompressed data, which gzip stores in the last
-/// eight bytes. A rebuilt database therefore changes the fingerprint even if
-/// it happens to compress to the same size.
-String _fingerprint(Uint8List gz) {
-  final trailer = gz
-      .sublist(gz.length - 8)
-      .map((byte) => byte.toRadixString(16).padLeft(2, '0'))
-      .join();
-  return '${gz.length}:$trailer';
 }
 
 Future<void> _gunzipInBackground(Uint8List gz, String path) => Isolate.run(
