@@ -34,6 +34,12 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+            // With R8, ML Kit's InputImage.fromFilePath throws a
+            // NullPointerException on device: its internal logger is handed
+            // a null component that ML Kit looks up by reflection. Ship
+            // release builds unshrunk, like debug builds.
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }
