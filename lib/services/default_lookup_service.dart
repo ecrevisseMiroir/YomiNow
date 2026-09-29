@@ -28,14 +28,15 @@ class DefaultLookupService implements LookupService {
 
     // Compounds and expressions the tokenizer splits, e.g. 日本 + 語.
     final longest = await _dictionary.longestMatch(text, token.start);
-    // Inflected forms, e.g. 食べ → 食べる.
-    final base = token.basicForm == token.surface
-        ? const <DictionaryEntry>[]
-        : await _dictionary.lookup(token.basicForm);
+    final longerThanToken =
+        longest != null && longest.term.length > token.surface.length;
+    // Inflected forms (食べ → 食べる), and the token itself when a longer
+    // match could hide it (今日は "hello" must not hide 今日 "today").
+    final base = token.basicForm != token.surface || longerThanToken
+        ? await _dictionary.lookup(token.basicForm)
+        : const <DictionaryEntry>[];
 
-    final baseFirst =
-        base.isNotEmpty &&
-        (longest == null || longest.term.length <= token.surface.length);
+    final baseFirst = base.isNotEmpty && !longerThanToken;
     final primary = baseFirst ? base : longest?.entries ?? const [];
     final secondary = baseFirst ? longest?.entries ?? const [] : base;
 

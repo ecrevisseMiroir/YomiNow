@@ -203,9 +203,30 @@ void main() {
 
       expect(result!.matchedText, '日本語');
       expect([result.start, result.end], [0, 3]);
-      expect(result.entries.map((e) => e.id), [2]);
+      expect(result.entries.map((e) => e.id), [2, 1]);
       expect(result.reading, 'にほんご');
       expect(result.token!.surface, '日本');
+    });
+
+    test('lists the token itself after a longer expression', () async {
+      const text = '今日は天気';
+      final konnichiwa = _entry(1, '今日は', 'こんにちは');
+      final kyou = _entry(2, '今日', 'きょう');
+      final service = serviceFor(
+        [
+          _token(text, '今日', reading: 'きょう'),
+          _token(text, 'は', pos: '助詞', reading: 'は'),
+          _token(text, '天気', reading: 'てんき'),
+        ],
+        {
+          '今日は': [konnichiwa],
+          '今日': [kyou],
+        },
+      );
+      final result = await service.lookupAt(text, 0);
+
+      expect(result!.matchedText, '今日は');
+      expect(result.entries.map((e) => e.id), [1, 2]);
     });
 
     test('puts a longer match before the dictionary form', () async {
