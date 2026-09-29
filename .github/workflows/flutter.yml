@@ -5,6 +5,13 @@ on:
     branches: [main, "claude/**"]
   pull_request:
   workflow_dispatch:
+    inputs:
+      retrace:
+        description: >-
+          Obfuscated stack trace from the release APK. When set, the Android
+          job deobfuscates it with this build's R8 mapping, and iOS is skipped.
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -73,11 +80,23 @@ jobs:
           name: yominow-apk-mapping
           path: build/app/outputs/mapping/release/mapping.txt
           retention-days: 30
+      # The mapping only fits an APK built from the same sources; compare the
+      # printed pg_map_id with the r8-map-id in the stack trace.
+      - name: Retrace the given stack trace
+        if: inputs.retrace != ''
+        env:
+          STACKTRACE: ${{ inputs.retrace }}
+        run: |
+          mapping=build/app/outputs/mapping/release/mapping.txt
+          grep -m1 pg_map_id "$mapping"
+          printf '%s\n' "$STACKTRACE" > stacktrace.txt
+          retrace=$(find "$ANDROID_HOME/cmdline-tools" -path '*/bin/retrace' | head -n1)
+          "$retrace" "$mapping" stacktrace.txt
 
   # macOS runners are expensive, so iOS only builds when triggered by hand.
   ios:
     name: iOS (debug, no codesign)
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' && inputs.retrace == ''
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
