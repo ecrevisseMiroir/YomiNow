@@ -67,6 +67,12 @@ jobs:
           name: yominow-apk
           path: build/app/outputs/flutter-apk/app-release.apk
           retention-days: 30
+      # R8 mapping, needed to retrace obfuscated stack traces from this APK.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yominow-apk-mapping
+          path: build/app/outputs/mapping/release/mapping.txt
+          retention-days: 30
 
   # macOS runners are expensive, so iOS only builds when triggered by hand.
   ios:
