@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
@@ -11,6 +12,15 @@ bool get _hasTesseract {
   } on ProcessException {
     return false;
   }
+}
+
+/// Intersection over union of two boxes.
+double _iou(Rect a, Rect b) {
+  final overlap = a.intersect(b);
+  if (overlap.width <= 0 || overlap.height <= 0) return 0;
+  final intersection = overlap.width * overlap.height;
+  return intersection /
+      (a.width * a.height + b.width * b.height - intersection);
 }
 
 void main() {
@@ -38,6 +48,36 @@ void main() {
     }
     expect(progress, [(0.0, 'loading OCR engine'), (1.0, 'done')]);
   }, skip: _hasTesseract ? false : 'tesseract is not installed');
+
+  test(
+    'gives every character of a line its own box, in reading order',
+    () async {
+      final service = TesseractOcrService(tessdataDir: () async => tessdata);
+
+      final result = await service.recognize(sample);
+
+      for (final text in ['日本語を勉強しています', '東京に行きました']) {
+        final line = result.lines.firstWhere(
+          (l) => l.text == text,
+          orElse: () => fail('"$text" not found in "${result.text}"'),
+        );
+        final characters = [...text.runes.map(String.fromCharCode)];
+        expect(line.words.map((w) => w.text), characters);
+
+        final boxes = [for (final word in line.words) word.bbox];
+        for (var i = 1; i < boxes.length; i++) {
+          expect(boxes[i].left, greaterThan(boxes[i - 1].left));
+          expect(_iou(boxes[i - 1], boxes[i]), lessThan(0.2));
+        }
+        // The sample is set in 64 px type starting at x = 40, so character i
+        // is centered near 72 + 64 * i.
+        for (var i = 0; i < boxes.length; i++) {
+          expect(boxes[i].center.dx, closeTo(72 + 64 * i, 16));
+        }
+      }
+    },
+    skip: _hasTesseract ? false : 'tesseract is not installed',
+  );
 
   test('reports a missing binary as OcrUnavailableException', () {
     final service = TesseractOcrService(

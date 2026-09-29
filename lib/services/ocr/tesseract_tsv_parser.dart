@@ -2,20 +2,31 @@ import 'dart:convert';
 import 'dart:ui';
 
 import '../../models/ocr_result.dart';
+import 'ocr_line_builder.dart';
 
-/// A recognized word before its position in the line text is known.
-typedef RawOcrWord = ({String text, Rect bbox, double? confidence});
-
-/// Parses Tesseract's TSV output into an [OcrResult].
+/// Parses Tesseract's TSV output into an [OcrResult] with one [OcrWord] per
+/// CJK character.
 ///
-/// Only word rows (level 5) are used; they are grouped into lines by
-/// (page, block, paragraph, line). Blank words, malformed rows and lines
-/// without words are dropped. A negative confidence becomes null.
+/// Words (level 5) are grouped into lines by (page, block, paragraph, line).
+/// Blank words, malformed rows and lines without words are dropped, and a
+/// negative confidence becomes null. Each character carries the confidence of
+/// its Tesseract word.
+///
+/// The line boxes (level 4) are used to place the characters, not the word
+/// boxes: for Japanese, Tesseract's word and character boxes overlap, collapse
+/// and drift from the glyphs, while its line boxes hug the ink. Each line box
+/// is divided among the line's characters in proportion to their advance width
+/// (see [layOutAcross]), which matches the evenly spaced glyphs of Japanese
+/// text. A line without a level 4 row falls back to the union of its word
+/// boxes.
 OcrResult parseTesseractTsv(String tsv) {
-  final groups = <(int, int, int, int), List<RawOcrWord>>{};
+  final lineBoxes = <(int, int, int, int), Rect>{};
+  final lineWords = <(int, int, int, int), List<RawOcrWord>>{};
   for (final row in const LineSplitter().convert(tsv)) {
     final columns = row.split('\t');
-    if (columns.length < 12 || columns[0] != '5') continue;
+    if (columns.length < 12) continue;
+    final level = columns[0];
+    if (level != '4' && level != '5') continue;
 
     final ints = [for (final c in columns.sublist(1, 10)) int.tryParse(c)];
     final conf = double.tryParse(columns[10]);
@@ -23,68 +34,44 @@ OcrResult parseTesseractTsv(String tsv) {
 
     final [page, block, par, line, _, left, top, width, height] = ints
         .cast<int>();
-    groups.putIfAbsent((page, block, par, line), () => []).add((
-      text: columns[11],
-      bbox: Rect.fromLTWH(
-        left.toDouble(),
-        top.toDouble(),
-        width.toDouble(),
-        height.toDouble(),
-      ),
+    final key = (page, block, par, line);
+    final box = Rect.fromLTWH(
+      left.toDouble(),
+      top.toDouble(),
+      width.toDouble(),
+      height.toDouble(),
+    );
+    if (level == '4') {
+      lineBoxes[key] = box;
+      continue;
+    }
+
+    final text = columns[11].trim();
+    if (text.isEmpty) continue;
+    lineWords.putIfAbsent(key, () => []).add((
+      text: text,
+      bbox: box,
       confidence: conf < 0 ? null : conf / 100,
     ));
   }
 
   return OcrResult(
     lines: [
-      for (final words in groups.values) joinOcrWords(words),
-    ].where((line) => line.words.isNotEmpty).toList(),
+      for (final MapEntry(:key, value: words) in lineWords.entries)
+        _buildLine(
+          lineBoxes[key] ??
+              words.map((w) => w.bbox).reduce((a, b) => a.expandToInclude(b)),
+          words,
+        ),
+    ],
   );
 }
 
-/// Builds a line from [words] in reading order.
-///
-/// Words that are blank after trimming are skipped. Words are joined without
-/// a separator when either neighbouring character is CJK (kanji, kana or
-/// fullwidth), and with a single space otherwise, so Japanese text stays
-/// contiguous while Latin words stay separated. Each [OcrWord] records its
-/// range in the returned [OcrLine.text].
-OcrLine joinOcrWords(Iterable<RawOcrWord> words) {
-  final text = StringBuffer();
-  final result = <OcrWord>[];
-  String? previous;
-  for (final word in words) {
-    final wordText = word.text.trim();
-    if (wordText.isEmpty) continue;
-
-    if (previous != null &&
-        !_isCjk(previous.runes.last) &&
-        !_isCjk(wordText.runes.first)) {
-      text.write(' ');
-    }
-    final start = text.length;
-    text.write(wordText);
-    result.add(
-      OcrWord(
-        text: wordText,
-        bbox: word.bbox,
-        confidence: word.confidence,
-        start: start,
-        end: text.length,
-      ),
-    );
-    previous = wordText;
-  }
-  return OcrLine(text: text.toString(), words: result);
+/// Spreads [lineBox] over [words] and splits them into characters.
+OcrLine _buildLine(Rect lineBox, List<RawOcrWord> words) {
+  final boxes = layOutAcross(lineBox, [for (final w in words) w.text]);
+  return joinOcrWords([
+    for (var i = 0; i < words.length; i++)
+      (text: words[i].text, bbox: boxes[i], confidence: words[i].confidence),
+  ]);
 }
-
-/// Whether [rune] is kanji, kana, CJK punctuation or a fullwidth/halfwidth
-/// form.
-bool _isCjk(int rune) =>
-    (rune >= 0x3000 && rune <= 0x30FF) || // CJK symbols, hiragana, katakana
-    (rune >= 0x31F0 && rune <= 0x31FF) || // katakana phonetic extensions
-    (rune >= 0x3400 && rune <= 0x4DBF) || // CJK extension A
-    (rune >= 0x4E00 && rune <= 0x9FFF) || // CJK unified ideographs
-    (rune >= 0xF900 && rune <= 0xFAFF) || // CJK compatibility ideographs
-    (rune >= 0xFF00 && rune <= 0xFFEF) || // fullwidth and halfwidth forms
-    (rune >= 0x20000 && rune <= 0x3134F); // CJK extensions B and later
