@@ -64,6 +64,14 @@ flutter run
 
 ML Kit's Japanese text recognition model is bundled through the Gradle dependency, so no download is needed at runtime.
 
+### Install the APK without a computer
+
+Every CI run uploads a release APK. It is signed with the debug key until a real signing config is added.
+
+1. On your phone, open the repository's **Actions** tab, pick the latest green **Flutter CI** run, and download the `yominow-apk` artifact. You need to be signed in to GitHub.
+2. Unzip it with the Files app and open `app-release.apk`.
+3. When Android asks, allow your browser or Files app to install unknown apps.
+
 ## Run it on iOS
 
 You need macOS, Xcode and CocoaPods. Then:
@@ -120,7 +128,7 @@ integration_test/     end-to-end OCR → tap → dictionary test on the desktop 
 
 ## Continuous integration
 
-`.github/workflows/flutter.yml` runs on pushes to `main` and `claude/**`, on pull requests, and on manual dispatch. The `linux` job runs `flutter analyze`, `flutter test`, the end-to-end test under Xvfb, and a release build. The `android` job builds a debug APK. The `ios` job runs only when dispatched by hand, to save macOS minutes.
+`.github/workflows/flutter.yml` runs on pushes to `main` and `claude/**`, on pull requests, and on manual dispatch. The `linux` job runs `flutter analyze`, `flutter test`, the end-to-end test under Xvfb, and a release build. The `android` job builds a release APK and uploads it as the `yominow-apk` artifact. The `ios` job runs only when dispatched by hand, to save macOS minutes.
 
 ## Licences and attribution
 

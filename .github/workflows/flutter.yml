@@ -42,7 +42,7 @@ jobs:
       - run: flutter build linux --release
 
   android:
-    name: Android (debug APK)
+    name: Android (release APK)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -59,7 +59,14 @@ jobs:
           cache: true
 
       - run: flutter pub get
-      - run: flutter build apk --debug
+      # Signed with the debug key (see android/app/build.gradle.kts), so it
+      # installs on any phone that allows apps from unknown sources.
+      - run: flutter build apk --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yominow-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
 
   # macOS runners are expensive, so iOS only builds when triggered by hand.
   ios:
