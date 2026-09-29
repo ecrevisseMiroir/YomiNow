@@ -1,17 +1,137 @@
-# yominow
+# YomiNow
 
-A new Flutter project.
+Point your camera at Japanese text, tap a word, and read it now: OCR, tokenization and an offline JMdict lookup in one Flutter app.
 
-## Getting Started
+YomiNow is a Flutter app for Linux desktop, Android and iOS. It started as a React/Vite web prototype, which is preserved on the branch `claude/yominow-architecture-planning-vk9xH`.
 
-This project is a starting point for a Flutter application.
+## Features
 
-A few resources to get you started if this is your first Flutter project:
+- Pick an image from the gallery or a file dialog, or take a photo (mobile).
+- Normalizes the image before OCR: EXIF orientation is applied and the longest side is capped at 2000 px.
+- Japanese OCR with tappable word boxes drawn over the image.
+- Tap a word and the kuromoji (IPADIC) tokenizer finds it and its dictionary form.
+- The dictionary form is looked up in a bundled JMdict SQLite database. A bottom sheet shows readings, part of speech and English glosses.
+- A "Text" panel shows the full detected text with furigana. Each word in it is tappable too.
+- Works offline: the OCR model and the dictionary ship with the app.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## Platforms and OCR backends
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+| Platform | OCR backend | Notes |
+| --- | --- | --- |
+| Linux (also macOS, Windows desktop) | Tesseract CLI | `tesseract` must be installed. The Japanese LSTM model `jpn.traineddata` is bundled in `assets/tessdata` and passed with `--tessdata-dir`. |
+| Android | Google ML Kit Text Recognition v2 (Japanese script) | Via `google_mlkit_text_recognition`. |
+| iOS | Google ML Kit Text Recognition v2 (Japanese script) | Via `google_mlkit_text_recognition`. |
+
+Images come from `image_picker`: camera and gallery on mobile, a file dialog on desktop.
+
+## Run it on Linux
+
+1. Install Flutter (3.47.5 stable, Dart 3.13): <https://docs.flutter.dev/get-started/install/linux>
+2. Install the build tools and Tesseract:
+
+   ```sh
+   sudo apt install clang cmake ninja-build pkg-config libgtk-3-dev tesseract-ocr
+   ```
+
+3. Fetch the dependencies:
+
+   ```sh
+   flutter pub get
+   ```
+
+4. Run the app:
+
+   ```sh
+   flutter run -d linux
+   ```
+
+5. Run the tests:
+
+   ```sh
+   flutter test
+   ```
+
+## Run it on Android
+
+Connect a device or start an emulator, then:
+
+```sh
+flutter run
+```
+
+ML Kit's Japanese text recognition model is bundled through the Gradle dependency, so no download is needed at runtime.
+
+## Run it on iOS
+
+You need macOS, Xcode and CocoaPods. Then:
+
+```sh
+flutter run
+```
+
+The `pod install` step happens automatically.
+
+## Dictionary
+
+The lookup database is `assets/dict/jmdict.db.gz`. On first run the app gunzips it into the app-support directory and opens it with SQLite.
+
+The bundled file is currently built from the `jamdict-data` 1.5 PyPI package. That is JMdict data from about 2020-05, about 190k entries. The official source was not reachable from the build environment, so this is a stand-in.
+
+To refresh it from the official EDRDG file:
+
+```sh
+curl -LO https://www.edrdg.org/pub/Nihongo/JMdict_e.gz
+dart run tool/build_jmdict.dart --jmdict-xml JMdict_e.gz
+```
+
+Options:
+
+- `--out assets/dict/jmdict.db.gz` sets the output path.
+- `--common-only` keeps only entries marked as common.
+- `--jamdict-db <path>` builds from a jamdict SQLite database instead of the XML.
+
+This command may be refined. The builder's own `--help` output and doc comment in `tool/build_jmdict.dart` are authoritative.
+
+## Project layout
+
+```text
+lib/
+  models/      OCR result, token, dictionary entry, lookup result
+  services/
+    ocr/       Tesseract and ML Kit backends, plus the factory that picks one
+    image_preprocess.dart
+    kuromoji_tokenizer_service.dart
+    sqlite_dictionary_service.dart
+    default_lookup_service.dart
+    app_services.dart
+  screens/     home, image
+  widgets/     word overlay, lookup sheet, tokenized text
+assets/
+  tessdata/    jpn.traineddata for the Tesseract backend
+  dict/        jmdict.db.gz
+tool/
+  build_jmdict.dart   builds assets/dict/jmdict.db.gz
+test/
+.github/workflows/flutter.yml   CI: Linux analyze/test/build, Android APK, iOS (manual)
+```
+
+## Continuous integration
+
+`.github/workflows/flutter.yml` runs on pushes to `main` and `claude/**`, on pull requests, and on manual dispatch. The `linux` job runs `flutter analyze`, `flutter test` and a release build. The `android` job builds a debug APK. The `ios` job runs only when dispatched by hand, to save macOS minutes.
+
+## Licences and attribution
+
+The licence for the YomiNow app code has not been decided yet.
+
+Third-party data and components:
+
+- **JMdict** is the property of the Electronic Dictionary Research and Development Group (EDRDG) and is used under CC BY-SA 4.0. See <https://www.edrdg.org/edrdg/licence.html>.
+- **IPADIC** is used through the [`kuromoji`](https://pub.dev/packages/kuromoji) Dart package, a Dart port of kuromoji.js.
+- **Tesseract** is licensed under Apache-2.0, and so is the `jpn` tessdata model.
+- **Google ML Kit** is used under Google's ML Kit terms.
+
+## References
+
+- J. Breen, "JMdict: a Japanese-Multilingual Dictionary", COLING Workshop on Multilingual Linguistic Resources, 2004.
+- T. Kudo, K. Yamamoto, Y. Matsumoto, "Applying Conditional Random Fields to Japanese Morphological Analysis", EMNLP 2004. This is the basis of MeCab and its IPADIC tokenization.
+- R. Smith, "An Overview of the Tesseract OCR Engine", ICDAR 2007.
