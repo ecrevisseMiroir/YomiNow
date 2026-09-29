@@ -44,6 +44,12 @@ kotlin {
     }
 }
 
+dependencies {
+    // google_mlkit_text_recognition only bundles the Latin model; the Japanese
+    // model has to be added by the app.
+    implementation("com.google.mlkit:text-recognition-japanese:16.0.1")
+}
+
 flutter {
     source = "../.."
 }
