@@ -6,13 +6,15 @@ class Sense {
     this.misc = const [],
   });
 
-  /// Part-of-speech codes as JMdict entity names, e.g. `n`, `v5r`, `adj-i`.
+  /// Part-of-speech labels as expanded JMdict entity text, e.g.
+  /// `Godan verb with 'ru' ending`.
   final List<String> pos;
 
   /// English glosses.
   final List<String> glosses;
 
-  /// Misc codes as JMdict entity names, e.g. `uk`, `abbr`.
+  /// Misc labels as expanded JMdict entity text, e.g.
+  /// `word usually written using kana alone`.
   final List<String> misc;
 
   factory Sense.fromJson(Map<String, dynamic> json) => Sense(
