@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- JMdict created: 2024-03-05 -->
+<!DOCTYPE JMdict [
+<!-- Trimmed copy of the JMdict DTD: only the declarations this fixture needs
+     plus a few unused ones. Commented-out declarations such as
+     <!ENTITY commented "must be ignored"> are not entities. -->
+<!ELEMENT JMdict (entry*)>
+<!ELEMENT entry (ent_seq, k_ele*, r_ele*, sense+)>
+<!ELEMENT ent_seq (#PCDATA)>
+<!ELEMENT k_ele (keb, ke_inf*, ke_pri*)>
+<!ELEMENT keb (#PCDATA)>
+<!ELEMENT ke_pri (#PCDATA)>
+<!ELEMENT r_ele (reb, re_nokanji?, re_restr*, re_inf*, re_pri*)>
+<!ELEMENT reb (#PCDATA)>
+<!ELEMENT re_pri (#PCDATA)>
+<!ELEMENT sense (stagk*, stagr*, pos*, xref*, ant*, field*, misc*, s_inf*, lsource*, dial*, gloss*)>
+<!ELEMENT pos (#PCDATA)>
+<!ELEMENT misc (#PCDATA)>
+<!ELEMENT dial (#PCDATA)>
+<!ELEMENT gloss (#PCDATA | pri)*>
+<!ATTLIST gloss xml:lang CDATA "eng">
+<!ATTLIST gloss g_type CDATA #IMPLIED>
+<!ENTITY n "noun (common) (futsuumeishi)">
+<!ENTITY vs "noun or participle which takes the aux. verb suru">
+<!ENTITY pn "pronoun">
+<!ENTITY pref "prefix">
+<!ENTITY int "interjection (kandoushi)">
+<!ENTITY v1 "Ichidan verb">
+<!ENTITY v5k-s "Godan verb - Iku/Yuku special class">
+<!ENTITY v5r "Godan verb with 'ru' ending">
+<!ENTITY vi "intransitive verb">
+<!ENTITY vt "transitive verb">
+<!ENTITY aux-v "auxiliary verb">
+<!ENTITY uk "word usually written using kana alone">
+<!ENTITY ksb "Kansai-ben">
+<!ENTITY comp "computing">
+]>
+<JMdict>
+<entry>
+<ent_seq>1157500</ent_seq>
+<k_ele>
+<keb>畏懼</keb>
+<!-- news2 alone must not make a form common -->
+<ke_pri>news2</ke_pri>
+<ke_pri>nf40</ke_pri>
+</k_ele>
+<r_ele>
+<reb>いく</reb>
+</r_ele>
+<sense>
+<pos>&n;</pos>
+<pos>&vs;</pos>
+<gloss>reverence</gloss>
+<gloss>awe</gloss>
+<gloss>fear &amp; dread</gloss>
+</sense>
+</entry>
+<entry>
+<ent_seq>1219950</ent_seq>
+<k_ele>
+<keb>幾</keb>
+<ke_pri>ichi1</ke_pri>
+</k_ele>
+<r_ele>
+<reb>いく</reb>
+<re_pri>ichi1</re_pri>
+</r_ele>
+<sense>
+<pos>&n;</pos>
+<pos>&pref;</pos>
+<gloss>some</gloss>
+<gloss>several</gloss>
+</sense>
+<sense>
+<gloss>how many?</gloss>
+<gloss>how much?</gloss>
+</sense>
+</entry>
+<entry>
+<ent_seq>1358280</ent_seq>
+<k_ele>
+<keb>食べる</keb>
+<ke_pri>ichi1</ke_pri>
+<ke_pri>news2</ke_pri>
+<ke_pri>nf25</ke_pri>
+</k_ele>
+<k_ele>
+<keb>喰べる</keb>
+</k_ele>
+<r_ele>
+<reb>たべる</reb>
+<re_pri>ichi1</re_pri>
+<re_pri>news2</re_pri>
+<re_pri>nf25</re_pri>
+</r_ele>
+<sense>
+<pos>&v1;</pos>
+<pos>&vt;</pos>
+<gloss>to eat</gloss>
+</sense>
+<sense>
+<gloss>to live on (e.g. a salary)</gloss>
+<gloss>to live off</gloss>
+<gloss>to subsist on</gloss>
+</sense>
+</entry>
+<entry>
+<ent_seq>1464530</ent_seq>
+<k_ele>
+<keb>日本語</keb>
+<ke_pri>news1</ke_pri>
+<ke_pri>nf02</ke_pri>
+</k_ele>
+<r_ele>
+<reb>にほんご</reb>
+<re_pri>news1</re_pri>
+<re_pri>nf02</re_pri>
+</r_ele>
+<r_ele>
+<reb>にっぽんご</reb>
+</r_ele>
+<sense>
+<pos>&n;</pos>
+<gloss>Japanese (language)</gloss>
+<gloss xml:lang="fre">japonais</gloss>
+</sense>
+</entry>
+<entry>
+<ent_seq>1578850</ent_seq>
+<k_ele>
+<keb>行く</keb>
+<ke_pri>ichi1</ke_pri>
+</k_ele>
+<k_ele>
+<keb>逝く</keb>
+</k_ele>
+<k_ele>
+<keb>往く</keb>
+</k_ele>
+<r_ele>
+<reb>いく</reb>
+<re_pri>ichi1</re_pri>
+</r_ele>
+<r_ele>
+<reb>ゆく</reb>
+<re_pri>ichi1</re_pri>
+</r_ele>
+<sense>
+<pos>&v5k-s;</pos>
+<pos>&vi;</pos>
+<gloss>to go</gloss>
+<gloss>to move (in a direction or towards a specific location)</gloss>
+</sense>
+<sense>
+<gloss>to proceed</gloss>
+<gloss>to take place</gloss>
+</sense>
+<sense>
+<gloss>to die</gloss>
+<gloss>to pass away</gloss>
+</sense>
+<sense>
+<pos>&v5k-s;</pos>
+<pos>&aux-v;</pos>
+<misc>&uk;</misc>
+<gloss>to continue</gloss>
+</sense>
+</entry>
+<entry>
+<ent_seq>1582710</ent_seq>
+<k_ele>
+<keb>日本</keb>
+<ke_pri>news2</ke_pri>
+<ke_pri>nf25</ke_pri>
+<ke_pri>spec1</ke_pri>
+</k_ele>
+<r_ele>
+<reb>にほん</reb>
+<re_pri>news2</re_pri>
+<re_pri>nf25</re_pri>
+<re_pri>spec1</re_pri>
+</r_ele>
+<r_ele>
+<reb>にっぽん</reb>
+</r_ele>
+<sense>
+<pos>&n;</pos>
+<gloss>Japan</gloss>
+</sense>
+</entry>
+<entry>
+<ent_seq>1628530</ent_seq>
+<k_ele>
+<keb>此れ</keb>
+<ke_pri>ichi1</ke_pri>
+</k_ele>
+<k_ele>
+<keb>是</keb>
+</k_ele>
+<r_ele>
+<reb>これ</reb>
+<re_pri>ichi1</re_pri>
+</r_ele>
+<sense>
+<pos>&pn;</pos>
+<misc>&uk;</misc>
+<gloss>this</gloss>
+<gloss>this one</gloss>
+</sense>
+<sense>
+<misc>&uk;</misc>
+<gloss>now</gloss>
+<gloss>this point (in time)</gloss>
+</sense>
+</entry>
+<entry>
+<ent_seq>2216120</ent_seq>
+<r_ele>
+<reb>これ</reb>
+</r_ele>
+<sense>
+<pos>&int;</pos>
+<gloss>hey</gloss>
+<gloss>oi</gloss>
+<gloss>come on</gloss>
+</sense>
+</entry>
+</JMdict>
