@@ -1,20 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'screens/home_screen.dart';
+import 'screens/splash_screen.dart';
 import 'services/app_services.dart';
+import 'theme/yomi_now_theme.dart';
 
-/// The app's dark Material 3 theme.
-ThemeData yomiNowTheme() => ThemeData(
-  useMaterial3: true,
-  colorScheme: ColorScheme.fromSeed(
-    seedColor: const Color(0xFF38BDF8), // sky blue
-    brightness: Brightness.dark,
-  ),
-  scaffoldBackgroundColor: Colors.black,
-);
-
-/// The root widget: a dark Material 3 app that provides [services] to every
-/// screen.
+/// The root widget provides app services and the system-aware theme to screens.
 class YomiNowApp extends StatelessWidget {
   const YomiNowApp({super.key, required this.services});
 
@@ -26,8 +16,10 @@ class YomiNowApp extends StatelessWidget {
       services: services,
       child: MaterialApp(
         title: 'YomiNow',
-        theme: yomiNowTheme(),
-        home: const HomeScreen(),
+        theme: YomiNowTheme.light,
+        darkTheme: YomiNowTheme.dark,
+        themeMode: ThemeMode.system,
+        home: const SplashScreen(),
       ),
     );
   }

@@ -14,13 +14,22 @@ YomiNow is a Flutter app for Linux desktop, Android and iOS. It started as a Rea
 - A "Text" panel shows the full detected text with furigana. Each word in it is tappable too.
 - Works offline: the OCR model and the dictionary ship with the app.
 
+## Theme system
+
+The app follows the device appearance setting and provides Material 3 light and
+dark themes from `YomiNowTheme` in `lib/theme/yomi_now_theme.dart`. Use
+`Theme.of(context).colorScheme` for semantic UI colors; use
+`YomiNowPalette.coral`, `indigo`, `softBlue`, and `cream` for intentional brand
+accents. Update the palette and theme builder there rather than adding new
+brand color literals to screens.
+
 ## Platforms and OCR backends
 
-| Platform | OCR backend | Notes |
-| --- | --- | --- |
-| Linux (also macOS, Windows desktop) | Tesseract CLI | `tesseract` must be installed. The Japanese LSTM model `jpn.traineddata` is bundled in `assets/tessdata` and passed with `--tessdata-dir`. |
-| Android | Google ML Kit Text Recognition v2 (Japanese script) | Via `google_mlkit_text_recognition`. |
-| iOS | Google ML Kit Text Recognition v2 (Japanese script) | Via `google_mlkit_text_recognition`. |
+| Platform                            | OCR backend                                         | Notes                                                                                                                                      |
+| ----------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Linux (also macOS, Windows desktop) | Tesseract CLI                                       | `tesseract` must be installed. The Japanese LSTM model `jpn.traineddata` is bundled in `assets/tessdata` and passed with `--tessdata-dir`. |
+| Android                             | Google ML Kit Text Recognition v2 (Japanese script) | Via `google_mlkit_text_recognition`.                                                                                                       |
+| iOS                                 | Google ML Kit Text Recognition v2 (Japanese script) | Via `google_mlkit_text_recognition`.                                                                                                       |
 
 Images come from `image_picker`: camera and gallery on mobile, a file dialog on desktop.
 
@@ -107,6 +116,7 @@ The first `dart run` downloads a prebuilt SQLite library for the `sqlite3` packa
 ```text
 lib/
   models/      OCR result, token, dictionary entry, lookup result
+  theme/       brand palette and light/dark Material 3 themes
   services/
     ocr/       Tesseract and ML Kit backends, plus the factory that picks one
     image_preprocess.dart
