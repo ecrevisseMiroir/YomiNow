@@ -100,25 +100,19 @@ jobs:
     name: Create GitHub Release
     needs: [linux, android]
     runs-on: ubuntu-latest
-    # if: github.ref == 'refs/heads/main'
+    # Push runs only: a pull request run of the same commit would race the
+    # push run for the tag.
+    if: github.event_name == 'push'
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
+      # One release per pubspec version; bump `version:` to publish a new one.
       - name: Get version from pubspec.yaml
         id: get_version
         run: |
           VERSION=$(grep '^version:' pubspec.yaml | cut -d' ' -f2 | cut -d'+' -f1)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-      - name: Create or update release
-        id: create_release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: v${{ steps.get_version.outputs.version }}
-          name: Release v${{ steps.get_version.outputs.version }}
-          body: |
-            ## Release v${{ steps.get_version.outputs.version }}
-            <!-- Add changelog or release notes here -->
-          draft: false
-          prerelease: false
       - name: Download Android APK
         uses: actions/download-artifact@v4
         with:
@@ -129,21 +123,15 @@ jobs:
         with:
           name: yominow-linux
           path: ./artifacts
-      - name: Upload Android APK
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create or update release
+        id: create_release
+        uses: softprops/action-gh-release@v2
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/app-release.apk
-          asset_name: app-release.apk
-          asset_content_type: application/vnd.android.package-archive
-      - name: Upload Linux Build
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/linux-build.zip
-          asset_name: linux-build.zip
-          asset_content_type: application/zip
+          tag_name: v${{ steps.get_version.outputs.version }}
+          name: Release v${{ steps.get_version.outputs.version }}
+          body: |
+            ## Release v${{ steps.get_version.outputs.version }}
+            <!-- Add changelog or release notes here -->
+          files: |
+            ./artifacts/app-release.apk
+            ./artifacts/linux-build.zip
