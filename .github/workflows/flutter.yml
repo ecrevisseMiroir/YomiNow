@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: flutter-${{ github.workflow }}-${{ github.ref }}
@@ -39,7 +39,18 @@ jobs:
       - run: flutter test
       - name: End-to-end test (OCR → tap → JMdict) on the Linux app
         run: xvfb-run -a flutter test integration_test -d linux
-      - run: flutter build linux --release
+      - name: Build Linux release
+        run: flutter build linux --release
+      - name: Archive Linux build
+        run: |
+          cd build/linux/x64/release/bundle
+          zip -r ../../../../linux-build.zip .
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: yominow-linux
+          path: build/linux-build.zip
+          retention-days: 30
 
   android:
     name: Android (release APK)
@@ -59,10 +70,8 @@ jobs:
           cache: true
 
       - run: flutter pub get
-      # Signed with the debug key (see android/app/build.gradle.kts), so it
-      # installs on any phone that allows apps from unknown sources.
-      - run: flutter build apk --release
-      # ML Kit fails at runtime under R8 (see android/app/build.gradle.kts).
+      - name: Build release APK
+        run: flutter build apk --release
       - name: Check R8 did not shrink the release build
         run: test ! -e build/app/outputs/mapping/release/mapping.txt
       - uses: actions/upload-artifact@v4
@@ -71,7 +80,6 @@ jobs:
           path: build/app/outputs/flutter-apk/app-release.apk
           retention-days: 30
 
-  # macOS runners are expensive, so iOS only builds when triggered by hand.
   ios:
     name: iOS (debug, no codesign)
     if: github.event_name == 'workflow_dispatch'
@@ -87,3 +95,43 @@ jobs:
 
       - run: flutter pub get
       - run: flutter build ios --debug --no-codesign
+
+  release:
+    name: Create GitHub Release
+    needs: [linux, android]
+    runs-on: ubuntu-latest
+    # if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get version from pubspec.yaml
+        id: get_version
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | cut -d' ' -f2 | cut -d'+' -f1)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+      - name: Create Git tag
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git tag -a v${{ steps.get_version.outputs.version }} -m "Release ${{ steps.get_version.outputs.version }}"
+          git push origin v${{ steps.get_version.outputs.version }}
+      - name: Download Android APK
+        uses: actions/download-artifact@v4
+        with:
+          name: yominow-apk
+          path: ./artifacts
+      - name: Download Linux artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: yominow-linux
+          path: ./artifacts
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}
+          name: Release v${{ steps.get_version.outputs.version }}
+          body: |
+            ## Release v${{ steps.get_version.outputs.version }}
+            <!-- Add changelog or release notes here -->
+          files: |
+            ./artifacts/app-release.apk
+            ./artifacts/linux-build.zip
