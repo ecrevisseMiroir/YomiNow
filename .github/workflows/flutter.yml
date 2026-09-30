@@ -129,9 +129,7 @@ jobs:
         with:
           tag_name: v${{ steps.get_version.outputs.version }}
           name: Release v${{ steps.get_version.outputs.version }}
-          body: |
-            ## Release v${{ steps.get_version.outputs.version }}
-            <!-- Add changelog or release notes here -->
+          generate_release_notes: true
           files: |
             ./artifacts/app-release.apk
             ./artifacts/linux-build.zip
