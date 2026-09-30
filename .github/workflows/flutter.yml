@@ -1,0 +1,137 @@
+name: Flutter CI
+
+on:
+  push:
+    branches: [main, "claude/**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: flutter-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: "3.47.5"
+
+jobs:
+  linux:
+    name: Linux (analyze, test, build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux build dependencies and Tesseract
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev tesseract-ocr xvfb
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+      - name: End-to-end test (OCR → tap → JMdict) on the Linux app
+        run: xvfb-run -a flutter test integration_test -d linux
+      - name: Build Linux release
+        run: flutter build linux --release
+      - name: Archive Linux build
+        run: |
+          cd build/linux/x64/release/bundle
+          zip -r ../../../../linux-build.zip .
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: yominow-linux
+          path: build/linux-build.zip
+          retention-days: 30
+
+  android:
+    name: Android (release APK)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - run: flutter pub get
+      - name: Build release APK
+        run: flutter build apk --release
+      - name: Check R8 did not shrink the release build
+        run: test ! -e build/app/outputs/mapping/release/mapping.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yominow-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
+
+  ios:
+    name: iOS (debug, no codesign)
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - run: flutter pub get
+      - run: flutter build ios --debug --no-codesign
+
+  release:
+    name: Create GitHub Release
+    needs: [linux, android]
+    runs-on: ubuntu-latest
+    # if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get version from pubspec.yaml
+        id: get_version
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | cut -d' ' -f2 | cut -d'+' -f1)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+      - name: Create Git tag
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git tag -a v${{ steps.get_version.outputs.version }} -m "Release ${{ steps.get_version.outputs.version }}"
+          git push origin v${{ steps.get_version.outputs.version }}
+      - name: Download Android APK
+        uses: actions/download-artifact@v4
+        with:
+          name: yominow-apk
+          path: ./artifacts
+      - name: Download Linux artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: yominow-linux
+          path: ./artifacts
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}
+          name: Release v${{ steps.get_version.outputs.version }}
+          body: |
+            ## Release v${{ steps.get_version.outputs.version }}
+            <!-- Add changelog or release notes here -->
+          files: |
+            ./artifacts/app-release.apk
+            ./artifacts/linux-build.zip
