@@ -22,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void _openHome() {
-    if (mounted) return;
+    if (!mounted) return;
     Navigator.of(context).pushReplacement(
       PageRouteBuilder<void>(
         pageBuilder: (_, _, _) => const HomeScreen(),
@@ -44,81 +44,110 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              flex: 4,
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final compact = constraints.maxHeight < 220;
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Image.asset(
-                          'assets/02_brand_logo/logo_splash.png',
-                          width: 200,
-                          height: 150,
-                          fit: BoxFit.cover,
-                          semanticLabel: 'YomiNow logo',
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isLandscape = constraints.maxWidth > constraints.maxHeight;
+            return Column(
+              children: [
+                Expanded(
+                  child: isLandscape
+                      ? Row(
+                          children: [
+                            Expanded(flex: 4, child: _buildBrand()),
+                            Expanded(flex: 6, child: _buildScene()),
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            Expanded(flex: 4, child: _buildBrand()),
+                            Expanded(flex: 5, child: _buildScene()),
+                          ],
                         ),
-                        Image.asset(
-                          'assets/02_brand_logo/wordmark_splash.png',
-                          width: 200,
-                          height: compact ? 48 : 84,
-                          fit: BoxFit.contain,
-                          semanticLabel: 'YomiNow, Read Japanese Instantly',
+                ),
+                SizedBox(
+                  height: isLandscape ? 64 : 100,
+                  child: LayoutBuilder(
+                    builder: (context, footerConstraints) {
+                      final progress = SizedBox(
+                        width: footerConstraints.maxWidth * 0.45,
+                        child: LinearProgressIndicator(
+                          minHeight: 6,
+                          color: YomiNowPalette.coral,
+                          backgroundColor: YomiNowPalette.coral.withValues(
+                            alpha: 0.2,
+                          ),
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(3),
+                          ),
                         ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-            Expanded(
-              flex: 5,
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: Transform.scale(
-                  scale: 1.05,
-                  child: Image.asset(
-                    'assets/04_scenery_backgrounds/splash_fuji_torii_scene.png',
-                    width: double.infinity,
-                    fit: BoxFit.fitWidth,
-                    semanticLabel: 'Mount Fuji and a torii gate',
+                      );
+                      final label = Text(
+                        'Loading...',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontWeight: FontWeight.w600,
+                            ),
+                      );
+
+                      if (isLandscape) {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            label,
+                            const SizedBox(width: 16),
+                            progress,
+                          ],
+                        );
+                      }
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [label, const SizedBox(height: 16), progress],
+                      );
+                    },
                   ),
                 ),
-              ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBrand() {
+    return Center(
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              'assets/02_brand_logo/logo_splash.png',
+              width: 200,
+              height: 150,
+              fit: BoxFit.contain,
+              semanticLabel: 'YomiNow logo',
             ),
-            SizedBox(
-              height: 100,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Loading...',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: 200,
-                    child: LinearProgressIndicator(
-                      minHeight: 6,
-                      color: YomiNowPalette.coral,
-                      backgroundColor: YomiNowPalette.coral.withValues(
-                        alpha: 0.2,
-                      ),
-                      borderRadius: BorderRadius.all(Radius.circular(3)),
-                    ),
-                  ),
-                ],
-              ),
+            Image.asset(
+              'assets/02_brand_logo/wordmark_splash.png',
+              width: 200,
+              height: 84,
+              fit: BoxFit.contain,
+              semanticLabel: 'YomiNow, Read Japanese Instantly',
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildScene() {
+    return SizedBox.expand(
+      child: Image.asset(
+        'assets/04_scenery_backgrounds/splash_fuji_torii_scene.png',
+        fit: BoxFit.contain,
+        semanticLabel: 'Mount Fuji and a torii gate',
       ),
     );
   }

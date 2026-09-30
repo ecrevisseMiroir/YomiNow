@@ -27,6 +27,18 @@ void main() {
     },
   );
 
+  testWidgets('splash fits a landscape viewport', (tester) async {
+    tester.view.physicalSize = const Size(800, 400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(YomiNowApp(services: fakeServices()));
+
+    expect(find.byType(SplashScreen), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('uses the brand themes and follows the system setting', (
     tester,
   ) async {
