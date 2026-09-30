@@ -1,6 +1,6 @@
 name: yominow
 description: "Point your camera at Japanese text, tap a word, read it now."
-publish_to: 'none'
+publish_to: "none"
 version: 0.1.0+1
 
 environment:
@@ -19,6 +19,7 @@ dependencies:
   sqlite3: ^3.6.0
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.14.4
   lucide_icons_flutter: ^3.1.20
   flutter_native_splash: ^2.4.8
   flutter_test:
@@ -44,3 +45,8 @@ flutter_native_splash:
   image: assets/02_brand_logo/logo_splash.png
   android: true
   ios: true
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/02_brand_logo/logo_brand_panel.png"
