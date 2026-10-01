@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'screens/documents_screen.dart';
+import 'screens/home_screen.dart';
+import 'screens/settings_screen.dart';
 import 'screens/splash_screen.dart';
 import 'services/app_services.dart';
 import 'theme/yomi_now_theme.dart';
@@ -20,6 +23,11 @@ class YomiNowApp extends StatelessWidget {
         darkTheme: YomiNowTheme.dark,
         themeMode: ThemeMode.system,
         home: const SplashScreen(),
+        routes: {
+          '/home': (_) => const HomeScreen(),
+          '/documents': (_) => const DocumentsScreen(),
+          '/settings': (_) => const SettingsScreen(),
+        },
       ),
     );
   }

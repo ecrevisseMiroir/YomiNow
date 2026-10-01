@@ -6,7 +6,6 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../theme/yomi_now_theme.dart';
 import '../widgets/yomi_now_bottom_nav.dart';
 import 'image_screen.dart';
-import 'settings_screen.dart';
 
 /// The start screen: pick or take a photo of Japanese text.
 ///
@@ -137,11 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: InkWell(
                 customBorder: const CircleBorder(),
                 onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => const SettingsScreen(),
-                    ),
-                  );
+                  Navigator.pushNamed(context, '/settings');
                 },
                 child: Center(
                   child: Icon(

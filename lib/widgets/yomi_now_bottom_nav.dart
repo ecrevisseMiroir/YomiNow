@@ -11,9 +11,9 @@ class YomiNowBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = [
-      _BottomNavItem(icon: LucideIcons.home, label: 'Home'),
-      _BottomNavItem(icon: LucideIcons.fileText, label: 'Documents'),
-      _BottomNavItem(icon: LucideIcons.settings, label: 'Settings'),
+      _BottomNavItem(icon: LucideIcons.home, label: 'Home', link: '/home'),
+      _BottomNavItem(icon: LucideIcons.fileText, label: 'Documents', link: '/documents'),
+      _BottomNavItem(icon: LucideIcons.settings, label: 'Settings', link: '/settings'),
     ];
 
     return Container(
@@ -35,7 +35,12 @@ class YomiNowBottomNav extends StatelessWidget {
               Expanded(
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onTap: () {},
+                  onTap: () {
+                    if (items[i].link != null) {
+                      // Navigate to the specified link
+                      Navigator.pushNamed(context, items[i].link!);
+                    }
+                  },
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -70,8 +75,9 @@ class YomiNowBottomNav extends StatelessWidget {
 }
 
 class _BottomNavItem {
-  const _BottomNavItem({required this.icon, required this.label});
+  const _BottomNavItem({required this.icon, required this.label, this.link});
 
   final IconData icon;
   final String label;
+  final String? link; 
 }

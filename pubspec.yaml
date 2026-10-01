@@ -40,6 +40,7 @@ flutter:
     - assets/02_brand_logo/wordmark_splash.png
     - assets/04_scenery_backgrounds/splash_fuji_torii_scene.png
     - assets/03_characters_mascot/cat_home_face_notification.png
+    - assets/04_scenery_backgrounds/background.png
   fonts:
     - family: NotoSansJP
       fonts:

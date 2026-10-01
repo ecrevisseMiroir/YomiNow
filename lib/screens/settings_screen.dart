@@ -8,7 +8,6 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     const items = [
       _SettingsItem(
         icon: Icons.document_scanner_outlined,
@@ -23,7 +22,7 @@ class SettingsScreen extends StatelessWidget {
       _SettingsItem(
         icon: Icons.light_mode_outlined,
         title: 'Appearance',
-        subtitle: 'System theme',
+        subtitle: 'Light theme',
       ),
       _SettingsItem(
         icon: Icons.language_outlined,
@@ -33,44 +32,138 @@ class SettingsScreen extends StatelessWidget {
       _SettingsItem(
         icon: Icons.info_outline,
         title: 'About',
-        subtitle: 'Version 0.1.0',
+        subtitle: 'Version 1.0.0',
       ),
     ];
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
-      appBar: AppBar(title: const Text('Settings')),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       bottomNavigationBar: const YomiNowBottomNav(selectedIndex: 2),
-      body: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        itemCount: items.length,
-        separatorBuilder: (context, index) => Divider(
-          height: 1,
-          indent: 64,
-          color: YomiNowPalette.indigo.withValues(alpha: 0.12),
+      body: DecoratedBox(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(
+              'assets/04_scenery_backgrounds/background.png',
+            ),
+            fit: BoxFit.contain,
+            alignment: Alignment.bottomCenter,
+          ),
         ),
-        itemBuilder: (context, index) {
-          final item = items[index];
-          return ListTile(
-            contentPadding: const EdgeInsets.symmetric(vertical: 8),
-            leading: Icon(item.icon, size: 30, color: YomiNowPalette.ink),
-            title: Text(
-              item.title,
-              style: const TextStyle(
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w600,
-                color: YomiNowPalette.ink,
-              ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.only(
+              left: 18,
+              right: 18,
+              top: 8,
+              bottom: 0,
             ),
-            subtitle: Text(
-              item.subtitle,
-              style: TextStyle(
-                fontFamily: 'Inter',
-                color: YomiNowPalette.ink.withValues(alpha: 0.65),
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      icon: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        size: 30,
+                      ),
+                      color: YomiNowPalette.ink,
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Settings',
+                        style: TextStyle(
+                          fontFamily: 'Fredoka',
+                          fontSize: 35,
+                          fontWeight: FontWeight.w600,
+                          color: YomiNowPalette.ink,
+                          letterSpacing: -1.2,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                Expanded(
+                  child: ListView.separated(
+                    padding: const EdgeInsets.only(top: 8, bottom: 12),
+                    itemCount: items.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 18),
+                    itemBuilder: (context, index) {
+                      final item = items[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 2),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 52,
+                              height: 52,
+                              decoration: BoxDecoration(
+                                color: Colors.transparent,
+                                border: Border.all(
+                                  color: YomiNowPalette.indigo.withValues(
+                                    alpha: 0.8,
+                                  ),
+                                  width: 3,
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Icon(
+                                item.icon,
+                                size: 28,
+                                color: YomiNowPalette.indigo,
+                              ),
+                            ),
+                            const SizedBox(width: 18),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item.title,
+                                    style: TextStyle(
+                                      fontFamily: 'Fredoka',
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.w500,
+                                      color: YomiNowPalette.ink,
+                                      letterSpacing: -0.8,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    item.subtitle,
+                                    style: TextStyle(
+                                      fontFamily: 'Inter',
+                                      fontSize: 18,
+                                      color: YomiNowPalette.ink.withValues(
+                                        alpha: 0.7,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(
+                              Icons.chevron_right_rounded,
+                              size: 30,
+                              color: YomiNowPalette.ink.withValues(alpha: 0.7),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }
