@@ -54,7 +54,10 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final maxWidth = constraints.maxWidth > 480
+            final isLandscape = constraints.maxWidth > constraints.maxHeight;
+            final maxWidth = isLandscape
+                ? constraints.maxWidth
+                : constraints.maxWidth > 480
                 ? 430.0
                 : constraints.maxWidth;
             final horizontalPadding = constraints.maxWidth < 360 ? 12.0 : 22.0;
