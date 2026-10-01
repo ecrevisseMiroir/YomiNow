@@ -1,0 +1,77 @@
+import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+import '../theme/yomi_now_theme.dart';
+
+class YomiNowBottomNav extends StatelessWidget {
+  const YomiNowBottomNav({super.key, this.selectedIndex = 0});
+
+  final int selectedIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    final items = [
+      _BottomNavItem(icon: LucideIcons.home, label: 'Home'),
+      _BottomNavItem(icon: LucideIcons.fileText, label: 'Documents'),
+      _BottomNavItem(icon: LucideIcons.settings, label: 'Settings'),
+    ];
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        border: Border(
+          top: BorderSide(
+            color: YomiNowPalette.indigo.withValues(alpha: 0.12),
+            width: 1,
+          ),
+        ),
+      ),
+      padding: const EdgeInsets.only(top: 12, bottom: 8),
+      child: SafeArea(
+        top: false,
+        child: Row(
+          children: [
+            for (int i = 0; i < items.length; i++) ...[
+              Expanded(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () {},
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        items[i].icon,
+                        size: 30,
+                        color: i == selectedIndex
+                            ? YomiNowPalette.coral
+                            : YomiNowPalette.indigo.withValues(alpha: 0.65),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        items[i].label,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: i == selectedIndex
+                              ? YomiNowPalette.coral
+                              : YomiNowPalette.indigo.withValues(alpha: 0.65),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BottomNavItem {
+  const _BottomNavItem({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+}
