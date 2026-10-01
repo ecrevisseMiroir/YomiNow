@@ -30,6 +30,8 @@ abstract final class YomiNowTheme {
 
     return ThemeData(
       useMaterial3: true,
+      fontFamily: 'Inter',
+      fontFamilyFallback: const ['NotoSansJP'],
       colorScheme: colorScheme,
       scaffoldBackgroundColor: colorScheme.surface,
       appBarTheme: AppBarTheme(
