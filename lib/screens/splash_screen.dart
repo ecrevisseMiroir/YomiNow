@@ -54,13 +54,13 @@ class _SplashScreenState extends State<SplashScreen> {
                       ? Row(
                           children: [
                             Expanded(flex: 4, child: _buildBrand()),
-                            Expanded(flex: 6, child: _buildScene()),
+                            Expanded(flex: 6, child: _buildScene(isLandscape)),
                           ],
                         )
                       : Column(
                           children: [
                             Expanded(flex: 4, child: _buildBrand()),
-                            Expanded(flex: 5, child: _buildScene()),
+                            Expanded(flex: 5, child: _buildScene(isLandscape)),
                           ],
                         ),
                 ),
@@ -142,12 +142,15 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
-  Widget _buildScene() {
+  Widget _buildScene(bool isLandscape) {
     return SizedBox.expand(
-      child: Image.asset(
-        'assets/04_scenery_backgrounds/splash_fuji_torii_scene.png',
-        fit: BoxFit.contain,
-        semanticLabel: 'Mount Fuji and a torii gate',
+      child: Transform.scale(
+        scale: isLandscape ? 1.0 : 1.05,
+        child: Image.asset(
+          'assets/04_scenery_backgrounds/splash_fuji_torii_scene.png',
+          fit: isLandscape ? BoxFit.contain : BoxFit.fitWidth,
+          semanticLabel: 'Mount Fuji and a torii gate',
+        ),
       ),
     );
   }
