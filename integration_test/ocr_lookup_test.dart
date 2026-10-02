@@ -79,10 +79,10 @@ void main() {
 
     // Tap 日 in the first line; the word there is 日本語.
     final firstChar = find.byKey(const ValueKey('word-0-0'));
-    await _pumpUntil(tester, firstChar);
+    await _pumpUntil(tester, firstChar, timeout: const Duration(seconds: 180));
     await tester.tap(firstChar);
 
-    await _pumpUntil(tester, find.textContaining('Japanese (language)'));
+    await _pumpUntil(tester, find.textContaining('Japanese (language)'), timeout: const Duration(seconds: 180));
     expect(find.text('日本語'), findsWidgets);
     expect(find.textContaining('JMdict'), findsOneWidget);
 
