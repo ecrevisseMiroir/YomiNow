@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:yominow/screens/image_screen.dart';
 
 import '../theme/yomi_now_theme.dart';
 import '../widgets/yomi_now_bottom_nav.dart';
