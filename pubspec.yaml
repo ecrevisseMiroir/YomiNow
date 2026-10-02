@@ -44,8 +44,10 @@ flutter:
     - assets/04_scenery_backgrounds/background.png
     - assets/02_brand_logo/logo_about.png
     - assets/04_scenery_backgrounds/about-background.png
+    - assets/04_scenery_backgrounds/loading.png
     - assets/03_characters_mascot/cat_empty_state.png
     - assets/03_characters_mascot/cat_error.png
+    - assets/03_characters_mascot/cat_loading.png
   fonts:
     - family: NotoSansJP
       fonts:
