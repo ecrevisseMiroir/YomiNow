@@ -19,6 +19,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
   late final ImagePicker _picker = widget.picker ?? ImagePicker();
   final List<_DocumentItem> _documents = <_DocumentItem>[];
 
+
   Future<void> _pickDocument(ImageSource source) async {
     final XFile? file;
     try {

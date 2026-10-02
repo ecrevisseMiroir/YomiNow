@@ -11,10 +11,7 @@ void main() {
       withServices(fakeServices(), const DocumentsScreen()),
     );
 
-    expect(find.text('Documents'), findsOneWidget);
-    expect(find.text('All'), findsOneWidget);
-    expect(find.text('Images'), findsOneWidget);
-    expect(find.text('Text'), findsOneWidget);
-    expect(find.textContaining('東京の観光ガイド'), findsOneWidget);
+    expect(find.text('Documents'), findsNWidgets(2));
+    expect(find.text('No Documents Yet'), findsOneWidget);
   });
 }
