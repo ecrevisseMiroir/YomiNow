@@ -126,19 +126,23 @@ void main() {
     },
   );
 
-  testWidgets('a picker error shows a snack bar', variant: _mobile, (
-    tester,
-  ) async {
-    final picker = FakePicker(
-      error: PlatformException(code: 'camera_access_denied'),
-    );
-    await pumpHome(tester, picker: picker);
+  testWidgets(
+    'a picker error shows the shared error dialog',
+    variant: _mobile,
+    (tester) async {
+      final picker = FakePicker(
+        error: PlatformException(code: 'camera_access_denied'),
+      );
+      await pumpHome(tester, picker: picker);
 
-    await tester.tap(find.text('Take photo'));
-    await tester.pump();
+      await tester.tap(find.text('Take photo'));
+      await tester.pump();
 
-    expect(find.byType(SnackBar), findsOneWidget);
-    expect(find.textContaining('camera_access_denied'), findsOneWidget);
-    expect(find.byType(ImageScreen), findsNothing);
-  });
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SnackBar), findsNothing);
+      expect(find.text('Something went wrong'), findsOneWidget);
+      expect(find.byType(ImageScreen), findsNothing);
+    },
+  );
 }
