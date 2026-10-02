@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:yominow/screens/image_screen.dart';
 
 import '../theme/yomi_now_theme.dart';
 import '../widgets/yomi_now_bottom_nav.dart';
@@ -35,13 +36,13 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
       } else {
         file = await _picker.pickImage(source: source);
       }
-    } catch (error) {
-      if (!mounted) return;
-      await YomiNowErrorDialog.show(context);
-      return;
-    }
 
-    if (file == null || !mounted) {
+      if (file == null || !mounted) return;
+      final path = file.path;
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (_) => ImageScreen(imagePath: path)),
+      );
+    } catch (error) {
       if (!mounted) return;
       await YomiNowErrorDialog.show(context);
       return;

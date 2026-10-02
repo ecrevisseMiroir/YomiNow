@@ -10,6 +10,10 @@ import '../services/ocr/ocr_service.dart';
 import '../widgets/lookup_sheet.dart';
 import '../widgets/tokenized_text.dart';
 import '../widgets/word_overlay.dart';
+import 'loading_screen.dart';
+import '../theme/yomi_now_theme.dart';
+
+enum _ImageScreenMode { text, image }
 
 /// Shows a photo, runs OCR on it and lets the user tap the detected words to
 /// look them up.
@@ -27,9 +31,9 @@ class _ImageScreenState extends State<ImageScreen> {
   PreparedImage? _image;
   OcrResult? _result;
   Object? _error;
-  double _progress = 0;
+  int _loadingStep = 0;
 
-  bool _showText = false;
+  _ImageScreenMode _mode = _ImageScreenMode.text;
   WordId? _selected;
   Set<WordId> _highlighted = const {};
 
@@ -48,11 +52,15 @@ class _ImageScreenState extends State<ImageScreen> {
     try {
       final image = await services.imagePreprocessor.prepare(widget.imagePath);
       if (!mounted) return;
-      setState(() => _image = image);
+      setState(() {
+        _image = image;
+        _loadingStep = 1;
+      });
       final result = await services.ocr.recognize(
         image.path,
         onProgress: (progress, _) {
-          if (mounted) setState(() => _progress = progress);
+          if (!mounted) return;
+          setState(() => _loadingStep = progress >= 1 ? 2 : 1);
         },
       );
       if (mounted) setState(() => _result = result);
@@ -92,64 +100,229 @@ class _ImageScreenState extends State<ImageScreen> {
   Widget build(BuildContext context) {
     final image = _image;
     final result = _result;
+    if (result == null && _error == null) {
+      return LoadingScreen(currentStep: _loadingStep);
+    }
+    final hasText = result != null && !result.isEmpty;
     return Scaffold(
-      body: Column(
-        children: [
-          Expanded(
-            child: Stack(
-              children: [
-                if (image != null)
-                  Positioned.fill(
-                    child: _Photo(
-                      image: image,
-                      overlay: result == null
-                          ? null
-                          : WordOverlay(
-                              result: result,
-                              imageSize: Size(
-                                image.width.toDouble(),
-                                image.height.toDouble(),
-                              ),
-                              selected: _selected,
-                              highlighted: _highlighted,
-                              onWordTap: (lineIndex, wordIndex) =>
-                                  _lookupWord(result, lineIndex, wordIndex),
-                            ),
-                    ),
-                  ),
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: _StatusBanner(
-                    result: result,
-                    error: _error,
-                    progress: _progress,
-                  ),
+      backgroundColor: YomiNowPalette.cream,
+      body: SafeArea(
+        child: Column(
+          children: [
+            _DetectedTextHeader(
+              onBack: () => Navigator.of(context).pop(),
+              onShowImage: hasText
+                  ? () => setState(() => _mode = _ImageScreenMode.image)
+                  : null,
+            ),
+            if (hasText) ...[
+              _ViewModeSelector(
+                mode: _mode,
+                onChanged: (mode) => setState(() => _mode = mode),
+              ),
+              Expanded(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 180),
+                  child: _mode == _ImageScreenMode.text
+                      ? _DetectedTextList(
+                          key: const ValueKey('detected-text'),
+                          result: result,
+                          onTapOffset: (lineIndex, offset) => _lookup(
+                            result.lines[lineIndex],
+                            lineIndex,
+                            offset,
+                          ),
+                        )
+                      : _buildImageView(image!, result),
                 ),
-                if (_showText && result != null)
-                  Positioned(
-                    top: 16,
-                    left: 16,
-                    right: 16,
-                    child: SafeArea(
-                      bottom: false,
-                      child: _FullTextPanel(
-                        lines: result.lines,
-                        onTapOffset: (lineIndex, offset) =>
-                            _lookup(result.lines[lineIndex], lineIndex, offset),
-                        onClose: () => setState(() => _showText = false),
-                      ),
-                    ),
-                  ),
-              ],
+              ),
+              const _LookupHint(),
+            ] else
+              Expanded(
+                child: Center(
+                  child: _StatusBanner(result: result, error: _error),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImageView(PreparedImage image, OcrResult result) {
+    return Padding(
+      key: const ValueKey('detected-image'),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 14),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: _Photo(
+          image: image,
+          overlay: WordOverlay(
+            result: result,
+            imageSize: Size(image.width.toDouble(), image.height.toDouble()),
+            selected: _selected,
+            highlighted: _highlighted,
+            onWordTap: (lineIndex, wordIndex) =>
+                _lookupWord(result, lineIndex, wordIndex),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DetectedTextHeader extends StatelessWidget {
+  const _DetectedTextHeader({required this.onBack, required this.onShowImage});
+
+  final VoidCallback onBack;
+  final VoidCallback? onShowImage;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 58,
+      child: Row(
+        children: [
+          IconButton(
+            tooltip: 'Back',
+            onPressed: onBack,
+            icon: const Icon(Icons.arrow_back_ios_new_rounded),
+            color: YomiNowPalette.ink,
+          ),
+          Expanded(
+            child: Text(
+              'Detected Text',
+              style: TextStyle(
+                fontFamily: 'Fredoka',
+                fontSize: 24,
+                fontWeight: FontWeight.w600,
+                color: YomiNowPalette.ink,
+              ),
             ),
           ),
-          _BottomBar(
-            onRetake: () => Navigator.of(context).pop(),
-            onToggleText: result == null || result.isEmpty
-                ? null
-                : () => setState(() => _showText = !_showText),
+        ],
+      ),
+    );
+  }
+}
+
+class _ViewModeSelector extends StatelessWidget {
+  const _ViewModeSelector({required this.mode, required this.onChanged});
+
+  final _ImageScreenMode mode;
+  final ValueChanged<_ImageScreenMode> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(22, 10, 22, 16),
+      child: Container(
+        height: 52,
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: YomiNowPalette.softBlue.withValues(alpha: 0.55),
+          borderRadius: BorderRadius.circular(28),
+        ),
+        child: Row(
+          children: [
+            _modeButton('Text', _ImageScreenMode.text),
+            _modeButton('Image', _ImageScreenMode.image),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _modeButton(String label, _ImageScreenMode value) {
+    final selected = mode == value;
+    return Expanded(
+      child: Semantics(
+        button: true,
+        selected: selected,
+        child: InkWell(
+          onTap: () => onChanged(value),
+          borderRadius: BorderRadius.circular(24),
+          child: Container(
+            height: 44,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: selected ? YomiNowPalette.coral : Colors.transparent,
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Text(
+              label,
+              style: TextStyle(
+                color: selected ? YomiNowPalette.cream : YomiNowPalette.ink,
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DetectedTextList extends StatelessWidget {
+  const _DetectedTextList({
+    super.key,
+    required this.result,
+    required this.onTapOffset,
+  });
+
+  final OcrResult result;
+  final void Function(int lineIndex, int offset) onTapOffset;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      padding: const EdgeInsets.fromLTRB(24, 4, 24, 20),
+      itemCount: result.lines.length,
+      separatorBuilder: (_, _) => const SizedBox(height: 14),
+      itemBuilder: (context, index) {
+        final line = result.lines[index];
+        return Container(
+          constraints: const BoxConstraints(minHeight: 62),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: YomiNowPalette.softBlue.withValues(alpha: 0.42),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: TokenizedText(
+            key: ValueKey('text-line-$index'),
+            text: line.text,
+            onTapOffset: (offset) => onTapOffset(index, offset),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _LookupHint extends StatelessWidget {
+  const _LookupHint();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(minHeight: 54),
+      margin: const EdgeInsets.fromLTRB(18, 8, 18, 14),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color: YomiNowPalette.softBlue.withValues(alpha: 0.7),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.touch_app_rounded, color: YomiNowPalette.indigo),
+          const SizedBox(width: 12),
+          Text(
+            'Tap a word to see its meaning',
+            style: TextStyle(
+              color: YomiNowPalette.ink.withValues(alpha: 0.72),
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
       ),
@@ -195,18 +368,12 @@ class _Photo extends StatelessWidget {
   }
 }
 
-/// The banner across the top: progress, an error, or "no text"; nothing when
-/// text was found.
+/// An error or empty-result message shown when there are no detected lines.
 class _StatusBanner extends StatelessWidget {
-  const _StatusBanner({
-    required this.result,
-    required this.error,
-    required this.progress,
-  });
+  const _StatusBanner({required this.result, required this.error});
 
   final OcrResult? result;
   final Object? error;
-  final double progress;
 
   @override
   Widget build(BuildContext context) {
@@ -218,29 +385,9 @@ class _StatusBanner extends StatelessWidget {
         child: _ErrorMessage(error: error),
       );
     }
-    if (result == null) {
+    if (result == null || result.isEmpty) {
       return _Banner(
-        color: Colors.black.withValues(alpha: 0.7),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          spacing: 8,
-          children: [
-            const Text('Detecting Japanese text…'),
-            SizedBox(
-              width: 256,
-              child: LinearProgressIndicator(
-                value: progress.clamp(0.0, 1.0),
-                minHeight: 6,
-                borderRadius: BorderRadius.circular(3),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-    if (result.isEmpty) {
-      return _Banner(
-        color: Colors.black.withValues(alpha: 0.7),
+        color: YomiNowPalette.softBlue,
         child: const Text('No Japanese text detected.'),
       );
     }
@@ -297,112 +444,6 @@ class _ErrorMessage extends StatelessWidget {
             style: const TextStyle(fontFamily: 'monospace'),
           ),
       ],
-    );
-  }
-}
-
-/// The "Retake" and "Text" pill buttons.
-class _BottomBar extends StatelessWidget {
-  const _BottomBar({required this.onRetake, required this.onToggleText});
-
-  final VoidCallback onRetake;
-
-  /// Null while there is no text to show, which hides the button.
-  final VoidCallback? onToggleText;
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          spacing: 12,
-          children: [
-            FilledButton.tonalIcon(
-              onPressed: onRetake,
-              icon: const Icon(Icons.replay),
-              label: const Text('Retake'),
-            ),
-            if (onToggleText != null)
-              FilledButton.tonalIcon(
-                onPressed: onToggleText,
-                icon: const Icon(Icons.document_scanner_outlined),
-                label: const Text('Text'),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// The full detected text, one [TokenizedText] per line.
-class _FullTextPanel extends StatelessWidget {
-  const _FullTextPanel({
-    required this.lines,
-    required this.onTapOffset,
-    required this.onClose,
-  });
-
-  final List<OcrLine> lines;
-  final void Function(int lineIndex, int offset) onTapOffset;
-  final VoidCallback onClose;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Material(
-      color: theme.colorScheme.surfaceContainerHigh.withValues(alpha: 0.95),
-      borderRadius: BorderRadius.circular(12),
-      clipBehavior: Clip.antiAlias,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.sizeOf(context).height * 0.5,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 16),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Detected text',
-                      style: theme.textTheme.labelMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: onClose,
-                    icon: const Icon(Icons.close),
-                    tooltip: 'Close',
-                  ),
-                ],
-              ),
-            ),
-            Flexible(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 8,
-                  children: [
-                    for (final (index, line) in lines.indexed)
-                      TokenizedText(
-                        text: line.text,
-                        onTapOffset: (offset) => onTapOffset(index, offset),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

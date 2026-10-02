@@ -142,6 +142,11 @@ final _tokens = {
 
 Key _key(int line, int word) => ValueKey('word-$line-$word');
 
+Future<void> _showImageMode(WidgetTester tester) async {
+  await tester.tap(find.text('Image'));
+  await tester.pumpAndSettle();
+}
+
 void main() {
   late FakeOcrService ocr;
   late FakeImagePreprocessor preprocessor;
@@ -193,6 +198,7 @@ void main() {
   group('pipeline and display', () {
     testWidgets('runs OCR on the prepared image', (tester) async {
       await pumpScreen(tester);
+      await _showImageMode(tester);
 
       expect(preprocessor.prepared, ['/photos/sign.jpg']);
       expect(ocr.recognized, [preprocessor.image.path]);
@@ -202,6 +208,7 @@ void main() {
       tester,
     ) async {
       await pumpScreen(tester);
+      await _showImageMode(tester);
 
       final image = tester.getRect(find.byType(Image));
       expect(image.width / image.height, closeTo(2, 0.001));
@@ -223,6 +230,7 @@ void main() {
 
     testWidgets('boxes stay on their words when zooming', (tester) async {
       await pumpScreen(tester);
+      await _showImageMode(tester);
       expect(
         find.descendant(
           of: find.byType(InteractiveViewer),
@@ -251,25 +259,21 @@ void main() {
       );
     });
 
-    testWidgets('shows progress while OCR runs', (tester) async {
+    testWidgets('shows the branded loading state while OCR runs', (
+      tester,
+    ) async {
       await pumpScreen(tester, ocrDelay: const Duration(seconds: 2));
 
-      expect(find.text('Detecting Japanese text…'), findsOneWidget);
-      final bar = tester.widget<LinearProgressIndicator>(
-        find.byType(LinearProgressIndicator),
-      );
-      expect(bar.value, 0.5);
-      expect(find.byType(Image), findsOneWidget);
+      expect(find.text('Processing Image...'), findsOneWidget);
+      expect(find.text('Running OCR'), findsOneWidget);
       expect(find.byType(WordBox), findsNothing);
       expect(find.text('Text'), findsNothing);
-      expect(find.text('Retake'), findsOneWidget);
 
       await tester.pump(const Duration(seconds: 2));
       await tester.pump();
 
-      expect(find.text('Detecting Japanese text…'), findsNothing);
-      expect(find.byType(LinearProgressIndicator), findsNothing);
-      expect(find.byType(WordBox), findsNWidgets(5));
+      expect(find.text('Processing Image...'), findsNothing);
+      expect(find.byType(TokenizedText), findsNWidgets(2));
       expect(find.text('Text'), findsOneWidget);
     });
   });
@@ -315,7 +319,7 @@ void main() {
       expect(find.text('No Japanese text detected.'), findsOneWidget);
       expect(find.byType(WordBox), findsNothing);
       expect(find.text('Text'), findsNothing);
-      expect(find.byType(Image), findsOneWidget);
+      expect(find.text('Image'), findsNothing);
     });
   });
 
@@ -324,6 +328,7 @@ void main() {
       tester,
     ) async {
       await pumpScreen(tester);
+      await _showImageMode(tester);
 
       await tester.tap(find.byKey(_key(0, 2)));
       await pumpSheet(tester);
@@ -344,6 +349,7 @@ void main() {
       tester,
     ) async {
       await pumpScreen(tester, lookupDelay: const Duration(seconds: 1));
+      await _showImageMode(tester);
 
       await tester.tap(find.byKey(_key(0, 0)));
       await pumpSheet(tester);
@@ -360,6 +366,7 @@ void main() {
 
     testWidgets('a compound highlights every box it covers', (tester) async {
       await pumpScreen(tester);
+      await _showImageMode(tester);
 
       await tester.tap(find.byKey(_key(1, 0)));
       await pumpSheet(tester);
@@ -377,6 +384,7 @@ void main() {
       tester,
     ) async {
       await pumpScreen(tester, lookupDelay: const Duration(seconds: 1));
+      await _showImageMode(tester);
 
       // First lookup: the compound, still pending when its sheet is dismissed.
       await tester.tap(find.byKey(_key(1, 0)));
@@ -402,6 +410,7 @@ void main() {
 
     testWidgets('a failed lookup is reported in the sheet', (tester) async {
       await pumpScreen(tester, lookupError: StateError('dictionary missing'));
+      await _showImageMode(tester);
 
       await tester.tap(find.byKey(_key(0, 2)));
       await pumpSheet(tester);
@@ -413,18 +422,12 @@ void main() {
   });
 
   group('full text panel', () {
-    testWidgets('the Text button shows the lines with furigana', (
-      tester,
-    ) async {
+    testWidgets('text mode shows detected lines with furigana', (tester) async {
       await pumpScreen(tester);
-      expect(find.byType(TokenizedText), findsNothing);
-
-      await tester.tap(find.text('Text'));
-      await tester.pump();
-      await tester.pump();
-
-      expect(find.text('Detected text'), findsOneWidget);
+      await tester.pumpAndSettle();
       expect(find.byType(TokenizedText), findsNWidgets(2));
+
+      expect(find.text('Detected Text'), findsOneWidget);
       // Readings above the kanji words, none above kana-only ones.
       expect(find.text('にほんご'), findsOneWidget);
       expect(find.text('よむ'), findsOneWidget);
@@ -433,40 +436,29 @@ void main() {
       expect(find.text('日本語'), findsOneWidget);
     });
 
-    testWidgets('the Text button and the close button hide the panel', (
-      tester,
-    ) async {
+    testWidgets('switching to image mode hides the text lines', (tester) async {
       await pumpScreen(tester);
+      await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Text'));
-      await tester.pump();
-      expect(find.byType(TokenizedText), findsNWidgets(2));
-
-      await tester.tap(find.text('Text'));
-      await tester.pump();
+      await _showImageMode(tester);
       expect(find.byType(TokenizedText), findsNothing);
-
-      await tester.tap(find.text('Text'));
-      await tester.pump();
-      await tester.tap(find.byTooltip('Close'));
-      await tester.pump();
-      expect(find.byType(TokenizedText), findsNothing);
+      expect(find.byType(WordBox), findsNWidgets(5));
     });
 
     testWidgets(
       'tapping a word in the panel looks it up and highlights boxes',
       (tester) async {
         await pumpScreen(tester);
-        await tester.tap(find.text('Text'));
-        await tester.pump();
-        await tester.pump();
+        await tester.pumpAndSettle();
 
         await tester.tap(find.text('読む'));
         await pumpSheet(tester);
 
         expect(lookup.calls, [(_lineA, 4)]);
         expect(find.text('to read'), findsOneWidget);
-        // No box was tapped, so none is selected, but the match is marked.
+        await tester.tapAt(const Offset(10, 10));
+        await tester.pump(const Duration(milliseconds: 300));
+        await _showImageMode(tester);
         expect(stateOf(tester, 0, 2), WordBoxState.highlighted);
         expect(stateOf(tester, 0, 0), WordBoxState.normal);
       },
@@ -498,7 +490,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(ImageScreen), findsOneWidget);
 
-    await tester.tap(find.text('Retake'));
+    await tester.tap(find.byTooltip('Back'));
     await tester.pumpAndSettle();
 
     expect(find.byType(ImageScreen), findsNothing);

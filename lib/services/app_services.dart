@@ -32,8 +32,8 @@ class AppServicesScope extends InheritedWidget {
   final AppServices services;
 
   static AppServices of(BuildContext context) {
-    final scope =
-        context.dependOnInheritedWidgetOfExactType<AppServicesScope>();
+    final scope = context
+        .dependOnInheritedWidgetOfExactType<AppServicesScope>();
     assert(scope != null, 'No AppServicesScope found in context');
     return scope!.services;
   }

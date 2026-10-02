@@ -12,8 +12,16 @@ class YomiNowBottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = [
       _BottomNavItem(icon: LucideIcons.home, label: 'Home', link: '/home'),
-      _BottomNavItem(icon: LucideIcons.fileText, label: 'Documents', link: '/documents'),
-      _BottomNavItem(icon: LucideIcons.settings, label: 'Settings', link: '/settings'),
+      _BottomNavItem(
+        icon: LucideIcons.fileText,
+        label: 'Documents',
+        link: '/documents',
+      ),
+      _BottomNavItem(
+        icon: LucideIcons.settings,
+        label: 'Settings',
+        link: '/settings',
+      ),
     ];
 
     return Container(
@@ -79,5 +87,5 @@ class _BottomNavItem {
 
   final IconData icon;
   final String label;
-  final String? link; 
+  final String? link;
 }

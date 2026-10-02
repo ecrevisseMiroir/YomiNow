@@ -123,7 +123,9 @@ class AboutScreen extends StatelessWidget {
                       Center(
                         child: Image.asset(
                           'assets/04_scenery_backgrounds/about-background.png',
-                          width: isLandscape ? constraints.maxWidth : constraints.maxWidth * 0.9,
+                          width: isLandscape
+                              ? constraints.maxWidth
+                              : constraints.maxWidth * 0.9,
                           fit: BoxFit.fitWidth,
                         ),
                       ),
