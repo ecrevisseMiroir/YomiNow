@@ -19,20 +19,21 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
   late final ImagePicker _picker = widget.picker ?? ImagePicker();
   final List<_DocumentItem> _documents = <_DocumentItem>[];
 
-
   Future<void> _pickDocument(ImageSource source) async {
     final XFile? file;
     try {
       file = await _picker.pickImage(source: source);
-    } on Exception catch (error) {
+    } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not pick an image: $error')),
-      );
+      await _showErrorDialog();
       return;
     }
 
-    if (file == null || !mounted) return;
+    if (file == null || !mounted) {
+      if (!mounted) return;
+      await _showErrorDialog();
+      return;
+    }
 
     final path = file.path;
     final now = DateTime.now();
@@ -50,6 +51,125 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
         ),
       );
     });
+  }
+
+  Future<void> _showErrorDialog() async {
+    if (!mounted) return;
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Dialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 18),
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(32),
+          ),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 420),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 10),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Image.asset(
+                    'assets/03_characters_mascot/cat_error.png',
+                    width: double.infinity,
+                    fit: BoxFit.contain,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Something went wrong',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Fredoka',
+                      fontSize: 30,
+                      fontWeight: FontWeight.w700,
+                      color: YomiNowPalette.ink,
+                      letterSpacing: -1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "We couldn't process the image.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Fredoka',
+                      fontSize: 20,
+                      height: 1.2,
+                      color: YomiNowPalette.ink.withValues(alpha: 0.74),
+                      letterSpacing: -0.6,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Please try again.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Fredoka',
+                      fontSize: 20,
+                      height: 1.2,
+                      color: YomiNowPalette.ink.withValues(alpha: 0.74),
+                      letterSpacing: -0.6,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: YomiNowPalette.coral,
+                        foregroundColor: YomiNowPalette.ink,
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                      ),
+                      icon: Icon(
+                        Icons.refresh_rounded,
+                        size: 28,
+                        color: YomiNowPalette.cream,
+                      ),
+                      label: Text(
+                        'Retry',
+                        style: TextStyle(
+                          fontFamily: 'Fredoka',
+                          fontSize: 24,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: -0.8,
+                          color: YomiNowPalette.cream,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextButton.icon(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: TextButton.styleFrom(
+                      foregroundColor: YomiNowPalette.ink,
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                    ),
+                    icon: Icon(Icons.arrow_back_rounded, size: 22),
+                    label: Text(
+                      'Go back',
+                      style: TextStyle(
+                        fontFamily: 'Fredoka',
+                        fontSize: 22,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: -0.6,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   void _deleteDocument(int index) {
@@ -242,125 +362,179 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isCompact = constraints.maxWidth < 420;
-        final imageWidth = isCompact ? 260.0 : 320.0;
+        final isLandscape = constraints.maxWidth > constraints.maxHeight;
+        final imageWidth = isLandscape ? 180.0 : (isCompact ? 260.0 : 320.0);
+
+        final header = Text(
+          'Documents',
+          style: TextStyle(
+            fontFamily: 'Fredoka',
+            fontSize: 35,
+            height: 1,
+            fontWeight: FontWeight.w600,
+            color: YomiNowPalette.ink,
+            letterSpacing: -2.0,
+          ),
+        );
+
+        final title = Text(
+          'No Documents Yet',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontFamily: 'Fredoka',
+            fontSize: isCompact ? 32 : 40,
+            fontWeight: FontWeight.w700,
+            color: YomiNowPalette.ink,
+            letterSpacing: -1.2,
+          ),
+        );
+
+        final subtitle = Text(
+          'Scan your first image or import\nan existing one to get started.',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontFamily: 'Fredoka',
+            fontSize: isCompact ? 20 : 24,
+            height: 1.3,
+            color: YomiNowPalette.ink.withValues(alpha: 0.75),
+            letterSpacing: -0.6,
+          ),
+        );
+
+        final cameraButton = FilledButton.icon(
+          onPressed: () async {
+            await _pickDocument(ImageSource.camera);
+          },
+          style: FilledButton.styleFrom(
+            backgroundColor: YomiNowPalette.coral,
+            foregroundColor: YomiNowPalette.ink,
+            padding: const EdgeInsets.symmetric(vertical: 18),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+          ),
+          icon: Icon(
+            Icons.camera_alt_rounded,
+            size: isCompact ? 26 : 32,
+            color: YomiNowPalette.cream,
+          ),
+          label: Text(
+            'Scan with Camera',
+            style: TextStyle(
+              fontFamily: 'Fredoka',
+              fontSize: isCompact ? 24 : 30,
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.8,
+              color: YomiNowPalette.cream,
+            ),
+          ),
+        );
+
+        final galleryButton = FilledButton.icon(
+          onPressed: () async {
+            await _pickDocument(ImageSource.gallery);
+          },
+          style: FilledButton.styleFrom(
+            backgroundColor: YomiNowPalette.softBlue,
+            foregroundColor: YomiNowPalette.ink,
+            padding: const EdgeInsets.symmetric(vertical: 18),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+          ),
+          icon: Icon(
+            Icons.photo_library_rounded,
+            size: isCompact ? 26 : 32,
+            color: YomiNowPalette.indigo,
+          ),
+          label: Text(
+            'Choose from Gallery',
+            style: TextStyle(
+              fontFamily: 'Fredoka',
+              fontSize: isCompact ? 24 : 30,
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.8,
+              color: YomiNowPalette.indigo,
+            ),
+          ),
+        );
+
+        final columnContent = Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            header,
+            const SizedBox(height: 18),
+            Center(
+              child: Image.asset(
+                'assets/03_characters_mascot/cat_empty_state.png',
+                width: imageWidth,
+                fit: BoxFit.contain,
+              ),
+            ),
+            const SizedBox(height: 18),
+            title,
+            const SizedBox(height: 12),
+            subtitle,
+            const SizedBox(height: 28),
+            cameraButton,
+            const SizedBox(height: 16),
+            galleryButton,
+          ],
+        );
 
         return Scaffold(
           backgroundColor: Theme.of(context).colorScheme.surface,
           body: SafeArea(
-            child: Padding(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.only(
                 left: 18,
                 right: 18,
                 top: 8,
                 bottom: 0,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'Documents',
-                    style: TextStyle(
-                      fontFamily: 'Fredoka',
-                      fontSize: 35,
-                      height: 1,
-                      fontWeight: FontWeight.w600,
-                      color: YomiNowPalette.ink,
-                      letterSpacing: -2.0,
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  const Spacer(flex: 1),
-                  Center(
-                    child: Image.asset(
-                      'assets/03_characters_mascot/cat_empty_state.png',
-                      width: imageWidth,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  Text(
-                    'No Documents Yet',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: 'Fredoka',
-                      fontSize: isCompact ? 32 : 40,
-                      fontWeight: FontWeight.w700,
-                      color: YomiNowPalette.ink,
-                      letterSpacing: -1.2,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Scan your first image or import\nan existing one to get started.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: 'Fredoka',
-                      fontSize: isCompact ? 20 : 24,
-                      height: 1.3,
-                      color: YomiNowPalette.ink.withValues(alpha: 0.75),
-                      letterSpacing: -0.6,
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-                  FilledButton.icon(
-                    onPressed: () async {
-                      await _pickDocument(ImageSource.camera);
-                    },
-                    style: FilledButton.styleFrom(
-                      backgroundColor: YomiNowPalette.coral,
-                      foregroundColor: YomiNowPalette.ink,
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                    ),
-                    icon: Icon(
-                      Icons.camera_alt_rounded,
-                      size: isCompact ? 26 : 32,
-                      color: YomiNowPalette.cream,
-                    ),
-                    label: Text(
-                      'Scan with Camera',
-                      style: TextStyle(
-                        fontFamily: 'Fredoka',
-                        fontSize: isCompact ? 24 : 30,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: -0.8,
-                        color: YomiNowPalette.cream,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  FilledButton.icon(
-                    onPressed: () async {
-                      await _pickDocument(ImageSource.gallery);
-                    },
-                    style: FilledButton.styleFrom(
-                      backgroundColor: YomiNowPalette.softBlue,
-                      foregroundColor: YomiNowPalette.ink,
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                    ),
-                    icon: Icon(
-                      Icons.photo_library_rounded,
-                      size: isCompact ? 26 : 32,
-                      color: YomiNowPalette.indigo,
-                    ),
-                    label: Text(
-                      'Choose from Gallery',
-                      style: TextStyle(
-                        fontFamily: 'Fredoka',
-                        fontSize: isCompact ? 24 : 30,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: -0.8,
-                        color: YomiNowPalette.indigo,
-                      ),
-                    ),
-                  ),
-                  const Spacer(flex: 2),
-                ],
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 700),
+                  child: isLandscape
+                      ? SingleChildScrollView(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Flexible(
+                                flex: 2,
+                                child: Center(
+                                  child: Image.asset(
+                                    'assets/03_characters_mascot/cat_empty_state.png',
+                                    width: imageWidth,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 22),
+                              Flexible(
+                                flex: 3,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    header,
+                                    const SizedBox(height: 18),
+                                    title,
+                                    const SizedBox(height: 12),
+                                    subtitle,
+                                    const SizedBox(height: 24),
+                                    cameraButton,
+                                    const SizedBox(height: 12),
+                                    galleryButton,
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : columnContent,
+                ),
               ),
             ),
           ),
