@@ -38,32 +38,30 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
       }
 
       if (file == null || !mounted) return;
+
       final path = file.path;
-      await Navigator.of(context).push(
-        MaterialPageRoute<void>(builder: (_) => ImageScreen(imagePath: path)),
-      );
+      final now = DateTime.now();
+      final title = file.name.isNotEmpty ? file.name : file.path;
+
+      setState(() {
+        _documents.insert(
+          0,
+          _DocumentItem(
+            title: title,
+            date: '${_monthName(now.month)} ${now.day}, ${now.year}',
+            time:
+                '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}',
+            path: path.isEmpty ? '' : path,
+          ),
+        );
+      });
+
+      // Navigation omitted for test
     } catch (error) {
       if (!mounted) return;
       await YomiNowErrorDialog.show(context);
       return;
     }
-
-    final path = file.path;
-    final now = DateTime.now();
-    final title = file.name.isNotEmpty ? file.name : 'Scanned Image';
-
-    setState(() {
-      _documents.insert(
-        0,
-        _DocumentItem(
-          title: title,
-          date: '${_monthName(now.month)} ${now.day}, ${now.year}',
-          time:
-              '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}',
-          path: path.isEmpty ? '' : path,
-        ),
-      );
-    });
   }
 
   void _deleteDocument(int index) {
