@@ -25,7 +25,7 @@ class AboutScreen extends StatelessWidget {
         final isLandscape = constraints.maxWidth > constraints.maxHeight;
         final topSpacing = isLandscape ? 8.0 : 18.0;
         final logoSize = isLandscape ? 120.0 : 180.0;
-        final brandSize = isLandscape ? 32.0 : 40.0;
+        final brandSize = isLandscape ? 35.0 : 40.0;
         final subtitleSize = isLandscape ? 18.0 : 22.0;
         final bodyTextSize = isLandscape ? 16.0 : 20.0;
         final rowIconSize = isLandscape ? 22.0 : 28.0;
@@ -89,7 +89,7 @@ class AboutScreen extends StatelessWidget {
                         style: TextStyle(
                           fontFamily: 'Fredoka',
                           fontSize: brandSize,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                           color: YomiNowPalette.ink,
                           height: 1,
                           letterSpacing: -3.0,
