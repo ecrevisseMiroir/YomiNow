@@ -8,6 +8,7 @@ import '../services/app_services.dart';
 import '../services/image_preprocessor.dart';
 import '../services/ocr/ocr_service.dart';
 import '../widgets/lookup_sheet.dart';
+import '../widgets/no_japanese_text.dart';
 import '../widgets/tokenized_text.dart';
 import '../widgets/word_overlay.dart';
 import 'loading_screen.dart';
@@ -140,7 +141,11 @@ class _ImageScreenState extends State<ImageScreen> {
             ] else
               Expanded(
                 child: Center(
-                  child: _StatusBanner(result: result, error: _error),
+                  child: _error == null
+                      ? NoJapaneseText(
+                          onTryAgain: () => Navigator.of(context).pop(),
+                        )
+                      : _StatusBanner(result: result, error: _error),
                 ),
               ),
           ],

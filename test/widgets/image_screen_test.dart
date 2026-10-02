@@ -316,7 +316,12 @@ void main() {
     testWidgets('says so when no text was detected', (tester) async {
       await pumpScreen(tester, result: const OcrResult(lines: []));
 
-      expect(find.text('No Japanese text detected.'), findsOneWidget);
+      expect(find.text('No Japanese text found'), findsOneWidget);
+      expect(
+        find.text("We couldn't find readable Japanese in this image."),
+        findsOneWidget,
+      );
+      expect(find.text('Choose another image'), findsOneWidget);
       expect(find.byType(WordBox), findsNothing);
       expect(find.text('Text'), findsNothing);
       expect(find.text('Image'), findsNothing);
