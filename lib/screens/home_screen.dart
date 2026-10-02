@@ -84,8 +84,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           _buildActionTile(
                             backgroundColor: YomiNowPalette.coral,
                             icon: LucideIcons.camera,
-                            title: 'Scan with Camera',
-                            subtitle: 'Take a photo',
+                            title: 'Take photo',
+                            subtitle: '',
                             textColor: YomiNowPalette.cream,
                             iconColor: YomiNowPalette.cream,
                             onTap: () => _pick(ImageSource.camera),
@@ -94,8 +94,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           _buildActionTile(
                             backgroundColor: YomiNowPalette.softBlue,
                             icon: LucideIcons.image,
-                            title: 'Choose from Gallery',
-                            subtitle: 'Pick an image',
+                            title: 'Choose from gallery',
+                            subtitle: '',
                             textColor: YomiNowPalette.ink,
                             iconColor: YomiNowPalette.indigo,
                             onTap: () => _pick(ImageSource.gallery),
@@ -209,7 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          'Point your camera at Japanese text,\ntap a word, and read it now.',
+          'Point your camera at Japanese text,\ntap any word, and read it now.',
           style: TextStyle(
             fontFamily: 'Inter',
             fontSize: 17,

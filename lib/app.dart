@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'screens/about_screen.dart';
 import 'screens/documents_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/settings_screen.dart';
@@ -27,6 +28,7 @@ class YomiNowApp extends StatelessWidget {
           '/home': (_) => const HomeScreen(),
           '/documents': (_) => const DocumentsScreen(),
           '/settings': (_) => const SettingsScreen(),
+          '/about': (_) => const AboutScreen(),
         },
       ),
     );

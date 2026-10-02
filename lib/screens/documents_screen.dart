@@ -187,7 +187,7 @@ class DocumentsScreen extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: const YomiNowBottomNav(selectedIndex: 1),
+      bottomNavigationBar: null,
     );
   }
 }
@@ -214,7 +214,7 @@ class _TabButton extends StatelessWidget {
           label,
           style: TextStyle(
             fontFamily: 'Inter',
-            fontSize: 22,
+            fontSize: 18,
             fontWeight: FontWeight.w700,
             color: selected
                 ? YomiNowPalette.cream

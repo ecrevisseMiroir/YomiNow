@@ -33,6 +33,7 @@ class SettingsScreen extends StatelessWidget {
         icon: Icons.info_outline,
         title: 'About',
         subtitle: 'Version 1.0.0',
+        route: '/about',
       ),
     ];
 
@@ -42,9 +43,7 @@ class SettingsScreen extends StatelessWidget {
       body: DecoratedBox(
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(
-              'assets/04_scenery_backgrounds/background.png',
-            ),
+            image: AssetImage('assets/04_scenery_backgrounds/background.png'),
             fit: BoxFit.contain,
             alignment: Alignment.bottomCenter,
           ),
@@ -96,65 +95,74 @@ class SettingsScreen extends StatelessWidget {
                         const SizedBox(height: 18),
                     itemBuilder: (context, index) {
                       final item = items[index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 2),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 52,
-                              height: 52,
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                border: Border.all(
-                                  color: YomiNowPalette.indigo.withValues(
-                                    alpha: 0.8,
-                                  ),
-                                  width: 3,
-                                ),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Icon(
-                                item.icon,
-                                size: 28,
-                                color: YomiNowPalette.indigo,
-                              ),
-                            ),
-                            const SizedBox(width: 18),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    item.title,
-                                    style: TextStyle(
-                                      fontFamily: 'Fredoka',
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.w500,
-                                      color: YomiNowPalette.ink,
-                                      letterSpacing: -0.8,
+                      return InkWell(
+                        onTap: item.route == null
+                            ? null
+                            : () =>
+                                  Navigator.of(context).pushNamed(item.route!),
+                        borderRadius: BorderRadius.circular(18),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 52,
+                                height: 52,
+                                decoration: BoxDecoration(
+                                  color: Colors.transparent,
+                                  border: Border.all(
+                                    color: YomiNowPalette.indigo.withValues(
+                                      alpha: 0.8,
                                     ),
+                                    width: 3,
                                   ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    item.subtitle,
-                                    style: TextStyle(
-                                      fontFamily: 'Inter',
-                                      fontSize: 18,
-                                      color: YomiNowPalette.ink.withValues(
-                                        alpha: 0.7,
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Icon(
+                                  item.icon,
+                                  size: 28,
+                                  color: YomiNowPalette.indigo,
+                                ),
+                              ),
+                              const SizedBox(width: 18),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item.title,
+                                      style: TextStyle(
+                                        fontFamily: 'Fredoka',
+                                        fontSize: 28,
+                                        fontWeight: FontWeight.w500,
+                                        color: YomiNowPalette.ink,
+                                        letterSpacing: -0.8,
                                       ),
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      item.subtitle,
+                                      style: TextStyle(
+                                        fontFamily: 'Inter',
+                                        fontSize: 18,
+                                        color: YomiNowPalette.ink.withValues(
+                                          alpha: 0.7,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            Icon(
-                              Icons.chevron_right_rounded,
-                              size: 30,
-                              color: YomiNowPalette.ink.withValues(alpha: 0.7),
-                            ),
-                          ],
+                              Icon(
+                                Icons.chevron_right_rounded,
+                                size: 30,
+                                color: YomiNowPalette.ink.withValues(
+                                  alpha: 0.7,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },
@@ -174,9 +182,11 @@ class _SettingsItem {
     required this.icon,
     required this.title,
     required this.subtitle,
+    this.route,
   });
 
   final IconData icon;
   final String title;
   final String subtitle;
+  final String? route;
 }
