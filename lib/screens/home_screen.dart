@@ -5,6 +5,8 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../theme/yomi_now_theme.dart';
 import '../widgets/yomi_now_bottom_nav.dart';
+import '../widgets/error_dialog.dart';
+import 'camera_scanner.dart';
 import 'image_screen.dart';
 
 /// The start screen: pick or take a photo of Japanese text.
@@ -26,12 +28,19 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _pick(ImageSource source) async {
     final XFile? file;
     try {
-      file = await _picker.pickImage(source: source);
-    } on Exception catch (error) {
+      if (source == ImageSource.camera &&
+          (defaultTargetPlatform == TargetPlatform.android ||
+              defaultTargetPlatform == TargetPlatform.iOS) &&
+          widget.picker == null) {
+        file = await Navigator.of(
+          context,
+        ).push<XFile>(MaterialPageRoute(builder: (_) => const CameraScanner()));
+      } else {
+        file = await _picker.pickImage(source: source);
+      }
+    } on Exception {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not pick an image: $error')),
-      );
+      await YomiNowErrorDialog.show(context);
       return;
     }
     if (file == null || !mounted) return;
