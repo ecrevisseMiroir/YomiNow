@@ -1,0 +1,177 @@
+name: Flutter CI
+
+on:
+  push:
+    branches: [main, dev, canary, "claude/**"]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: flutter-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: "3.47.5"
+
+jobs:
+  linux:
+    name: Linux (analyze, test, build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux build dependencies and Tesseract
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev tesseract-ocr xvfb
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+      - name: End-to-end test (OCR → tap → JMdict) on the Linux app
+        run: xvfb-run -a flutter test integration_test -d linux
+      - name: Build Linux release
+        run: flutter build linux --release
+      - name: Archive Linux build
+        run: |
+          cd build/linux/x64/release/bundle
+          zip -r ../../../../linux-build.zip .
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: yominow-linux
+          path: build/linux-build.zip
+          retention-days: 30
+
+  android:
+    name: Android (release APK)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - run: flutter pub get
+      - name: Build release APK
+        run: flutter build apk --release
+      - name: Check R8 did not shrink the release build
+        run: test ! -e build/app/outputs/mapping/release/mapping.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yominow-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
+
+  ios:
+    name: iOS (debug, no codesign)
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - run: flutter pub get
+      - run: flutter build ios --debug --no-codesign
+
+  release:
+    name: Publish ${{ github.ref_name }} release
+    needs: [linux, android]
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'push' &&
+      (github.ref == 'refs/heads/dev' ||
+        github.ref == 'refs/heads/main' ||
+       github.ref == 'refs/heads/canary' ||
+       startsWith(github.ref, 'refs/tags/v'))
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare release channel and tag
+        id: release_meta
+        run: |
+          VERSION=$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | head -n 1)
+          RELEASE_VERSION=${VERSION%%+*}
+
+          case "$GITHUB_REF" in
+            refs/heads/main)
+              CHANNEL=prod
+              TAG="v${RELEASE_VERSION}+${GITHUB_SHA:0:12}"
+              PRERELEASE=false
+              ;;
+            refs/heads/dev)
+              CHANNEL=dev
+              TAG="v${RELEASE_VERSION}-dev.${GITHUB_SHA:0:12}"
+              PRERELEASE=true
+              ;;
+            refs/heads/canary)
+              CHANNEL=canary
+              TAG="v${RELEASE_VERSION}-canary.${GITHUB_SHA:0:12}"
+              PRERELEASE=true
+              ;;
+            refs/tags/v*)
+              CHANNEL=prod
+              TAG="$GITHUB_REF_NAME"
+              TAG_VERSION=${TAG#v}
+              if [ "$TAG_VERSION" != "$RELEASE_VERSION" ]; then
+                echo "Tag $TAG does not match pubspec.yaml version $RELEASE_VERSION" >&2
+                exit 1
+              fi
+              PRERELEASE=false
+              ;;
+            *)
+              echo "This ref is not configured to publish a release: $GITHUB_REF" >&2
+              exit 1
+              ;;
+          esac
+
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "name=YomiNow $TAG" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$PRERELEASE" >> "$GITHUB_OUTPUT"
+      - name: Download Android APK
+        uses: actions/download-artifact@v4
+        with:
+          name: yominow-apk
+          path: ./artifacts
+      - name: Download Linux artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: yominow-linux
+          path: ./artifacts
+      - name: Create or update release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release_meta.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ steps.release_meta.outputs.name }}
+          prerelease: ${{ steps.release_meta.outputs.prerelease }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            ./artifacts/app-release.apk
+            ./artifacts/linux-build.zip
