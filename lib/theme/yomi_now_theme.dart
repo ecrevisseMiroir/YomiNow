@@ -26,6 +26,10 @@ abstract final class YomiNowTheme {
         ).copyWith(
           tertiary: YomiNowPalette.softBlue,
           onTertiary: YomiNowPalette.ink,
+          onSurface: isDark ? YomiNowPalette.cream : null,
+          onSurfaceVariant: isDark
+              ? YomiNowPalette.cream.withValues(alpha: 0.72)
+              : null,
         );
 
     return ThemeData(

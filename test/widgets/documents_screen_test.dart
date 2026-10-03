@@ -1,6 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:yominow/screens/documents_screen.dart';
+import 'package:yominow/theme/yomi_now_theme.dart';
 
 import '../fakes.dart';
 
@@ -28,6 +30,36 @@ void main() {
 
     expect(find.text('Documents'), findsNWidgets(2));
     expect(find.text('No Documents Yet'), findsOneWidget);
+  });
+
+  testWidgets('documents empty-state text follows both themes', (tester) async {
+    for (final mode in [ThemeMode.light, ThemeMode.dark]) {
+      await tester.pumpWidget(
+        withServices(
+          fakeServices(),
+          const DocumentsScreen(),
+          theme: YomiNowTheme.light,
+          darkTheme: YomiNowTheme.dark,
+          themeMode: mode,
+        ),
+      );
+      await tester.pumpAndSettle();
+      final colorScheme = mode == ThemeMode.dark
+          ? YomiNowTheme.dark.colorScheme
+          : YomiNowTheme.light.colorScheme;
+
+      expect(
+        tester.widget<Text>(find.text('No Documents Yet')).style?.color,
+        colorScheme.onSurface,
+      );
+      expect(
+        tester
+            .widget<Text>(find.textContaining('Scan your first image'))
+            .style
+            ?.color,
+        colorScheme.onSurfaceVariant,
+      );
+    }
   });
 
   testWidgets(

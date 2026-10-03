@@ -7,6 +7,7 @@ import 'package:yominow/models/lookup_result.dart';
 import 'package:yominow/models/ocr_result.dart';
 import 'package:yominow/screens/image_screen.dart';
 import 'package:yominow/services/ocr/ocr_service.dart';
+import 'package:yominow/theme/yomi_now_theme.dart';
 import 'package:yominow/widgets/lookup_sheet.dart';
 import 'package:yominow/widgets/tokenized_text.dart';
 import 'package:yominow/widgets/word_overlay.dart';
@@ -164,6 +165,7 @@ void main() {
     Duration ocrDelay = Duration.zero,
     Object? lookupError,
     Duration lookupDelay = Duration.zero,
+    ThemeMode? themeMode,
   }) async {
     preprocessor = FakeImagePreprocessor();
     addTearDown(preprocessor.deleteFiles);
@@ -183,6 +185,9 @@ void main() {
           lookup: lookup,
         ),
         const ImageScreen(imagePath: '/photos/sign.jpg'),
+        theme: themeMode == null ? null : YomiNowTheme.light,
+        darkTheme: themeMode == null ? null : YomiNowTheme.dark,
+        themeMode: themeMode,
       ),
     );
     await tester.pump();
@@ -196,6 +201,28 @@ void main() {
   }
 
   group('pipeline and display', () {
+    testWidgets('image screen text follows both themes', (tester) async {
+      for (final mode in [ThemeMode.light, ThemeMode.dark]) {
+        await pumpScreen(tester, themeMode: mode);
+        await tester.pumpAndSettle();
+        final colorScheme = mode == ThemeMode.dark
+            ? YomiNowTheme.dark.colorScheme
+            : YomiNowTheme.light.colorScheme;
+
+        expect(
+          tester.widget<Text>(find.text('Detected Text')).style?.color,
+          colorScheme.onSurface,
+        );
+        expect(
+          tester
+              .widget<Text>(find.text('Tap a word to see its meaning'))
+              .style
+              ?.color,
+          colorScheme.onSurfaceVariant,
+        );
+      }
+    });
+
     testWidgets('runs OCR on the prepared image', (tester) async {
       await pumpScreen(tester);
       await _showImageMode(tester);

@@ -164,10 +164,13 @@ class _CameraScannerState extends State<CameraScanner> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
+      value: theme.brightness == Brightness.dark
+          ? SystemUiOverlayStyle.light
+          : SystemUiOverlayStyle.dark,
       child: Scaffold(
-        backgroundColor: YomiNowPalette.darkSurface,
+        backgroundColor: theme.colorScheme.surface,
         body: SafeArea(
           child: Column(
             children: [
@@ -190,7 +193,6 @@ class _CameraScannerState extends State<CameraScanner> {
             icon: Icons.close_rounded,
             label: AppLocalizations.of(context)!.cameraScannerCloseCamera,
             onPressed: () => Navigator.of(context).pop(),
-            backgroundColor: Colors.transparent,
           ),
           const Spacer(),
           _roundIconButton(
@@ -201,7 +203,6 @@ class _CameraScannerState extends State<CameraScanner> {
                 ? AppLocalizations.of(context)!.cameraScannerTurnFlashOff
                 : AppLocalizations.of(context)!.cameraScannerTurnFlashOn,
             onPressed: _toggleFlash,
-            backgroundColor: Colors.transparent,
           ),
         ],
       ),
@@ -210,9 +211,10 @@ class _CameraScannerState extends State<CameraScanner> {
 
   Widget _buildPreview() {
     final controller = _controller;
+    final colorScheme = Theme.of(context).colorScheme;
     if (_isInitializing) {
-      return const Center(
-        child: CircularProgressIndicator(color: YomiNowPalette.indigo),
+      return Center(
+        child: CircularProgressIndicator(color: colorScheme.primary),
       );
     }
     if (_cameraError != null || controller == null) {
@@ -222,16 +224,16 @@ class _CameraScannerState extends State<CameraScanner> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
+              Icon(
                 Icons.no_photography_outlined,
-                color: Colors.white70,
+                color: colorScheme.onSurfaceVariant,
                 size: 42,
               ),
               const SizedBox(height: 16),
               Text(
                 AppLocalizations.of(context)!.cameraScannerCameraUnavailable,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: colorScheme.onSurface,
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
                 ),
@@ -240,7 +242,10 @@ class _CameraScannerState extends State<CameraScanner> {
               Text(
                 AppLocalizations.of(context)!.cameraScannerAccessInstructions,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white70, height: 1.4),
+                style: TextStyle(
+                  color: colorScheme.onSurfaceVariant,
+                  height: 1.4,
+                ),
               ),
               const SizedBox(height: 18),
               FilledButton.icon(
@@ -280,6 +285,7 @@ class _CameraScannerState extends State<CameraScanner> {
   }
 
   Widget _buildControls() {
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 10),
       child: Column(
@@ -288,7 +294,7 @@ class _CameraScannerState extends State<CameraScanner> {
           Container(
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: const Color(0xFF0C1420),
+              color: colorScheme.surfaceContainerHigh,
               borderRadius: BorderRadius.circular(28),
             ),
             child: Row(
@@ -355,6 +361,7 @@ class _CameraScannerState extends State<CameraScanner> {
     required VoidCallback onTap,
     bool selected = false,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(24),
@@ -369,7 +376,7 @@ class _CameraScannerState extends State<CameraScanner> {
         child: Text(
           label,
           style: TextStyle(
-            color: Colors.white,
+            color: selected ? YomiNowPalette.cream : colorScheme.onSurface,
             fontSize: 16,
             fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
           ),
@@ -382,14 +389,15 @@ class _CameraScannerState extends State<CameraScanner> {
     required IconData icon,
     required String label,
     required VoidCallback onPressed,
-    Color backgroundColor = const Color(0xFF263447),
+    Color? backgroundColor,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     return IconButton(
       tooltip: label,
       onPressed: onPressed,
       style: IconButton.styleFrom(
-        foregroundColor: Colors.white,
-        backgroundColor: backgroundColor,
+        foregroundColor: colorScheme.onSurface,
+        backgroundColor: backgroundColor ?? colorScheme.surfaceContainerHigh,
         fixedSize: const Size(58, 58),
       ),
       icon: Icon(icon, size: 29),

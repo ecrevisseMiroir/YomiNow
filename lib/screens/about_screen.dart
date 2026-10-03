@@ -30,6 +30,7 @@ class AboutScreen extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
+        final colorScheme = Theme.of(context).colorScheme;
         final isLandscape = constraints.maxWidth > constraints.maxHeight;
         final topSpacing = isLandscape ? 8.0 : 18.0;
         final logoSize = isLandscape ? 120.0 : 180.0;
@@ -60,7 +61,7 @@ class AboutScreen extends StatelessWidget {
                               Icons.arrow_back_ios_new_rounded,
                               size: 30,
                             ),
-                            color: YomiNowPalette.ink,
+                            color: colorScheme.onSurface,
                             onPressed: () => Navigator.of(context).pop(),
                           ),
                           const SizedBox(width: 8),
@@ -72,7 +73,7 @@ class AboutScreen extends StatelessWidget {
                                 fontSize: 35,
                                 height: 1,
                                 fontWeight: FontWeight.w600,
-                                color: YomiNowPalette.ink,
+                                color: colorScheme.onSurface,
                                 letterSpacing: -2.0,
                               ),
                             ),
@@ -98,7 +99,7 @@ class AboutScreen extends StatelessWidget {
                           fontFamily: 'Fredoka',
                           fontSize: brandSize,
                           fontWeight: FontWeight.w600,
-                          color: YomiNowPalette.ink,
+                          color: colorScheme.onSurface,
                           height: 1,
                           letterSpacing: -3.0,
                         ),
@@ -111,7 +112,7 @@ class AboutScreen extends StatelessWidget {
                           fontFamily: 'Fredoka',
                           fontSize: subtitleSize,
                           fontWeight: FontWeight.w500,
-                          color: YomiNowPalette.ink.withValues(alpha: 0.8),
+                          color: colorScheme.onSurfaceVariant,
                           letterSpacing: -1.0,
                         ),
                       ),
@@ -123,7 +124,7 @@ class AboutScreen extends StatelessWidget {
                           fontFamily: 'Fredoka',
                           fontSize: bodyTextSize,
                           height: 1.25,
-                          color: YomiNowPalette.ink.withValues(alpha: 0.86),
+                          color: colorScheme.onSurfaceVariant,
                           letterSpacing: -0.8,
                         ),
                       ),
@@ -182,7 +183,7 @@ class AboutScreen extends StatelessWidget {
                                         fontFamily: 'Fredoka',
                                         fontSize: rowTextSize,
                                         fontWeight: FontWeight.w500,
-                                        color: YomiNowPalette.ink,
+                                        color: colorScheme.onSurface,
                                         letterSpacing: -0.8,
                                       ),
                                     ),
@@ -190,9 +191,7 @@ class AboutScreen extends StatelessWidget {
                                   Icon(
                                     Icons.chevron_right_rounded,
                                     size: 30,
-                                    color: YomiNowPalette.ink.withValues(
-                                      alpha: 0.7,
-                                    ),
+                                    color: colorScheme.onSurfaceVariant,
                                   ),
                                 ],
                               ),

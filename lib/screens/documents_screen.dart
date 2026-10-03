@@ -94,6 +94,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
     if (_documents.isEmpty) {
       return _buildEmptyState();
     }
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -117,7 +118,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                   fontSize: 35,
                   height: 1,
                   fontWeight: FontWeight.w600,
-                  color: YomiNowPalette.ink,
+                  color: colorScheme.onSurface,
                   letterSpacing: -2.0,
                 ),
               ),
@@ -182,7 +183,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                                         fontFamily: 'NotoSansJP',
                                         fontSize: 18,
                                         fontWeight: FontWeight.w700,
-                                        color: YomiNowPalette.ink,
+                                        color: colorScheme.onSurface,
                                         height: 1.2,
                                       ),
                                     ),
@@ -197,8 +198,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                                           style: TextStyle(
                                             fontFamily: 'Inter',
                                             fontSize: 16,
-                                            color: YomiNowPalette.ink
-                                                .withValues(alpha: 0.72),
+                                            color: colorScheme.onSurfaceVariant,
                                           ),
                                         ),
                                         Text(
@@ -207,8 +207,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                                           style: TextStyle(
                                             fontFamily: 'Inter',
                                             fontSize: 15,
-                                            color: YomiNowPalette.ink
-                                                .withValues(alpha: 0.72),
+                                            color: colorScheme.onSurfaceVariant,
                                           ),
                                         ),
                                       ],
@@ -219,9 +218,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                               PopupMenuButton<int>(
                                 icon: Icon(
                                   Icons.more_vert,
-                                  color: YomiNowPalette.ink.withValues(
-                                    alpha: 0.7,
-                                  ),
+                                  color: colorScheme.onSurfaceVariant,
                                   size: 32,
                                 ),
                                 shape: RoundedRectangleBorder(
@@ -268,6 +265,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
   Widget _buildEmptyState() {
     return LayoutBuilder(
       builder: (context, constraints) {
+        final colorScheme = Theme.of(context).colorScheme;
         final isCompact = constraints.maxWidth < 420;
         final isLandscape = constraints.maxWidth > constraints.maxHeight;
         final imageWidth = isLandscape ? 180.0 : (isCompact ? 260.0 : 320.0);
@@ -279,7 +277,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
             fontSize: 35,
             height: 1,
             fontWeight: FontWeight.w600,
-            color: YomiNowPalette.ink,
+            color: colorScheme.onSurface,
             letterSpacing: -2.0,
           ),
         );
@@ -291,7 +289,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
             fontFamily: 'Fredoka',
             fontSize: isCompact ? 32 : 40,
             fontWeight: FontWeight.w700,
-            color: YomiNowPalette.ink,
+            color: colorScheme.onSurface,
             letterSpacing: -1.2,
           ),
         );
@@ -303,7 +301,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
             fontFamily: 'Fredoka',
             fontSize: isCompact ? 20 : 24,
             height: 1.3,
-            color: YomiNowPalette.ink.withValues(alpha: 0.75),
+            color: colorScheme.onSurfaceVariant,
             letterSpacing: -0.6,
           ),
         );
@@ -460,6 +458,7 @@ class _TabButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Expanded(
       child: Container(
         alignment: Alignment.center,
@@ -478,7 +477,7 @@ class _TabButton extends StatelessWidget {
             fontWeight: FontWeight.w700,
             color: selected
                 ? YomiNowPalette.cream
-                : YomiNowPalette.ink.withValues(alpha: 0.7),
+                : colorScheme.onSurfaceVariant,
           ),
         ),
       ),

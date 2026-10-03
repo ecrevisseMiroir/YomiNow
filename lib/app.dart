@@ -10,6 +10,7 @@ import 'screens/home_screen.dart';
 import 'screens/licenses/licenses_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/splash_screen.dart';
+import 'services/app_appearance.dart';
 import 'services/app_language.dart';
 import 'services/app_services.dart';
 import 'theme/yomi_now_theme.dart';
@@ -24,10 +25,13 @@ class YomiNowApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppServicesScope(
       services: services,
-      child: ValueListenableBuilder<String>(
-        valueListenable: AppLanguage.selected,
-        builder: (context, language, _) {
-          final locale = AppLanguage.localeFor(language);
+      child: ListenableBuilder(
+        listenable: Listenable.merge([
+          AppLanguage.selected,
+          AppAppearance.selected,
+        ]),
+        builder: (context, _) {
+          final locale = AppLanguage.localeFor(AppLanguage.selected.value);
           return MaterialApp(
             title: 'YomiNow',
             locale: locale,
@@ -40,7 +44,7 @@ class YomiNowApp extends StatelessWidget {
             ],
             theme: YomiNowTheme.light,
             darkTheme: YomiNowTheme.dark,
-            themeMode: ThemeMode.system,
+            themeMode: AppAppearance.selected.value,
             home: const SplashScreen(),
             routes: {
               '/home': (_) => const HomeScreen(),

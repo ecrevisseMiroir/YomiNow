@@ -10,6 +10,7 @@ class YomiNowBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final items = [
       _BottomNavItem(icon: LucideIcons.home, label: 'Home', link: '/home'),
       _BottomNavItem(
@@ -29,7 +30,7 @@ class YomiNowBottomNav extends StatelessWidget {
         color: Theme.of(context).colorScheme.surface,
         border: Border(
           top: BorderSide(
-            color: YomiNowPalette.indigo.withValues(alpha: 0.12),
+            color: colorScheme.outlineVariant.withValues(alpha: 0.4),
             width: 1,
           ),
         ),
@@ -57,7 +58,7 @@ class YomiNowBottomNav extends StatelessWidget {
                         size: 30,
                         color: i == selectedIndex
                             ? YomiNowPalette.coral
-                            : YomiNowPalette.indigo.withValues(alpha: 0.65),
+                            : colorScheme.onSurfaceVariant,
                       ),
                       const SizedBox(height: 6),
                       Text(
@@ -67,7 +68,7 @@ class YomiNowBottomNav extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                           color: i == selectedIndex
                               ? YomiNowPalette.coral
-                              : YomiNowPalette.indigo.withValues(alpha: 0.65),
+                              : colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],

@@ -8,6 +8,7 @@ class OpenSourceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
     final items = [
       _OpenSourceItem(
         title: l10n.openSourceScreenItem1Title,
@@ -24,7 +25,7 @@ class OpenSourceScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: YomiNowPalette.cream,
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(18, 8, 18, 18),
@@ -40,7 +41,7 @@ class OpenSourceScreen extends StatelessWidget {
                       Icons.arrow_back_ios_new_rounded,
                       size: 30,
                     ),
-                    color: YomiNowPalette.ink,
+                    color: colorScheme.onSurface,
                     tooltip: l10n.openSourceScreenBackTooltip,
                     onPressed: () => Navigator.of(context).pop(),
                   ),
@@ -53,7 +54,7 @@ class OpenSourceScreen extends StatelessWidget {
                         fontSize: 32,
                         height: 1,
                         fontWeight: FontWeight.w600,
-                        color: YomiNowPalette.ink,
+                        color: colorScheme.onSurface,
                         letterSpacing: -1.2,
                       ),
                     ),
@@ -65,7 +66,7 @@ class OpenSourceScreen extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: YomiNowPalette.softBlue,
+                  color: colorScheme.surfaceContainerHigh,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -74,7 +75,7 @@ class OpenSourceScreen extends StatelessWidget {
                     fontFamily: 'Inter',
                     fontSize: 16,
                     height: 1.55,
-                    color: YomiNowPalette.ink.withValues(alpha: 0.8),
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
               ),
@@ -88,10 +89,12 @@ class OpenSourceScreen extends StatelessWidget {
                     return Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: colorScheme.surfaceContainerHigh,
                         borderRadius: BorderRadius.circular(18),
                         border: Border.all(
-                          color: YomiNowPalette.indigo.withValues(alpha: 0.14),
+                          color: colorScheme.outlineVariant.withValues(
+                            alpha: 0.5,
+                          ),
                         ),
                       ),
                       child: Column(
@@ -103,7 +106,7 @@ class OpenSourceScreen extends StatelessWidget {
                               fontFamily: 'Fredoka',
                               fontSize: 22,
                               fontWeight: FontWeight.w600,
-                              color: YomiNowPalette.indigo,
+                              color: colorScheme.primary,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -113,7 +116,7 @@ class OpenSourceScreen extends StatelessWidget {
                               fontFamily: 'Inter',
                               fontSize: 15,
                               height: 1.55,
-                              color: YomiNowPalette.ink.withValues(alpha: 0.8),
+                              color: colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],

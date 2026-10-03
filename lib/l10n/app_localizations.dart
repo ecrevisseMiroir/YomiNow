@@ -334,11 +334,23 @@ abstract class AppLocalizations {
   /// **'Appearance'**
   String get settingsScreenAppearanceTitle;
 
-  /// No description provided for @settingsScreenAppearanceSubtitle.
+  /// No description provided for @settingsScreenThemeSystem.
   ///
   /// In en, this message translates to:
-  /// **'Light theme'**
-  String get settingsScreenAppearanceSubtitle;
+  /// **'System'**
+  String get settingsScreenThemeSystem;
+
+  /// No description provided for @settingsScreenThemeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get settingsScreenThemeLight;
+
+  /// No description provided for @settingsScreenThemeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get settingsScreenThemeDark;
 
   /// No description provided for @settingsScreenLanguageTitle.
   ///

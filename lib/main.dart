@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'services/app_services.dart';
+import 'services/app_appearance.dart';
 import 'services/default_lookup_service.dart';
 import 'services/image_preprocess.dart';
 import 'services/kuromoji_tokenizer_service.dart';
@@ -24,6 +25,7 @@ Future<void> main() async {
   if (savedLang != null) {
     await AppLanguage.setLanguage(savedLang);
   }
+  await AppAppearance.load();
   // Load the tokenizer and extract the dictionary in the background so the
   // first tap on a word is fast.
   unawaited(tokenizer.init());

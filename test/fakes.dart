@@ -176,11 +176,19 @@ AppServices fakeServices({
 
 /// Wraps [child] in the app's service scope and a dark [MaterialApp], like
 /// the real app does.
-Widget withServices(AppServices services, Widget child) {
+Widget withServices(
+  AppServices services,
+  Widget child, {
+  ThemeData? theme,
+  ThemeData? darkTheme,
+  ThemeMode? themeMode,
+}) {
   return AppServicesScope(
     services: services,
     child: MaterialApp(
-      theme: ThemeData.dark(),
+      theme: theme ?? ThemeData.dark(),
+      darkTheme: darkTheme,
+      themeMode: themeMode,
       home: child,
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: [

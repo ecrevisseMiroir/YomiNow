@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:yominow/screens/home_screen.dart';
 import 'package:yominow/screens/image_screen.dart';
+import 'package:yominow/theme/yomi_now_theme.dart';
 
 import '../fakes.dart';
 
@@ -38,6 +39,18 @@ final _mobile = TargetPlatformVariant({
 });
 
 void main() {
+  Future<void> pumpHomeWithTheme(WidgetTester tester, ThemeMode mode) {
+    return tester.pumpWidget(
+      withServices(
+        fakeServices(),
+        const HomeScreen(),
+        theme: YomiNowTheme.light,
+        darkTheme: YomiNowTheme.dark,
+        themeMode: mode,
+      ),
+    );
+  }
+
   Future<void> pumpHome(
     WidgetTester tester, {
     ImagePicker? picker,
@@ -56,6 +69,25 @@ void main() {
 
     expect(find.text('YomiNow'), findsOneWidget);
     expect(find.textContaining('tap any word'), findsOneWidget);
+  });
+
+  testWidgets('home text follows light and dark theme colors', (tester) async {
+    for (final mode in [ThemeMode.light, ThemeMode.dark]) {
+      await pumpHomeWithTheme(tester, mode);
+      await tester.pumpAndSettle();
+      final colorScheme = mode == ThemeMode.dark
+          ? YomiNowTheme.dark.colorScheme
+          : YomiNowTheme.light.colorScheme;
+
+      expect(
+        tester.widget<Text>(find.text('Welcome!')).style?.color,
+        colorScheme.onSurface,
+      );
+      expect(
+        tester.widget<Text>(find.textContaining('tap any word')).style?.color,
+        colorScheme.onSurfaceVariant,
+      );
+    }
   });
 
   testWidgets('desktop offers only "Open image"', variant: _desktop, (

@@ -108,8 +108,9 @@ class _ImageScreenState extends State<ImageScreen> {
     final hasText = result != null && !result.isEmpty;
     final isLoading = _isRecognizing;
     final l10n = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: YomiNowPalette.cream,
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: Column(
           children: [
@@ -133,7 +134,7 @@ class _ImageScreenState extends State<ImageScreen> {
                           fontFamily: 'Fredoka',
                           fontSize: 24,
                           fontWeight: FontWeight.w700,
-                          color: YomiNowPalette.ink,
+                          color: colorScheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -142,7 +143,7 @@ class _ImageScreenState extends State<ImageScreen> {
                         style: TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 16,
-                          color: YomiNowPalette.ink.withValues(alpha: 0.7),
+                          color: colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -217,6 +218,7 @@ class _DetectedTextHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return SizedBox(
       height: 58,
       child: Row(
@@ -225,7 +227,7 @@ class _DetectedTextHeader extends StatelessWidget {
             tooltip: AppLocalizations.of(context)!.imageScreenBackButtonTooltip,
             onPressed: onBack,
             icon: const Icon(Icons.arrow_back_ios_new_rounded),
-            color: YomiNowPalette.ink,
+            color: colorScheme.onSurface,
           ),
           Expanded(
             child: Text(
@@ -234,7 +236,7 @@ class _DetectedTextHeader extends StatelessWidget {
                 fontFamily: 'Fredoka',
                 fontSize: 24,
                 fontWeight: FontWeight.w600,
-                color: YomiNowPalette.ink,
+                color: colorScheme.onSurface,
               ),
             ),
           ),
@@ -252,22 +254,25 @@ class _ViewModeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.fromLTRB(22, 10, 22, 16),
       child: Container(
         height: 52,
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: YomiNowPalette.softBlue.withValues(alpha: 0.55),
+          color: colorScheme.surfaceContainerHigh,
           borderRadius: BorderRadius.circular(28),
         ),
         child: Row(
           children: [
             _modeButton(
+              context,
               AppLocalizations.of(context)!.imageScreenModeText,
               _ImageScreenMode.text,
             ),
             _modeButton(
+              context,
               AppLocalizations.of(context)!.imageScreenModeImage,
               _ImageScreenMode.image,
             ),
@@ -277,8 +282,13 @@ class _ViewModeSelector extends StatelessWidget {
     );
   }
 
-  Widget _modeButton(String label, _ImageScreenMode value) {
+  Widget _modeButton(
+    BuildContext context,
+    String label,
+    _ImageScreenMode value,
+  ) {
     final selected = mode == value;
+    final colorScheme = Theme.of(context).colorScheme;
     return Expanded(
       child: Semantics(
         button: true,
@@ -296,7 +306,7 @@ class _ViewModeSelector extends StatelessWidget {
             child: Text(
               label,
               style: TextStyle(
-                color: selected ? YomiNowPalette.cream : YomiNowPalette.ink,
+                color: selected ? YomiNowPalette.cream : colorScheme.onSurface,
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
               ),
@@ -320,6 +330,7 @@ class _DetectedTextList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(24, 4, 24, 20),
       itemCount: result.lines.length,
@@ -330,7 +341,7 @@ class _DetectedTextList extends StatelessWidget {
           constraints: const BoxConstraints(minHeight: 62),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
-            color: YomiNowPalette.softBlue.withValues(alpha: 0.42),
+            color: colorScheme.surfaceContainerHigh,
             borderRadius: BorderRadius.circular(14),
           ),
           child: TokenizedText(
@@ -349,22 +360,23 @@ class _LookupHint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       constraints: const BoxConstraints(minHeight: 54),
       margin: const EdgeInsets.fromLTRB(18, 8, 18, 14),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: YomiNowPalette.softBlue.withValues(alpha: 0.7),
+        color: colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(18),
       ),
       child: Row(
         children: [
-          const Icon(Icons.touch_app_rounded, color: YomiNowPalette.indigo),
+          Icon(Icons.touch_app_rounded, color: colorScheme.onSurfaceVariant),
           const SizedBox(width: 12),
           Text(
             AppLocalizations.of(context)!.imageScreenLookupHint,
             style: TextStyle(
-              color: YomiNowPalette.ink.withValues(alpha: 0.72),
+              color: colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -430,10 +442,12 @@ class _StatusBanner extends StatelessWidget {
       );
     }
     if (result == null || result.isEmpty) {
+      final colorScheme = Theme.of(context).colorScheme;
       return _Banner(
-        color: YomiNowPalette.softBlue,
+        color: colorScheme.surfaceContainerHigh,
         child: Text(
           AppLocalizations.of(context)!.imageScreenNoJapaneseDetected,
+          style: TextStyle(color: colorScheme.onSurface),
         ),
       );
     }

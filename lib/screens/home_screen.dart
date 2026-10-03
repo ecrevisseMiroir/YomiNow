@@ -142,6 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildHeaderRow() {
+    final colorScheme = Theme.of(context).colorScheme;
     return Row(
       children: [
         SizedBox(
@@ -175,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
               fontFamily: 'Fredoka',
               fontSize: 35,
               fontWeight: FontWeight.w600,
-              color: YomiNowPalette.ink,
+              color: colorScheme.onSurface,
               letterSpacing: -1.4,
             ),
           ),
@@ -214,6 +215,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildWelcomeText() {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -224,7 +226,7 @@ class _HomeScreenState extends State<HomeScreen> {
             fontSize: 36,
             height: 1.1,
             fontWeight: FontWeight.w700,
-            color: YomiNowPalette.ink,
+            color: colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: 8),
@@ -234,7 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
             fontFamily: 'Inter',
             fontSize: 17,
             height: 1.4,
-            color: YomiNowPalette.ink.withValues(alpha: 0.72),
+            color: colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -321,6 +323,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildRecentScansHeader() {
+    final colorScheme = Theme.of(context).colorScheme;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -330,7 +333,7 @@ class _HomeScreenState extends State<HomeScreen> {
             fontFamily: 'Inter',
             fontSize: 34,
             fontWeight: FontWeight.w700,
-            color: YomiNowPalette.ink,
+            color: colorScheme.onSurface,
           ),
         ),
         Text(
@@ -339,7 +342,7 @@ class _HomeScreenState extends State<HomeScreen> {
             fontFamily: 'Inter',
             fontSize: 18,
             fontWeight: FontWeight.w600,
-            color: YomiNowPalette.ink.withValues(alpha: 0.75),
+            color: colorScheme.onSurfaceVariant,
           ),
         ),
       ],
@@ -394,6 +397,7 @@ class _ScanCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -457,11 +461,11 @@ class _ScanCard extends StatelessWidget {
         const SizedBox(height: 12),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'NotoSansJP',
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: YomiNowPalette.ink,
+            color: colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: 2),
@@ -470,7 +474,7 @@ class _ScanCard extends StatelessWidget {
           style: TextStyle(
             fontFamily: 'Inter',
             fontSize: 14,
-            color: YomiNowPalette.ink.withValues(alpha: 0.7),
+            color: colorScheme.onSurfaceVariant,
           ),
         ),
       ],

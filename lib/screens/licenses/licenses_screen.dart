@@ -10,6 +10,7 @@ class LicensesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
     final rows = [
       _InfoRow(
         label: l10n.licensesScreenAppLabel,
@@ -26,7 +27,7 @@ class LicensesScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: YomiNowPalette.cream,
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(18, 8, 18, 18),
@@ -43,7 +44,7 @@ class LicensesScreen extends StatelessWidget {
                         Icons.arrow_back_ios_new_rounded,
                         size: 30,
                       ),
-                      color: YomiNowPalette.ink,
+                      color: colorScheme.onSurface,
                       tooltip: l10n.licensesScreenBackTooltip,
                       onPressed: () => Navigator.of(context).pop(),
                     ),
@@ -56,7 +57,7 @@ class LicensesScreen extends StatelessWidget {
                           fontSize: 32,
                           height: 1,
                           fontWeight: FontWeight.w600,
-                          color: YomiNowPalette.ink,
+                          color: colorScheme.onSurface,
                           letterSpacing: -1.2,
                         ),
                       ),
@@ -68,7 +69,7 @@ class LicensesScreen extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: YomiNowPalette.softBlue,
+                    color: colorScheme.surfaceContainerHigh,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Column(
@@ -80,7 +81,7 @@ class LicensesScreen extends StatelessWidget {
                           fontFamily: 'Fredoka',
                           fontSize: 22,
                           fontWeight: FontWeight.w600,
-                          color: YomiNowPalette.ink,
+                          color: colorScheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -90,7 +91,7 @@ class LicensesScreen extends StatelessWidget {
                           fontFamily: 'Inter',
                           fontSize: 16,
                           height: 1.5,
-                          color: YomiNowPalette.ink.withValues(alpha: 0.8),
+                          color: colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -131,14 +132,15 @@ class _DetailCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: YomiNowPalette.indigo.withValues(alpha: 0.14),
+          color: colorScheme.outlineVariant.withValues(alpha: 0.5),
         ),
       ),
       child: Column(
@@ -150,7 +152,7 @@ class _DetailCard extends StatelessWidget {
               fontFamily: 'Fredoka',
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: YomiNowPalette.indigo,
+              color: colorScheme.primary,
             ),
           ),
           const SizedBox(height: 6),
@@ -160,7 +162,7 @@ class _DetailCard extends StatelessWidget {
               fontFamily: 'Inter',
               fontSize: 15,
               height: 1.5,
-              color: YomiNowPalette.ink.withValues(alpha: 0.8),
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -177,11 +179,12 @@ class _SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: YomiNowPalette.softBlue.withValues(alpha: 0.5),
+        color: colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
@@ -193,7 +196,7 @@ class _SectionCard extends StatelessWidget {
               fontFamily: 'Fredoka',
               fontSize: 22,
               fontWeight: FontWeight.w600,
-              color: YomiNowPalette.ink,
+              color: colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 8),
@@ -203,7 +206,7 @@ class _SectionCard extends StatelessWidget {
               fontFamily: 'Inter',
               fontSize: 15,
               height: 1.6,
-              color: YomiNowPalette.ink.withValues(alpha: 0.82),
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
         ],

@@ -9,6 +9,7 @@ class NoJapaneseText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return LayoutBuilder(
       builder: (context, constraints) {
         final imageSize = constraints.maxHeight < 520 ? 180.0 : 250.0;
@@ -35,7 +36,7 @@ class NoJapaneseText extends StatelessWidget {
                       fontFamily: 'Fredoka',
                       fontSize: 28,
                       fontWeight: FontWeight.w700,
-                      color: YomiNowPalette.ink,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -46,7 +47,7 @@ class NoJapaneseText extends StatelessWidget {
                       fontFamily: 'Inter',
                       fontSize: 16,
                       height: 1.45,
-                      color: YomiNowPalette.ink.withValues(alpha: 0.72),
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -57,7 +58,7 @@ class NoJapaneseText extends StatelessWidget {
                       fontFamily: 'Inter',
                       fontSize: 15,
                       height: 1.4,
-                      color: YomiNowPalette.ink.withValues(alpha: 0.62),
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 24),

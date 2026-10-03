@@ -128,7 +128,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsScreenAppearanceTitle => '外観';
 
   @override
-  String get settingsScreenAppearanceSubtitle => 'ライトテーマ';
+  String get settingsScreenThemeSystem => 'システム';
+
+  @override
+  String get settingsScreenThemeLight => 'ライト';
+
+  @override
+  String get settingsScreenThemeDark => 'ダーク';
 
   @override
   String get settingsScreenLanguageTitle => '言語';
