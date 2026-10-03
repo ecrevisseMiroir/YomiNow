@@ -77,6 +77,14 @@ void main() {
       ),
     );
 
+    // Wait for the detected text list to appear (first line)
+    // and then switch to image view mode to access the word overlay.
+    await _pumpUntil(tester, find.byKey(const ValueKey('text-line-0')),
+        timeout: const Duration(seconds: 180));
+    // Tap the "Image" mode button.
+    await tester.tap(find.text('Image'));
+    await tester.pumpAndSettle();
+
     // Tap 日 in the first line; the word there is 日本語.
     final firstChar = find.byKey(const ValueKey('word-0-0'));
     await _pumpUntil(tester, firstChar, timeout: const Duration(seconds: 180));
