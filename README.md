@@ -138,7 +138,14 @@ integration_test/     end-to-end OCR → tap → dictionary test on the desktop 
 
 ## Continuous integration
 
-`.github/workflows/flutter.yml` runs on pushes to `main` and `claude/**`, on pull requests, and on manual dispatch. The `linux` job runs `flutter analyze`, `flutter test`, the end-to-end test under Xvfb, and a release build. The `android` job builds a release APK and uploads it as the `yominow-apk` artifact. The `ios` job runs only when dispatched by hand, to save macOS minutes.
+`.github/workflows/flutter.yml` runs on pushes to `main`, `dev`, `canary`, and `claude/**`, on pull requests, and on manual dispatch. The `linux` job runs `flutter analyze`, `flutter test`, the end-to-end test under Xvfb, and a release build. The `android` job builds a release APK and uploads it as the `yominow-apk` artifact. The `ios` job runs only when dispatched by hand, to save macOS minutes.
+
+Release names use the app version from `pubspec.yaml` (`0.1.1` from `0.1.1+1`) with a channel suffix where needed:
+
+- A push to `main` publishes `v0.1.1+<commit>` as a stable production release.
+- A push to `dev` publishes `v0.1.1-dev.<commit>` as a prerelease.
+- A push to `canary` publishes `v0.1.1-canary.<commit>` as a prerelease.
+- A pushed version tag such as `v0.1.1` publishes that stable production version. It must match the version in `pubspec.yaml`, ignoring the build number.
 
 ## Licences and attribution
 

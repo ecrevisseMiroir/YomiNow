@@ -118,18 +118,23 @@ jobs:
           RELEASE_VERSION=${VERSION%%+*}
 
           case "$GITHUB_REF" in
+            refs/heads/main)
+              CHANNEL=prod
+              TAG="v${RELEASE_VERSION}+${GITHUB_SHA:0:12}"
+              PRERELEASE=false
+              ;;
             refs/heads/dev)
               CHANNEL=dev
-              TAG="dev-${GITHUB_SHA:0:12}"
+              TAG="v${RELEASE_VERSION}-dev.${GITHUB_SHA:0:12}"
               PRERELEASE=true
               ;;
-            refs/heads/main|refs/heads/canary)
+            refs/heads/canary)
               CHANNEL=canary
-              TAG="canary-${GITHUB_SHA:0:12}"
+              TAG="v${RELEASE_VERSION}-canary.${GITHUB_SHA:0:12}"
               PRERELEASE=true
               ;;
             refs/tags/v*)
-              CHANNEL=production
+              CHANNEL=prod
               TAG="$GITHUB_REF_NAME"
               TAG_VERSION=${TAG#v}
               if [ "$TAG_VERSION" != "$RELEASE_VERSION" ]; then
@@ -145,7 +150,7 @@ jobs:
           esac
 
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "name=YomiNow $CHANNEL $VERSION (${GITHUB_SHA:0:7})" >> "$GITHUB_OUTPUT"
+          echo "name=YomiNow $TAG" >> "$GITHUB_OUTPUT"
           echo "prerelease=$PRERELEASE" >> "$GITHUB_OUTPUT"
       - name: Download Android APK
         uses: actions/download-artifact@v4
