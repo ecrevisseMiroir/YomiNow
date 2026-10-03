@@ -4,7 +4,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../theme/yomi_now_theme.dart';
+
 import 'package:yominow/l10n/app_localizations.dart';
+
 import '../widgets/yomi_now_bottom_nav.dart';
 import '../widgets/error_dialog.dart';
 import 'camera_scanner.dart';
@@ -94,7 +96,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           _buildActionTile(
                             backgroundColor: YomiNowPalette.coral,
                             icon: LucideIcons.camera,
-                            title: AppLocalizations.of(context)!.homeScreenTitleTakePhoto,
+                            title: AppLocalizations.of(context)!
+                                .homeScreenTitleTakePhoto,
                             subtitle: '',
                             textColor: YomiNowPalette.cream,
                             iconColor: YomiNowPalette.cream,
@@ -104,7 +107,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           _buildActionTile(
                             backgroundColor: YomiNowPalette.softBlue,
                             icon: LucideIcons.image,
-                            title: AppLocalizations.of(context)!.homeScreenTitleChooseFromGallery,
+                            title: AppLocalizations.of(context)!
+                                .homeScreenTitleChooseFromGallery,
                             subtitle: '',
                             textColor: YomiNowPalette.ink,
                             iconColor: YomiNowPalette.indigo,
@@ -114,7 +118,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           _buildActionTile(
                             backgroundColor: YomiNowPalette.coral,
                             icon: LucideIcons.folderOpen,
-                            title: AppLocalizations.of(context)!.homeScreenTitleOpenImage,
+                            title: AppLocalizations.of(context)!
+                                .homeScreenTitleOpenImage,
                             subtitle: '',
                             textColor: YomiNowPalette.ink,
                             iconColor: YomiNowPalette.ink,
@@ -179,14 +184,19 @@ class _HomeScreenState extends State<HomeScreen> {
           width: 44,
           height: 44,
           child: Tooltip(
-            message: AppLocalizations.of(context)!.homeScreenNotificationsTooltip,
+            message: AppLocalizations.of(context)!
+                .homeScreenNotificationsTooltip,
             child: Material(
               color: Colors.transparent,
               child: InkWell(
                 customBorder: const CircleBorder(),
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(AppLocalizations.of(context)!.homeScreenNoNotifications))
+                    SnackBar(
+                      content: Text(
+                        AppLocalizations.of(context)!.homeScreenNoNotifications,
+                      ),
+                    ),
                   );
                 },
                 child: Center(

@@ -71,9 +71,8 @@ String versionPathFor(String gzPath) =>
 Future<String> writeVersionFile(String gzPath) async {
   final bytes = await File(gzPath).readAsBytes();
   final fingerprint = '${sha256.convert(bytes)} ${bytes.length}';
-  await File(
-    versionPathFor(gzPath),
-  ).writeAsBytes(utf8.encode('$fingerprint\n'));
+  await File(versionPathFor(gzPath))
+      .writeAsBytes(utf8.encode('$fingerprint\n'));
 
   return fingerprint;
 }

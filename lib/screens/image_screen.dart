@@ -12,6 +12,7 @@ import '../widgets/no_japanese_text.dart';
 import '../widgets/tokenized_text.dart';
 import '../widgets/word_overlay.dart';
 import '../theme/yomi_now_theme.dart';
+
 import 'package:yominow/l10n/app_localizations.dart';
 
 enum _ImageScreenMode { text, image }
@@ -262,8 +263,14 @@ class _ViewModeSelector extends StatelessWidget {
         ),
         child: Row(
           children: [
-            _modeButton(AppLocalizations.of(context)!.imageScreenModeText, _ImageScreenMode.text),
-            _modeButton(AppLocalizations.of(context)!.imageScreenModeImage, _ImageScreenMode.image),
+            _modeButton(
+              AppLocalizations.of(context)!.imageScreenModeText,
+              _ImageScreenMode.text,
+            ),
+            _modeButton(
+              AppLocalizations.of(context)!.imageScreenModeImage,
+              _ImageScreenMode.image,
+            ),
           ],
         ),
       ),
@@ -425,7 +432,9 @@ class _StatusBanner extends StatelessWidget {
     if (result == null || result.isEmpty) {
       return _Banner(
         color: YomiNowPalette.softBlue,
-        child: Text(AppLocalizations.of(context)!.imageScreenNoJapaneseDetected),
+        child: Text(
+          AppLocalizations.of(context)!.imageScreenNoJapaneseDetected,
+        ),
       );
     }
     return const SizedBox.shrink();

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../theme/yomi_now_theme.dart';
+
 import 'package:yominow/l10n/app_localizations.dart';
 
 class CameraScanner extends StatefulWidget {
@@ -39,10 +40,10 @@ class _CameraScannerState extends State<CameraScanner> {
 
       final description =
           preferredCamera ??
-              cameras.firstWhere(
-                (camera) => camera.lensDirection == CameraLensDirection.back,
-                orElse: () => cameras.first,
-              );
+          cameras.firstWhere(
+            (camera) => camera.lensDirection == CameraLensDirection.back,
+            orElse: () => cameras.first,
+          );
       controller = CameraController(
         description,
         ResolutionPreset.high,
@@ -106,7 +107,9 @@ class _CameraScannerState extends State<CameraScanner> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(AppLocalizations.of(context)!.cameraScannerFlashUnavailable),
+          content: Text(
+            AppLocalizations.of(context)!.cameraScannerFlashUnavailable,
+          ),
         ),
       );
     }
@@ -127,7 +130,9 @@ class _CameraScannerState extends State<CameraScanner> {
       setState(() => _isBusy = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(AppLocalizations.of(context)!.cameraScannerCaptureFailed),
+          content: Text(
+            AppLocalizations.of(context)!.cameraScannerCaptureFailed,
+          ),
         ),
       );
     }
@@ -142,7 +147,9 @@ class _CameraScannerState extends State<CameraScanner> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(AppLocalizations.of(context)!.cameraScannerOpenGalleryFailed),
+          content: Text(
+            AppLocalizations.of(context)!.cameraScannerOpenGalleryFailed,
+          ),
         ),
       );
     }
@@ -242,7 +249,9 @@ class _CameraScannerState extends State<CameraScanner> {
                   unawaited(_initializeCamera());
                 },
                 icon: const Icon(Icons.refresh_rounded),
-                label: Text(AppLocalizations.of(context)!.cameraScannerTryAgain),
+                label: Text(
+                  AppLocalizations.of(context)!.cameraScannerTryAgain,
+                ),
               ),
             ],
           ),
@@ -286,12 +295,14 @@ class _CameraScannerState extends State<CameraScanner> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 _modeButton(
-                    label: AppLocalizations.of(context)!.cameraScannerModePhoto,
-                    selected: true,
-                    onTap: () {}),
+                  label: AppLocalizations.of(context)!.cameraScannerModePhoto,
+                  selected: true,
+                  onTap: () {},
+                ),
                 _modeButton(
-                    label: AppLocalizations.of(context)!.cameraScannerModeGallery,
-                    onTap: _openGallery),
+                  label: AppLocalizations.of(context)!.cameraScannerModeGallery,
+                  onTap: _openGallery,
+                ),
               ],
             ),
           ),
@@ -301,7 +312,8 @@ class _CameraScannerState extends State<CameraScanner> {
             children: [
               _roundIconButton(
                 icon: Icons.photo_library_outlined,
-                label: AppLocalizations.of(context)!.cameraScannerChooseFromGallery,
+                label: AppLocalizations.of(context)!
+                    .cameraScannerChooseFromGallery,
                 onPressed: _openGallery,
               ),
               Semantics(

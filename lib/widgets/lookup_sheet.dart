@@ -231,9 +231,8 @@ class _CommonChip extends StatelessWidget {
       padding: EdgeInsets.zero,
       side: BorderSide.none,
       backgroundColor: scheme.primaryContainer,
-      labelStyle: Theme.of(
-        context,
-      ).textTheme.labelSmall?.copyWith(color: scheme.onPrimaryContainer),
+      labelStyle: Theme.of(context).textTheme.labelSmall
+          ?.copyWith(color: scheme.onPrimaryContainer),
     );
   }
 }

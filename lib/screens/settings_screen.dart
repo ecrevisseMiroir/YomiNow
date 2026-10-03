@@ -3,7 +3,9 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 import '../services/app_language.dart';
 import '../theme/yomi_now_theme.dart';
+
 import 'package:yominow/l10n/app_localizations.dart';
+
 import '../widgets/yomi_now_bottom_nav.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -40,12 +42,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _SettingsItem(
         icon: Icons.menu_book_outlined,
         title: AppLocalizations.of(context)!.settingsScreenDictionaryTitle,
-        subtitle: AppLocalizations.of(context)!.settingsScreenDictionarySubtitle,
+        subtitle: AppLocalizations.of(context)!
+            .settingsScreenDictionarySubtitle,
       ),
       _SettingsItem(
         icon: Icons.light_mode_outlined,
         title: AppLocalizations.of(context)!.settingsScreenAppearanceTitle,
-        subtitle: AppLocalizations.of(context)!.settingsScreenAppearanceSubtitle,
+        subtitle: AppLocalizations.of(context)!
+            .settingsScreenAppearanceSubtitle,
       ),
       _SettingsItem(
         icon: Icons.language_outlined,
@@ -56,7 +60,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _SettingsItem(
         icon: Icons.info_outline,
         title: AppLocalizations.of(context)!.settingsScreenAboutTitle,
-        subtitle: '${AppLocalizations.of(context)!.settingsScreenVersionLabel} $_appVersion',
+        subtitle:
+            '${AppLocalizations.of(context)!.settingsScreenVersionLabel} $_appVersion',
         route: '/about',
       ),
     ];

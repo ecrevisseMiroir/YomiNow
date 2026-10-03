@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -54,7 +55,8 @@ class AppLocalizationsJa extends AppLocalizations {
   String get documentsScreenEmptyTitle => 'まだドキュメントがありません';
 
   @override
-  String get documentsScreenEmptySubtitle => '最初の画像をスキャンするか、既存の画像をインポートして開始してください。';
+  String get documentsScreenEmptySubtitle =>
+      '最初の画像をスキャンするか、既存の画像をインポートして開始してください。';
 
   @override
   String get documentsScreenCameraButton => 'カメラでスキャン';
@@ -204,7 +206,8 @@ class AppLocalizationsJa extends AppLocalizations {
   String get licensesScreenProjectCredits => 'プロジェクト クレジット';
 
   @override
-  String get licensesScreenProjectDescription => 'このアプリは、オープンソースのOCR、辞書データ、モバイル ツールを組み合わせ、日本語テキストを瞬時に読めるようにしています。';
+  String get licensesScreenProjectDescription =>
+      'このアプリは、オープンソースのOCR、辞書データ、モバイル ツールを組み合わせ、日本語テキストを瞬時に読めるようにしています。';
 
   @override
   String get licensesScreenAppLabel => 'アプリ';
@@ -222,13 +225,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get licensesScreenAttributionLabel => '帰属';
 
   @override
-  String get licensesScreenAttributionValue => 'JMdict、IPADIC、Tesseract、Google ML Kit を以下に記載します。';
+  String get licensesScreenAttributionValue =>
+      'JMdict、IPADIC、Tesseract、Google ML Kit を以下に記載します。';
 
   @override
   String get licensesScreenDataSourcesTitle => 'データ ソース';
 
   @override
-  String get licensesScreenDataSourcesBody => 'JMdictは日本語辞書検索に使用；IPADICはトークナイザーを駆動；TesseractとGoogle ML KitはOCRを駆動。';
+  String get licensesScreenDataSourcesBody =>
+      'JMdictは日本語辞書検索に使用；IPADICはトークナイザーを駆動；TesseractとGoogle ML KitはOCRを駆動。';
 
   @override
   String get thirdPartyLibrariesScreenTitle => 'サードパーティライブラリ';
@@ -240,25 +245,30 @@ class AppLocalizationsJa extends AppLocalizations {
   String get thirdPartyLibrariesScreenFlutter => 'Flutter';
 
   @override
-  String get thirdPartyLibrariesScreenFlutterPurpose => 'クロスプラットフォーム アプリ フレームワークと UI ツールキット。';
+  String get thirdPartyLibrariesScreenFlutterPurpose =>
+      'クロスプラットフォーム アプリ フレームワークと UI ツールキット。';
 
   @override
   String get thirdPartyLibrariesScreenCamera => 'camera';
 
   @override
-  String get thirdPartyLibrariesScreenCameraPurpose => 'Android と iOS でのカスタム モバイル カメラ撮影フロー。';
+  String get thirdPartyLibrariesScreenCameraPurpose =>
+      'Android と iOS でのカスタム モバイル カメラ撮影フロー。';
 
   @override
-  String get thirdPartyLibrariesScreenGoogleMlkit => 'google_mlkit_text_recognition';
+  String get thirdPartyLibrariesScreenGoogleMlkit =>
+      'google_mlkit_text_recognition';
 
   @override
-  String get thirdPartyLibrariesScreenGoogleMlkitPurpose => 'モバイル スキャン用の日本語 OCR バックエンド。';
+  String get thirdPartyLibrariesScreenGoogleMlkitPurpose =>
+      'モバイル スキャン用の日本語 OCR バックエンド。';
 
   @override
   String get thirdPartyLibrariesScreenImagePicker => 'image_picker';
 
   @override
-  String get thirdPartyLibrariesScreenImagePickerPurpose => 'ギャラリーとカメラからの画像選択をサポート。';
+  String get thirdPartyLibrariesScreenImagePickerPurpose =>
+      'ギャラリーとカメラからの画像選択をサポート。';
 
   @override
   String get thirdPartyLibrariesScreenKuromoji => 'kuromoji';
@@ -276,7 +286,8 @@ class AppLocalizationsJa extends AppLocalizations {
   String get thirdPartyLibrariesScreenPathProvider => 'path_provider';
 
   @override
-  String get thirdPartyLibrariesScreenPathProviderPurpose => 'アプリデータとローカル アセットのファイルシステム アクセス。';
+  String get thirdPartyLibrariesScreenPathProviderPurpose =>
+      'アプリデータとローカル アセットのファイルシステム アクセス。';
 
   @override
   String get thirdPartyLibrariesScreenImage => 'image';
@@ -291,25 +302,29 @@ class AppLocalizationsJa extends AppLocalizations {
   String get openSourceScreenBackTooltip => '戻る';
 
   @override
-  String get openSourceScreenDescription => 'YomiNowは、オープンでモジュール化され、共に改善しやすいよう構築されています。';
+  String get openSourceScreenDescription =>
+      'YomiNowは、オープンでモジュール化され、共に改善しやすいよう構築されています。';
 
   @override
   String get openSourceScreenItem1Title => 'プロジェクト ソース';
 
   @override
-  String get openSourceScreenItem1Detail => 'アプリのコードはプロジェクト ワークスペースに保持され、機能、サービス、UI 画面ごとに整理されています。';
+  String get openSourceScreenItem1Detail =>
+      'アプリのコードはプロジェクト ワークスペースに保持され、機能、サービス、UI 画面ごとに整理されています。';
 
   @override
   String get openSourceScreenItem2Title => '貢献モデル';
 
   @override
-  String get openSourceScreenItem2Detail => 'OCR、辞書マッチング、UI の改善、アクセシビリティは、コア ワークフローを変更せずに改善できます。';
+  String get openSourceScreenItem2Detail =>
+      'OCR、辞書マッチング、UI の改善、アクセシビリティは、コア ワークフローを変更せずに改善できます。';
 
   @override
   String get openSourceScreenItem3Title => 'プロジェクトの考え方';
 
   @override
-  String get openSourceScreenItem3Detail => 'YomiNowは、透明性があり、オフラインファーストで、将来の言語学習機能に簡単に拡張できるように設計されています。';
+  String get openSourceScreenItem3Detail =>
+      'YomiNowは、透明性があり、オフラインファーストで、将来の言語学習機能に簡単に拡張できるように設計されています。';
 
   @override
   String get imageScreenProcessingTitle => '画像を処理中...';

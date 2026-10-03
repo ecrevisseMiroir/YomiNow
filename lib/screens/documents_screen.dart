@@ -8,6 +8,7 @@ import '../theme/yomi_now_theme.dart';
 import '../widgets/yomi_now_bottom_nav.dart';
 import '../widgets/error_dialog.dart';
 import 'camera_scanner.dart';
+
 import 'package:yominow/l10n/app_localizations.dart';
 
 class DocumentsScreen extends StatefulWidget {
@@ -129,7 +130,8 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                   ),
                   const SizedBox(width: 26),
                   _TabButton(
-                    label: AppLocalizations.of(context)!.documentsScreenTabImages,
+                    label: AppLocalizations.of(context)!
+                        .documentsScreenTabImages,
                   ),
                   const SizedBox(width: 26),
                   _TabButton(
@@ -153,7 +155,8 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                           child: SizedBox(
                             width: 110,
                             height: 110,
-                            child: item.path.isNotEmpty &&
+                            child:
+                                item.path.isNotEmpty &&
                                     File(item.path).existsSync()
                                 ? Image.file(File(item.path), fit: BoxFit.cover)
                                 : Image.asset(
@@ -232,11 +235,17 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                                 itemBuilder: (_) => [
                                   PopupMenuItem<int>(
                                     value: 0,
-                                    child: Text(AppLocalizations.of(context)!.documentsScreenPopupOpen),
+                                    child: Text(
+                                      AppLocalizations.of(context)!
+                                          .documentsScreenPopupOpen,
+                                    ),
                                   ),
                                   PopupMenuItem<int>(
                                     value: 1,
-                                    child: Text(AppLocalizations.of(context)!.documentsScreenPopupDelete),
+                                    child: Text(
+                                      AppLocalizations.of(context)!
+                                          .documentsScreenPopupDelete,
+                                    ),
                                   ),
                                 ],
                               ),

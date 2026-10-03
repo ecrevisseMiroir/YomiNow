@@ -32,7 +32,8 @@ class YomiNowApp extends StatelessWidget {
             title: 'YomiNow',
             locale: locale,
             supportedLocales: AppLocalizations.supportedLocales,
-            localizationsDelegates: [AppLocalizations.delegate,
+            localizationsDelegates: [
+              AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,

@@ -16,10 +16,9 @@ class TesseractOcrService implements OcrService {
   /// [tessdataDir] resolves the directory that holds `jpn.traineddata`; by
   /// default the bundled model is copied to the app support directory.
   TesseractOcrService({
-    String executable = 'tesseract',
+    this._executable = 'tesseract',
     Future<String> Function()? tessdataDir,
-  }) : _executable = executable,
-       _tessdataDir = tessdataDir ?? _installBundledTessdata;
+  }) : _tessdataDir = tessdataDir ?? _installBundledTessdata;
 
   final String _executable;
   final Future<String> Function() _tessdataDir;

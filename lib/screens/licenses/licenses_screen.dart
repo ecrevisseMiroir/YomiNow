@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/yomi_now_theme.dart';
+
 import 'package:yominow/l10n/app_localizations.dart';
 
 class LicensesScreen extends StatelessWidget {
@@ -10,7 +11,10 @@ class LicensesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final rows = [
-      _InfoRow(label: l10n.licensesScreenAppLabel, value: l10n.licensesScreenAppValue),
+      _InfoRow(
+        label: l10n.licensesScreenAppLabel,
+        value: l10n.licensesScreenAppValue,
+      ),
       _InfoRow(
         label: l10n.licensesScreenLicenseStatusLabel,
         value: l10n.licensesScreenLicenseStatusValue,
