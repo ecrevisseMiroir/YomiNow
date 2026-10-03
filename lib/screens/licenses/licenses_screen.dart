@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../theme/yomi_now_theme.dart';
 
 import 'package:yominow/l10n/app_localizations.dart';
 

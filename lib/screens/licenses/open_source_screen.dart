@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:yominow/l10n/app_localizations.dart';
-import 'package:yominow/theme/yomi_now_theme.dart';
 
 class OpenSourceScreen extends StatelessWidget {
   const OpenSourceScreen({super.key});
