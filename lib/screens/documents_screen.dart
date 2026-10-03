@@ -8,6 +8,7 @@ import '../theme/yomi_now_theme.dart';
 import '../widgets/yomi_now_bottom_nav.dart';
 import '../widgets/error_dialog.dart';
 import 'camera_scanner.dart';
+import 'package:yominow/l10n/app_localizations.dart';
 
 class DocumentsScreen extends StatefulWidget {
   const DocumentsScreen({super.key, this.picker});
@@ -109,7 +110,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               const SizedBox(height: 8),
               const SizedBox(height: 16),
               Text(
-                'Documents',
+                AppLocalizations.of(context)!.documentsScreenTitle,
                 style: TextStyle(
                   fontFamily: 'Fredoka',
                   fontSize: 35,
@@ -122,11 +123,18 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               const SizedBox(height: 18),
               Row(
                 children: [
-                  _TabButton(label: 'All', selected: true),
+                  _TabButton(
+                    label: AppLocalizations.of(context)!.documentsScreenTabAll,
+                    selected: true,
+                  ),
                   const SizedBox(width: 26),
-                  _TabButton(label: 'Images'),
+                  _TabButton(
+                    label: AppLocalizations.of(context)!.documentsScreenTabImages,
+                  ),
                   const SizedBox(width: 26),
-                  _TabButton(label: 'Text'),
+                  _TabButton(
+                    label: AppLocalizations.of(context)!.documentsScreenTabText,
+                  ),
                 ],
               ),
               const SizedBox(height: 14),
@@ -145,8 +153,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                           child: SizedBox(
                             width: 110,
                             height: 110,
-                            child:
-                                item.path.isNotEmpty &&
+                            child: item.path.isNotEmpty &&
                                     File(item.path).existsSync()
                                 ? Image.file(File(item.path), fit: BoxFit.cover)
                                 : Image.asset(
@@ -222,14 +229,14 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                                     _deleteDocument(index);
                                   }
                                 },
-                                itemBuilder: (_) => const [
+                                itemBuilder: (_) => [
                                   PopupMenuItem<int>(
                                     value: 0,
-                                    child: Text('Open'),
+                                    child: Text(AppLocalizations.of(context)!.documentsScreenPopupOpen),
                                   ),
                                   PopupMenuItem<int>(
                                     value: 1,
-                                    child: Text('Delete'),
+                                    child: Text(AppLocalizations.of(context)!.documentsScreenPopupDelete),
                                   ),
                                 ],
                               ),
@@ -257,7 +264,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
         final imageWidth = isLandscape ? 180.0 : (isCompact ? 260.0 : 320.0);
 
         final header = Text(
-          'Documents',
+          AppLocalizations.of(context)!.documentsScreenTitle,
           style: TextStyle(
             fontFamily: 'Fredoka',
             fontSize: 35,
@@ -269,7 +276,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
         );
 
         final title = Text(
-          'No Documents Yet',
+          AppLocalizations.of(context)!.documentsScreenEmptyTitle,
           textAlign: TextAlign.center,
           style: TextStyle(
             fontFamily: 'Fredoka',
@@ -281,7 +288,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
         );
 
         final subtitle = Text(
-          'Scan your first image or import\nan existing one to get started.',
+          AppLocalizations.of(context)!.documentsScreenEmptySubtitle,
           textAlign: TextAlign.center,
           style: TextStyle(
             fontFamily: 'Fredoka',
@@ -310,7 +317,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
             color: YomiNowPalette.cream,
           ),
           label: Text(
-            'Scan with Camera',
+            AppLocalizations.of(context)!.documentsScreenCameraButton,
             style: TextStyle(
               fontFamily: 'Fredoka',
               fontSize: isCompact ? 24 : 30,
@@ -339,7 +346,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
             color: YomiNowPalette.indigo,
           ),
           label: Text(
-            'Choose from Gallery',
+            AppLocalizations.of(context)!.documentsScreenGalleryButton,
             style: TextStyle(
               fontFamily: 'Fredoka',
               fontSize: isCompact ? 24 : 30,

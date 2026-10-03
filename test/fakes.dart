@@ -2,9 +2,11 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image/image.dart' as img;
 import 'package:path/path.dart' as p;
+import 'package:yominow/l10n/app_localizations.dart';
 import 'package:yominow/models/ja_token.dart';
 import 'package:yominow/models/lookup_result.dart';
 import 'package:yominow/models/ocr_result.dart';
@@ -177,7 +179,17 @@ AppServices fakeServices({
 Widget withServices(AppServices services, Widget child) {
   return AppServicesScope(
     services: services,
-    child: MaterialApp(theme: ThemeData.dark(), home: child),
+    child: MaterialApp(
+      theme: ThemeData.dark(),
+      home: child,
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+    ),
   );
 }
 

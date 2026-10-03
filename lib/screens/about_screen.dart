@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:yominow/l10n/app_localizations.dart';
 import '../theme/yomi_now_theme.dart';
 import '../widgets/yomi_now_bottom_nav.dart';
 
@@ -8,20 +9,20 @@ class AboutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const items = [
+    final items = [
       _AboutItem(
         icon: Icons.description_outlined,
-        title: 'Licenses & Attribution',
+        title: AppLocalizations.of(context)!.aboutScreenLicenses,
         route: '/licenses',
       ),
       _AboutItem(
         icon: Icons.library_books_outlined,
-        title: 'Third-party Libraries',
+        title: AppLocalizations.of(context)!.aboutScreenThirdPartyLibraries,
         route: '/third-party-libraries',
       ),
       _AboutItem(
         icon: Icons.code_outlined,
-        title: 'Open Source',
+        title: AppLocalizations.of(context)!.aboutScreenOpenSource,
         route: '/open-source',
       ),
     ];
@@ -64,7 +65,7 @@ class AboutScreen extends StatelessWidget {
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              'About',
+                              AppLocalizations.of(context)!.aboutScreenTitle,
                               style: TextStyle(
                                 fontFamily: 'Fredoka',
                                 fontSize: 35,
@@ -103,7 +104,7 @@ class AboutScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Read Japanese Instantly',
+                        AppLocalizations.of(context)!.aboutScreenSubtitle,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: 'Fredoka',
@@ -115,7 +116,7 @@ class AboutScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        'An offline Japanese OCR and dictionary\napp built with Flutter.',
+                        AppLocalizations.of(context)!.aboutScreenDescription,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: 'Fredoka',

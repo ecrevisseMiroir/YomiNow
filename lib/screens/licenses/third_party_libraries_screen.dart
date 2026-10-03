@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yominow/l10n/app_localizations.dart';
 import 'package:yominow/theme/yomi_now_theme.dart';
 
 class ThirdPartyLibrariesScreen extends StatelessWidget {
@@ -6,38 +7,39 @@ class ThirdPartyLibrariesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final libraries = [
       _LibraryEntry(
-        name: 'Flutter',
-        purpose: 'Cross-platform app framework and UI toolkit.',
+        name: l10n.thirdPartyLibrariesScreenFlutter,
+        purpose: l10n.thirdPartyLibrariesScreenFlutterPurpose,
       ),
       _LibraryEntry(
-        name: 'camera',
-        purpose: 'Custom mobile camera capture flow on Android and iOS.',
+        name: l10n.thirdPartyLibrariesScreenCamera,
+        purpose: l10n.thirdPartyLibrariesScreenCameraPurpose,
       ),
       _LibraryEntry(
-        name: 'google_mlkit_text_recognition',
-        purpose: 'Japanese OCR backend for mobile scanning.',
+        name: l10n.thirdPartyLibrariesScreenGoogleMlkit,
+        purpose: l10n.thirdPartyLibrariesScreenGoogleMlkitPurpose,
       ),
       _LibraryEntry(
-        name: 'image_picker',
-        purpose: 'Gallery and camera image selection support.',
+        name: l10n.thirdPartyLibrariesScreenImagePicker,
+        purpose: l10n.thirdPartyLibrariesScreenImagePickerPurpose,
       ),
       _LibraryEntry(
-        name: 'kuromoji',
-        purpose: 'Japanese morphological tokenization and word analysis.',
+        name: l10n.thirdPartyLibrariesScreenKuromoji,
+        purpose: l10n.thirdPartyLibrariesScreenKuromojiPurpose,
       ),
       _LibraryEntry(
-        name: 'sqlite3',
-        purpose: 'Offline dictionary database access.',
+        name: l10n.thirdPartyLibrariesScreenSqlite3,
+        purpose: l10n.thirdPartyLibrariesScreenSqlite3Purpose,
       ),
       _LibraryEntry(
-        name: 'path_provider',
-        purpose: 'Filesystem access for app data and local assets.',
+        name: l10n.thirdPartyLibrariesScreenPathProvider,
+        purpose: l10n.thirdPartyLibrariesScreenPathProviderPurpose,
       ),
       _LibraryEntry(
-        name: 'image',
-        purpose: 'Image preprocessing and EXIF orientation handling.',
+        name: l10n.thirdPartyLibrariesScreenImage,
+        purpose: l10n.thirdPartyLibrariesScreenImagePurpose,
       ),
     ];
 
@@ -59,12 +61,13 @@ class ThirdPartyLibrariesScreen extends StatelessWidget {
                       size: 30,
                     ),
                     color: YomiNowPalette.ink,
+                    tooltip: l10n.thirdPartyLibrariesScreenBackTooltip,
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Third-party Libraries',
+                      l10n.thirdPartyLibrariesScreenTitle,
                       style: TextStyle(
                         fontFamily: 'Fredoka',
                         fontSize: 32,

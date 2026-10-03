@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yominow/l10n/app_localizations.dart';
 import 'package:yominow/theme/yomi_now_theme.dart';
 
 class OpenSourceScreen extends StatelessWidget {
@@ -6,21 +7,19 @@ class OpenSourceScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final items = [
       _OpenSourceItem(
-        title: 'Project source',
-        detail:
-            'The app code is kept in the project workspace and organized by feature, service, and UI screen.',
+        title: l10n.openSourceScreenItem1Title,
+        detail: l10n.openSourceScreenItem1Detail,
       ),
       _OpenSourceItem(
-        title: 'Contribution model',
-        detail:
-            'Improvements can be made to OCR, dictionary matching, UI polish, and accessibility without changing the core workflow.',
+        title: l10n.openSourceScreenItem2Title,
+        detail: l10n.openSourceScreenItem2Detail,
       ),
       _OpenSourceItem(
-        title: 'Project mindset',
-        detail:
-            'YomiNow is designed to be transparent, offline-first, and easy to extend for future language-learning features.',
+        title: l10n.openSourceScreenItem3Title,
+        detail: l10n.openSourceScreenItem3Detail,
       ),
     ];
 
@@ -42,12 +41,13 @@ class OpenSourceScreen extends StatelessWidget {
                       size: 30,
                     ),
                     color: YomiNowPalette.ink,
+                    tooltip: l10n.openSourceScreenBackTooltip,
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Open Source',
+                      l10n.openSourceScreenTitle,
                       style: TextStyle(
                         fontFamily: 'Fredoka',
                         fontSize: 32,
@@ -69,7 +69,7 @@ class OpenSourceScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  'YomiNow is built to stay open, modular, and easy to improve together.',
+                  l10n.openSourceScreenDescription,
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 16,

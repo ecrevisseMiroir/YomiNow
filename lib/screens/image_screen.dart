@@ -12,6 +12,7 @@ import '../widgets/no_japanese_text.dart';
 import '../widgets/tokenized_text.dart';
 import '../widgets/word_overlay.dart';
 import '../theme/yomi_now_theme.dart';
+import 'package:yominow/l10n/app_localizations.dart';
 
 enum _ImageScreenMode { text, image }
 
@@ -31,6 +32,7 @@ class _ImageScreenState extends State<ImageScreen> {
   PreparedImage? _image;
   OcrResult? _result;
   Object? _error;
+  bool _isRecognizing = false;
 
   _ImageScreenMode _mode = _ImageScreenMode.text;
   WordId? _selected;
@@ -53,10 +55,21 @@ class _ImageScreenState extends State<ImageScreen> {
       if (!mounted) return;
       setState(() => _image = image);
 
+      setState(() => _isRecognizing = true);
       final result = await services.ocr.recognize(image.path);
-      if (mounted) setState(() => _result = result);
+      if (mounted) {
+        setState(() {
+          _result = result;
+          _isRecognizing = false;
+        });
+      }
     } catch (error) {
-      if (mounted) setState(() => _error = error);
+      if (mounted) {
+        setState(() {
+          _error = error;
+          _isRecognizing = false;
+        });
+      }
     }
   }
 
@@ -92,6 +105,8 @@ class _ImageScreenState extends State<ImageScreen> {
     final image = _image;
     final result = _result;
     final hasText = result != null && !result.isEmpty;
+    final isLoading = _isRecognizing;
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: YomiNowPalette.cream,
       body: SafeArea(
@@ -103,7 +118,37 @@ class _ImageScreenState extends State<ImageScreen> {
                   ? () => setState(() => _mode = _ImageScreenMode.image)
                   : null,
             ),
-            if (hasText) ...[
+            if (isLoading)
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: 16),
+                      Text(
+                        l10n.imageScreenProcessingTitle,
+                        style: TextStyle(
+                          fontFamily: 'Fredoka',
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          color: YomiNowPalette.ink,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        l10n.imageScreenProcessingSubtitle,
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 16,
+                          color: YomiNowPalette.ink.withValues(alpha: 0.7),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else if (hasText) ...[
               _ViewModeSelector(
                 mode: _mode,
                 onChanged: (mode) => setState(() => _mode = mode),
@@ -176,14 +221,14 @@ class _DetectedTextHeader extends StatelessWidget {
       child: Row(
         children: [
           IconButton(
-            tooltip: 'Back',
+            tooltip: AppLocalizations.of(context)!.imageScreenBackButtonTooltip,
             onPressed: onBack,
             icon: const Icon(Icons.arrow_back_ios_new_rounded),
             color: YomiNowPalette.ink,
           ),
           Expanded(
             child: Text(
-              'Detected Text',
+              AppLocalizations.of(context)!.imageScreenDetectedTextTitle,
               style: TextStyle(
                 fontFamily: 'Fredoka',
                 fontSize: 24,
@@ -217,8 +262,8 @@ class _ViewModeSelector extends StatelessWidget {
         ),
         child: Row(
           children: [
-            _modeButton('Text', _ImageScreenMode.text),
-            _modeButton('Image', _ImageScreenMode.image),
+            _modeButton(AppLocalizations.of(context)!.imageScreenModeText, _ImageScreenMode.text),
+            _modeButton(AppLocalizations.of(context)!.imageScreenModeImage, _ImageScreenMode.image),
           ],
         ),
       ),
@@ -310,7 +355,7 @@ class _LookupHint extends StatelessWidget {
           const Icon(Icons.touch_app_rounded, color: YomiNowPalette.indigo),
           const SizedBox(width: 12),
           Text(
-            'Tap a word to see its meaning',
+            AppLocalizations.of(context)!.imageScreenLookupHint,
             style: TextStyle(
               color: YomiNowPalette.ink.withValues(alpha: 0.72),
               fontWeight: FontWeight.w600,
@@ -380,7 +425,7 @@ class _StatusBanner extends StatelessWidget {
     if (result == null || result.isEmpty) {
       return _Banner(
         color: YomiNowPalette.softBlue,
-        child: const Text('No Japanese text detected.'),
+        child: Text(AppLocalizations.of(context)!.imageScreenNoJapaneseDetected),
       );
     }
     return const SizedBox.shrink();

@@ -1,41 +1,135 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
+import '../services/app_language.dart';
 import '../theme/yomi_now_theme.dart';
+import 'package:yominow/l10n/app_localizations.dart';
 import '../widgets/yomi_now_bottom_nav.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    const items = [
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  String _appVersion = '0.0.0';
+
+  String get _selectedLanguage => AppLanguage.selected.value;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAppVersion();
+  }
+
+  Future<void> _loadAppVersion() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    if (!mounted) return;
+    setState(() => _appVersion = packageInfo.version);
+  }
+
+  List<_SettingsItem> _buildItems() {
+    return [
       _SettingsItem(
         icon: Icons.document_scanner_outlined,
-        title: 'OCR Settings',
-        subtitle: 'Tesseract / ML Kit',
+        title: AppLocalizations.of(context)!.settingsScreenOCRTitle,
+        subtitle: AppLocalizations.of(context)!.settingsScreenOCRSubtitle,
       ),
       _SettingsItem(
         icon: Icons.menu_book_outlined,
-        title: 'Dictionary',
-        subtitle: 'JMdict (offline)',
+        title: AppLocalizations.of(context)!.settingsScreenDictionaryTitle,
+        subtitle: AppLocalizations.of(context)!.settingsScreenDictionarySubtitle,
       ),
       _SettingsItem(
         icon: Icons.light_mode_outlined,
-        title: 'Appearance',
-        subtitle: 'Light theme',
+        title: AppLocalizations.of(context)!.settingsScreenAppearanceTitle,
+        subtitle: AppLocalizations.of(context)!.settingsScreenAppearanceSubtitle,
       ),
       _SettingsItem(
         icon: Icons.language_outlined,
-        title: 'Language',
-        subtitle: 'English',
+        title: AppLocalizations.of(context)!.settingsScreenLanguageTitle,
+        subtitle: _selectedLanguage,
+        isAction: true,
       ),
       _SettingsItem(
         icon: Icons.info_outline,
-        title: 'About',
-        subtitle: 'Version 1.0.0',
+        title: AppLocalizations.of(context)!.settingsScreenAboutTitle,
+        subtitle: '${AppLocalizations.of(context)!.settingsScreenVersionLabel} $_appVersion',
         route: '/about',
       ),
     ];
+  }
+
+  void _showLanguagePicker() {
+    final options = ['English', 'Français', '日本語'];
+
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: YomiNowPalette.cream,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 20, 18, 18),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.settingsScreenChooseLanguage,
+                  style: TextStyle(
+                    fontFamily: 'Fredoka',
+                    fontSize: 28,
+                    fontWeight: FontWeight.w600,
+                    color: YomiNowPalette.ink,
+                    letterSpacing: -0.8,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ...options.map((option) {
+                  final isSelected = option == _selectedLanguage;
+                  return ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(
+                      option,
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 18,
+                        fontWeight: isSelected
+                            ? FontWeight.w700
+                            : FontWeight.w500,
+                        color: YomiNowPalette.ink,
+                      ),
+                    ),
+                    trailing: isSelected
+                        ? Icon(
+                            Icons.check_rounded,
+                            color: YomiNowPalette.indigo,
+                          )
+                        : null,
+                    onTap: () async {
+                      final navigator = Navigator.of(context);
+                      await AppLanguage.setLanguage(option);
+                      if (!mounted) return;
+                      navigator.pop();
+                    },
+                  );
+                }),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final items = _buildItems();
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -74,7 +168,7 @@ class SettingsScreen extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Settings',
+                        AppLocalizations.of(context)!.settingsScreenTitle,
                         style: TextStyle(
                           fontFamily: 'Fredoka',
                           fontSize: 35,
@@ -97,7 +191,7 @@ class SettingsScreen extends StatelessWidget {
                       final item = items[index];
                       return InkWell(
                         onTap: item.route == null
-                            ? null
+                            ? (item.isAction ? _showLanguagePicker : null)
                             : () =>
                                   Navigator.of(context).pushNamed(item.route!),
                         borderRadius: BorderRadius.circular(18),
@@ -154,13 +248,14 @@ class SettingsScreen extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              Icon(
-                                Icons.chevron_right_rounded,
-                                size: 30,
-                                color: YomiNowPalette.ink.withValues(
-                                  alpha: 0.7,
+                              if (item.route != null || item.isAction)
+                                Icon(
+                                  Icons.chevron_right_rounded,
+                                  size: 30,
+                                  color: YomiNowPalette.ink.withValues(
+                                    alpha: 0.7,
+                                  ),
                                 ),
-                              ),
                             ],
                           ),
                         ),
@@ -183,10 +278,12 @@ class _SettingsItem {
     required this.title,
     required this.subtitle,
     this.route,
+    this.isAction = false,
   });
 
   final IconData icon;
   final String title;
   final String subtitle;
   final String? route;
+  final bool isAction;
 }

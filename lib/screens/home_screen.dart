@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../theme/yomi_now_theme.dart';
+import 'package:yominow/l10n/app_localizations.dart';
 import '../widgets/yomi_now_bottom_nav.dart';
 import '../widgets/error_dialog.dart';
 import 'camera_scanner.dart';
@@ -93,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           _buildActionTile(
                             backgroundColor: YomiNowPalette.coral,
                             icon: LucideIcons.camera,
-                            title: 'Take photo',
+                            title: AppLocalizations.of(context)!.homeScreenTitleTakePhoto,
                             subtitle: '',
                             textColor: YomiNowPalette.cream,
                             iconColor: YomiNowPalette.cream,
@@ -103,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           _buildActionTile(
                             backgroundColor: YomiNowPalette.softBlue,
                             icon: LucideIcons.image,
-                            title: 'Choose from gallery',
+                            title: AppLocalizations.of(context)!.homeScreenTitleChooseFromGallery,
                             subtitle: '',
                             textColor: YomiNowPalette.ink,
                             iconColor: YomiNowPalette.indigo,
@@ -113,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           _buildActionTile(
                             backgroundColor: YomiNowPalette.coral,
                             icon: LucideIcons.folderOpen,
-                            title: 'Open image',
+                            title: AppLocalizations.of(context)!.homeScreenTitleOpenImage,
                             subtitle: '',
                             textColor: YomiNowPalette.ink,
                             iconColor: YomiNowPalette.ink,
@@ -142,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
           width: 44,
           height: 44,
           child: Tooltip(
-            message: 'Settings',
+            message: AppLocalizations.of(context)!.homeScreenSettingsTooltip,
             child: Material(
               color: Colors.transparent,
               child: InkWell(
@@ -161,9 +162,9 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
-        const Expanded(
+        Expanded(
           child: Text(
-            'YomiNow',
+            AppLocalizations.of(context)!.appName,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: 'Fredoka',
@@ -178,14 +179,14 @@ class _HomeScreenState extends State<HomeScreen> {
           width: 44,
           height: 44,
           child: Tooltip(
-            message: 'Notifications',
+            message: AppLocalizations.of(context)!.homeScreenNotificationsTooltip,
             child: Material(
               color: Colors.transparent,
               child: InkWell(
                 customBorder: const CircleBorder(),
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('No new notifications')),
+                    SnackBar(content: Text(AppLocalizations.of(context)!.homeScreenNoNotifications))
                   );
                 },
                 child: Center(
@@ -207,7 +208,7 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'こんにちは!',
+          AppLocalizations.of(context)!.homeScreenGreeting,
           style: TextStyle(
             fontFamily: 'NotoSansJP',
             fontSize: 36,
@@ -218,7 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          'Point your camera at Japanese text,\ntap any word, and read it now.',
+          AppLocalizations.of(context)!.homeScreenSubtitle,
           style: TextStyle(
             fontFamily: 'Inter',
             fontSize: 17,
@@ -313,8 +314,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
-          'Recent Scans',
+        Text(
+          AppLocalizations.of(context)!.homeScreenRecentScans,
           style: TextStyle(
             fontFamily: 'Inter',
             fontSize: 34,
@@ -323,7 +324,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         Text(
-          'See all',
+          AppLocalizations.of(context)!.homeScreenSeeAll,
           style: TextStyle(
             fontFamily: 'Inter',
             fontSize: 18,

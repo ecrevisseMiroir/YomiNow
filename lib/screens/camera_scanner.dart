@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../theme/yomi_now_theme.dart';
+import 'package:yominow/l10n/app_localizations.dart';
 
 class CameraScanner extends StatefulWidget {
   const CameraScanner({super.key});
@@ -38,10 +39,10 @@ class _CameraScannerState extends State<CameraScanner> {
 
       final description =
           preferredCamera ??
-          cameras.firstWhere(
-            (camera) => camera.lensDirection == CameraLensDirection.back,
-            orElse: () => cameras.first,
-          );
+              cameras.firstWhere(
+                (camera) => camera.lensDirection == CameraLensDirection.back,
+                orElse: () => cameras.first,
+              );
       controller = CameraController(
         description,
         ResolutionPreset.high,
@@ -104,7 +105,9 @@ class _CameraScannerState extends State<CameraScanner> {
     } on CameraException {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Flash is unavailable on this camera.')),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.cameraScannerFlashUnavailable),
+        ),
       );
     }
   }
@@ -123,8 +126,8 @@ class _CameraScannerState extends State<CameraScanner> {
       if (!mounted) return;
       setState(() => _isBusy = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not capture the photo. Try again.'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.cameraScannerCaptureFailed),
         ),
       );
     }
@@ -138,7 +141,9 @@ class _CameraScannerState extends State<CameraScanner> {
     } on PlatformException {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not open the photo gallery.')),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.cameraScannerOpenGalleryFailed),
+        ),
       );
     }
   }
@@ -176,7 +181,7 @@ class _CameraScannerState extends State<CameraScanner> {
         children: [
           _roundIconButton(
             icon: Icons.close_rounded,
-            label: 'Close camera',
+            label: AppLocalizations.of(context)!.cameraScannerCloseCamera,
             onPressed: () => Navigator.of(context).pop(),
             backgroundColor: Colors.transparent,
           ),
@@ -185,7 +190,9 @@ class _CameraScannerState extends State<CameraScanner> {
             icon: _flashEnabled
                 ? Icons.flash_on_rounded
                 : Icons.flash_off_rounded,
-            label: _flashEnabled ? 'Turn flash off' : 'Turn flash on',
+            label: _flashEnabled
+                ? AppLocalizations.of(context)!.cameraScannerTurnFlashOff
+                : AppLocalizations.of(context)!.cameraScannerTurnFlashOn,
             onPressed: _toggleFlash,
             backgroundColor: Colors.transparent,
           ),
@@ -214,19 +221,19 @@ class _CameraScannerState extends State<CameraScanner> {
                 size: 42,
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Camera unavailable',
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)!.cameraScannerCameraUnavailable,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Allow camera access in Settings, then try again.',
+              Text(
+                AppLocalizations.of(context)!.cameraScannerAccessInstructions,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white70, height: 1.4),
+                style: const TextStyle(color: Colors.white70, height: 1.4),
               ),
               const SizedBox(height: 18),
               FilledButton.icon(
@@ -235,7 +242,7 @@ class _CameraScannerState extends State<CameraScanner> {
                   unawaited(_initializeCamera());
                 },
                 icon: const Icon(Icons.refresh_rounded),
-                label: const Text('Try again'),
+                label: Text(AppLocalizations.of(context)!.cameraScannerTryAgain),
               ),
             ],
           ),
@@ -278,8 +285,13 @@ class _CameraScannerState extends State<CameraScanner> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _modeButton(label: 'Photo', selected: true, onTap: () {}),
-                _modeButton(label: 'Gallery', onTap: _openGallery),
+                _modeButton(
+                    label: AppLocalizations.of(context)!.cameraScannerModePhoto,
+                    selected: true,
+                    onTap: () {}),
+                _modeButton(
+                    label: AppLocalizations.of(context)!.cameraScannerModeGallery,
+                    onTap: _openGallery),
               ],
             ),
           ),
@@ -289,12 +301,12 @@ class _CameraScannerState extends State<CameraScanner> {
             children: [
               _roundIconButton(
                 icon: Icons.photo_library_outlined,
-                label: 'Choose from gallery',
+                label: AppLocalizations.of(context)!.cameraScannerChooseFromGallery,
                 onPressed: _openGallery,
               ),
               Semantics(
                 button: true,
-                label: 'Take photo',
+                label: AppLocalizations.of(context)!.cameraScannerTakePhoto,
                 child: GestureDetector(
                   onTap: _isBusy ? null : _takePhoto,
                   child: Container(
@@ -316,7 +328,7 @@ class _CameraScannerState extends State<CameraScanner> {
               ),
               _roundIconButton(
                 icon: Icons.cameraswitch_outlined,
-                label: 'Switch camera',
+                label: AppLocalizations.of(context)!.cameraScannerSwitchCamera,
                 onPressed: _switchCamera,
               ),
             ],

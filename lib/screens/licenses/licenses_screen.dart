@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/yomi_now_theme.dart';
+import 'package:yominow/l10n/app_localizations.dart';
 
 class LicensesScreen extends StatelessWidget {
   const LicensesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final rows = [
-      _InfoRow(label: 'App', value: 'YomiNow'),
+      _InfoRow(label: l10n.licensesScreenAppLabel, value: l10n.licensesScreenAppValue),
       _InfoRow(
-        label: 'License status',
-        value: 'Final project license is still being set.',
+        label: l10n.licensesScreenLicenseStatusLabel,
+        value: l10n.licensesScreenLicenseStatusValue,
       ),
       _InfoRow(
-        label: 'Attribution',
-        value:
-            'JMdict, IPADIC, Tesseract, and Google ML Kit are credited below.',
+        label: l10n.licensesScreenAttributionLabel,
+        value: l10n.licensesScreenAttributionValue,
       ),
     ];
 
@@ -39,12 +40,13 @@ class LicensesScreen extends StatelessWidget {
                         size: 30,
                       ),
                       color: YomiNowPalette.ink,
+                      tooltip: l10n.licensesScreenBackTooltip,
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Licenses & Attribution',
+                        l10n.licensesScreenTitle,
                         style: TextStyle(
                           fontFamily: 'Fredoka',
                           fontSize: 32,
@@ -69,7 +71,7 @@ class LicensesScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Project credits',
+                        l10n.licensesScreenProjectCredits,
                         style: TextStyle(
                           fontFamily: 'Fredoka',
                           fontSize: 22,
@@ -79,7 +81,7 @@ class LicensesScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'This app brings together open-source OCR, dictionary data, and mobile tooling to make Japanese text instantly readable.',
+                        l10n.licensesScreenProjectDescription,
                         style: TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 16,
@@ -99,9 +101,8 @@ class LicensesScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 _SectionCard(
-                  title: 'Data sources',
-                  body:
-                      'JMdict is used for Japanese dictionary lookup; IPADIC powers the tokenizer; Tesseract and Google ML Kit power OCR.',
+                  title: l10n.licensesScreenDataSourcesTitle,
+                  body: l10n.licensesScreenDataSourcesBody,
                 ),
               ],
             ),
