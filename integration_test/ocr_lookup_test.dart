@@ -79,8 +79,11 @@ void main() {
 
     // Wait for the detected text list to appear (first line)
     // and then switch to image view mode to access the word overlay.
-    await _pumpUntil(tester, find.byKey(const ValueKey('text-line-0')),
-        timeout: const Duration(seconds: 180));
+    await _pumpUntil(
+      tester,
+      find.byKey(const ValueKey('text-line-0')),
+      timeout: const Duration(seconds: 180),
+    );
     // Tap the "Image" mode button.
     await tester.tap(find.text('Image'));
     await tester.pumpAndSettle();
@@ -90,7 +93,11 @@ void main() {
     await _pumpUntil(tester, firstChar, timeout: const Duration(seconds: 180));
     await tester.tap(firstChar);
 
-    await _pumpUntil(tester, find.textContaining('Japanese (language)'), timeout: const Duration(seconds: 180));
+    await _pumpUntil(
+      tester,
+      find.textContaining('Japanese (language)'),
+      timeout: const Duration(seconds: 180),
+    );
     expect(find.text('日本語'), findsWidgets);
     expect(find.textContaining('JMdict'), findsOneWidget);
 

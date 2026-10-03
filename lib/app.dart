@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:yominow/screens/licenses/open_source_screen.dart';
+import 'package:yominow/screens/licenses/third_party_libraries_screen.dart';
 
 import 'screens/about_screen.dart';
 import 'screens/documents_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/licenses/licenses_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/splash_screen.dart';
 import 'services/app_services.dart';
@@ -29,6 +32,9 @@ class YomiNowApp extends StatelessWidget {
           '/documents': (_) => const DocumentsScreen(),
           '/settings': (_) => const SettingsScreen(),
           '/about': (_) => const AboutScreen(),
+          '/licenses': (_) => const LicensesScreen(),
+          '/third-party-libraries': (_) => const ThirdPartyLibrariesScreen(),
+          '/open-source': (_) => const OpenSourceScreen(),
         },
       ),
     );

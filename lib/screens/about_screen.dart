@@ -12,12 +12,18 @@ class AboutScreen extends StatelessWidget {
       _AboutItem(
         icon: Icons.description_outlined,
         title: 'Licenses & Attribution',
+        route: '/licenses',
       ),
       _AboutItem(
         icon: Icons.library_books_outlined,
         title: 'Third-party Libraries',
+        route: '/third-party-libraries',
       ),
-      _AboutItem(icon: Icons.code_outlined, title: 'Open Source'),
+      _AboutItem(
+        icon: Icons.code_outlined,
+        title: 'Open Source',
+        route: '/open-source',
+      ),
     ];
 
     return LayoutBuilder(
@@ -141,7 +147,8 @@ class AboutScreen extends StatelessWidget {
                           final item = items[index];
                           return InkWell(
                             borderRadius: BorderRadius.circular(18),
-                            onTap: () {},
+                            onTap: () =>
+                                Navigator.of(context).pushNamed(item.route!),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(vertical: 4),
                               child: Row(
@@ -205,8 +212,9 @@ class AboutScreen extends StatelessWidget {
 }
 
 class _AboutItem {
-  const _AboutItem({required this.icon, required this.title});
+  const _AboutItem({required this.icon, required this.title, this.route});
 
   final IconData icon;
   final String title;
+  final String? route;
 }

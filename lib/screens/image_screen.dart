@@ -11,7 +11,6 @@ import '../widgets/lookup_sheet.dart';
 import '../widgets/no_japanese_text.dart';
 import '../widgets/tokenized_text.dart';
 import '../widgets/word_overlay.dart';
-import 'loading_screen.dart';
 import '../theme/yomi_now_theme.dart';
 
 enum _ImageScreenMode { text, image }
@@ -32,7 +31,6 @@ class _ImageScreenState extends State<ImageScreen> {
   PreparedImage? _image;
   OcrResult? _result;
   Object? _error;
-  int _loadingStep = 0;
 
   _ImageScreenMode _mode = _ImageScreenMode.text;
   WordId? _selected;
@@ -53,17 +51,9 @@ class _ImageScreenState extends State<ImageScreen> {
     try {
       final image = await services.imagePreprocessor.prepare(widget.imagePath);
       if (!mounted) return;
-      setState(() {
-        _image = image;
-        _loadingStep = 1;
-      });
-      final result = await services.ocr.recognize(
-        image.path,
-        onProgress: (progress, _) {
-          if (!mounted) return;
-          setState(() => _loadingStep = progress >= 1 ? 2 : 1);
-        },
-      );
+      setState(() => _image = image);
+
+      final result = await services.ocr.recognize(image.path);
       if (mounted) setState(() => _result = result);
     } catch (error) {
       if (mounted) setState(() => _error = error);
@@ -101,9 +91,6 @@ class _ImageScreenState extends State<ImageScreen> {
   Widget build(BuildContext context) {
     final image = _image;
     final result = _result;
-    if (result == null && _error == null) {
-      return LoadingScreen(currentStep: _loadingStep);
-    }
     final hasText = result != null && !result.isEmpty;
     return Scaffold(
       backgroundColor: YomiNowPalette.cream,
