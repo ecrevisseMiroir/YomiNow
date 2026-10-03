@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:yominow/l10n/app_localizations.dart';
 import 'package:yominow/screens/image_screen.dart';
 import 'package:yominow/services/app_services.dart';
 import 'package:yominow/services/default_lookup_service.dart';
@@ -71,6 +72,8 @@ void main() {
           services: services,
           child: MaterialApp(
             theme: ThemeData(),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: ImageScreen(imagePath: fixture),
           ),
         ),

@@ -2,7 +2,8 @@ name: Flutter CI
 
 on:
   push:
-    branches: [main, "claude/**"]
+    branches: [main, dev, canary, "claude/**"]
+    tags: ["v*"]
   pull_request:
   workflow_dispatch:
 
@@ -97,22 +98,55 @@ jobs:
       - run: flutter build ios --debug --no-codesign
 
   release:
-    name: Create GitHub Release
+    name: Publish ${{ github.ref_name }} release
     needs: [linux, android]
     runs-on: ubuntu-latest
-    # Push runs only: a pull request run of the same commit would race the
-    # push run for the tag.
-    if: github.event_name == 'push'
+    if: >-
+      github.event_name == 'push' &&
+      (github.ref == 'refs/heads/dev' ||
+        github.ref == 'refs/heads/main' ||
+       github.ref == 'refs/heads/canary' ||
+       startsWith(github.ref, 'refs/tags/v'))
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      # One release per pubspec version; bump `version:` to publish a new one.
-      - name: Get version from pubspec.yaml
-        id: get_version
+      - name: Prepare release channel and tag
+        id: release_meta
         run: |
-          VERSION=$(grep '^version:' pubspec.yaml | cut -d' ' -f2 | cut -d'+' -f1)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          VERSION=$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | head -n 1)
+          RELEASE_VERSION=${VERSION%%+*}
+
+          case "$GITHUB_REF" in
+            refs/heads/dev)
+              CHANNEL=dev
+              TAG="dev-${GITHUB_SHA:0:12}"
+              PRERELEASE=true
+              ;;
+            refs/heads/main|refs/heads/canary)
+              CHANNEL=canary
+              TAG="canary-${GITHUB_SHA:0:12}"
+              PRERELEASE=true
+              ;;
+            refs/tags/v*)
+              CHANNEL=production
+              TAG="$GITHUB_REF_NAME"
+              TAG_VERSION=${TAG#v}
+              if [ "$TAG_VERSION" != "$RELEASE_VERSION" ]; then
+                echo "Tag $TAG does not match pubspec.yaml version $RELEASE_VERSION" >&2
+                exit 1
+              fi
+              PRERELEASE=false
+              ;;
+            *)
+              echo "This ref is not configured to publish a release: $GITHUB_REF" >&2
+              exit 1
+              ;;
+          esac
+
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "name=YomiNow $CHANNEL $VERSION (${GITHUB_SHA:0:7})" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$PRERELEASE" >> "$GITHUB_OUTPUT"
       - name: Download Android APK
         uses: actions/download-artifact@v4
         with:
@@ -127,9 +161,12 @@ jobs:
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ steps.get_version.outputs.version }}
-          name: Release v${{ steps.get_version.outputs.version }}
+          tag_name: ${{ steps.release_meta.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ steps.release_meta.outputs.name }}
+          prerelease: ${{ steps.release_meta.outputs.prerelease }}
           generate_release_notes: true
+          fail_on_unmatched_files: true
           files: |
             ./artifacts/app-release.apk
             ./artifacts/linux-build.zip
