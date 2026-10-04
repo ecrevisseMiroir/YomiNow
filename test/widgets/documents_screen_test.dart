@@ -27,6 +27,7 @@ void main() {
     await tester.pumpWidget(
       withServices(fakeServices(), const DocumentsScreen()),
     );
+    await tester.pumpAndSettle();
 
     expect(find.text('Documents'), findsNWidgets(2));
     expect(find.text('No Documents Yet'), findsOneWidget);
@@ -71,6 +72,7 @@ void main() {
           DocumentsScreen(picker: ThrowingImagePicker()),
         ),
       );
+      await tester.pumpAndSettle();
 
       await tester.ensureVisible(find.text('Scan with Camera'));
       await tester.tap(find.text('Scan with Camera'));

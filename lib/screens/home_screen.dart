@@ -1,9 +1,15 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../theme/yomi_now_theme.dart';
+import '../models/scanned_document.dart';
+import '../services/app_route_observer.dart';
+import '../services/app_services.dart';
 
 import 'package:yominow/l10n/app_localizations.dart';
 
@@ -25,12 +31,55 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with RouteAware {
   late final ImagePicker _picker = widget.picker ?? ImagePicker();
+  List<ScannedDocument> _recentScans = <ScannedDocument>[];
+  bool _isLoadingScans = true;
+  bool _didLoadScans = false;
+  bool _didSubscribeToRoute = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_didSubscribeToRoute) {
+      final route = ModalRoute.of<dynamic>(context);
+      if (route != null) {
+        appRouteObserver.subscribe(this, route);
+        _didSubscribeToRoute = true;
+      }
+    }
+    if (!_didLoadScans) {
+      _didLoadScans = true;
+      unawaited(_loadRecentScans());
+    }
+  }
+
+  @override
+  void didPopNext() => unawaited(_loadRecentScans());
+
+  @override
+  void dispose() {
+    appRouteObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  Future<void> _loadRecentScans() async {
+    try {
+      final documents = await AppServicesScope.of(context).documents.getAll();
+      if (!mounted) return;
+      setState(() {
+        _recentScans = documents.take(2).toList();
+        _isLoadingScans = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isLoadingScans = false);
+    }
+  }
 
   Future<void> _pick(ImageSource source) async {
-    final XFile? file;
     try {
+      final XFile? file;
       if (source == ImageSource.camera &&
           (defaultTargetPlatform == TargetPlatform.android ||
               defaultTargetPlatform == TargetPlatform.iOS) &&
@@ -41,16 +90,44 @@ class _HomeScreenState extends State<HomeScreen> {
       } else {
         file = await _picker.pickImage(source: source);
       }
-    } on Exception {
+      if (file == null || !mounted) return;
+
+      final repository = AppServicesScope.of(context).documents;
+      final document = await repository.addImage(file);
       if (!mounted) return;
-      await YomiNowErrorDialog.show(context);
-      return;
+      setState(() {
+        _recentScans = [
+          document,
+          ..._recentScans.where((item) => item.id != document.id),
+        ].take(2).toList();
+        _isLoadingScans = false;
+      });
+
+      final hasText = await Navigator.of(context).push<bool>(
+        MaterialPageRoute<bool>(
+          builder: (_) => ImageScreen(imagePath: document.path),
+        ),
+      );
+      if (!mounted) return;
+      if (hasText != null) {
+        await repository.updateHasText(document.id, hasText);
+      }
+      await _loadRecentScans();
+    } catch (_) {
+      if (mounted) await YomiNowErrorDialog.show(context);
     }
-    if (file == null || !mounted) return;
-    final path = file.path;
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => ImageScreen(imagePath: path)),
+  }
+
+  Future<void> _openRecentScan(ScannedDocument document) async {
+    final repository = AppServicesScope.of(context).documents;
+    final hasText = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => ImageScreen(imagePath: document.path),
+      ),
     );
+    if (!mounted || hasText == null) return;
+    await repository.updateHasText(document.id, hasText);
+    await _loadRecentScans();
   }
 
   @override
@@ -62,6 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
+      appBar: _buildHeaderBar(context),
       bottomNavigationBar: const YomiNowBottomNav(selectedIndex: 0),
       body: SafeArea(
         child: LayoutBuilder(
@@ -88,7 +166,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         const SizedBox(height: 4),
-                        _buildHeaderRow(),
                         const SizedBox(height: 18),
                         _buildWelcomeText(),
                         const SizedBox(height: 22),
@@ -138,79 +215,6 @@ class _HomeScreenState extends State<HomeScreen> {
           },
         ),
       ),
-    );
-  }
-
-  Widget _buildHeaderRow() {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Row(
-      children: [
-        SizedBox(
-          width: 44,
-          height: 44,
-          child: Tooltip(
-            message: AppLocalizations.of(context)!.homeScreenSettingsTooltip,
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                customBorder: const CircleBorder(),
-                onTap: () {
-                  Navigator.pushNamed(context, '/settings');
-                },
-                child: Center(
-                  child: Icon(
-                    LucideIcons.settings,
-                    size: 28,
-                    color: YomiNowPalette.indigo.withValues(alpha: 0.8),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        Expanded(
-          child: Text(
-            AppLocalizations.of(context)!.appName,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: 'Fredoka',
-              fontSize: 35,
-              fontWeight: FontWeight.w600,
-              color: colorScheme.onSurface,
-              letterSpacing: -1.4,
-            ),
-          ),
-        ),
-        SizedBox(
-          width: 44,
-          height: 44,
-          child: Tooltip(
-            message: AppLocalizations.of(context)!
-                .homeScreenNotificationsTooltip,
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                customBorder: const CircleBorder(),
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        AppLocalizations.of(context)!.homeScreenNoNotifications,
-                      ),
-                    ),
-                  );
-                },
-                child: Center(
-                  child: Image.asset(
-                    'assets/03_characters_mascot/cat_home_face_notification.png',
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 
@@ -336,13 +340,25 @@ class _HomeScreenState extends State<HomeScreen> {
             color: colorScheme.onSurface,
           ),
         ),
-        Text(
-          AppLocalizations.of(context)!.homeScreenSeeAll,
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: colorScheme.onSurfaceVariant,
+        TextButton(
+          onPressed: () => Navigator.of(context).pushNamed('/documents'),
+          style: TextButton.styleFrom(
+            foregroundColor: colorScheme.onSurfaceVariant,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                AppLocalizations.of(context)!.homeScreenSeeAll,
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(width: 4),
+              const Icon(Icons.arrow_forward_rounded, size: 18),
+            ],
           ),
         ),
       ],
@@ -350,30 +366,45 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildRecentScansGrid() {
-    final scanCards = [
-      _ScanCard(
-        title: '東京の桜',
-        subtitle: 'Today, 10:24',
-        accent: const Color(0xFFB6E1F5),
-      ),
-      _ScanCard(
-        title: 'レストランメニュー',
-        subtitle: 'Yesterday, 16:03',
-        accent: const Color(0xFFCBE0F8),
-      ),
-    ];
+    if (_isLoadingScans) {
+      return const SizedBox(
+        height: 100,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    if (_recentScans.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 80),
+        child: Text(
+          AppLocalizations.of(context)!.homeScreenNoRecentScans,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontFamily: 'Inter',
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
+      );
+    }
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final cardWidth = (constraints.maxWidth - 18) / 2;
+        final cardWidth = _recentScans.length == 1
+            ? constraints.maxWidth
+            : (constraints.maxWidth - 18) / 2;
         return SizedBox(
           height: 250,
           child: Row(
             children: [
-              for (int i = 0; i < scanCards.length; i++) ...[
+              for (int i = 0; i < _recentScans.length; i++) ...[
                 if (i > 0) const SizedBox(width: 18),
                 Expanded(
-                  child: SizedBox(width: cardWidth, child: scanCards[i]),
+                  child: SizedBox(
+                    width: cardWidth,
+                    child: _ScanCard(
+                      document: _recentScans[i],
+                      onTap: () => _openRecentScan(_recentScans[i]),
+                    ),
+                  ),
                 ),
               ],
             ],
@@ -384,100 +415,139 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _ScanCard extends StatelessWidget {
-  const _ScanCard({
-    required this.title,
-    required this.subtitle,
-    required this.accent,
-  });
+PreferredSizeWidget _buildHeaderBar(BuildContext context) {
+  final colorScheme = Theme.of(context).colorScheme;
+  return AppBar(
+    automaticallyImplyLeading: false,
+    backgroundColor: colorScheme.surface,
+    elevation: 0,
+    scrolledUnderElevation: 0,
+    centerTitle: true,
+    leading: Tooltip(
+      message: AppLocalizations.of(context)!.homeScreenSettingsTooltip,
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: () => Navigator.pushNamed(context, '/settings'),
+        child: Icon(
+          LucideIcons.settings,
+          size: 28,
+          color: YomiNowPalette.indigo.withValues(alpha: 0.8),
+        ),
+      ),
+    ),
+    title: Text(
+      AppLocalizations.of(context)!.appName,
+      style: TextStyle(
+        fontFamily: 'Fredoka',
+        fontSize: 35,
+        fontWeight: FontWeight.w600,
+        color: colorScheme.onSurface,
+        letterSpacing: -1.4,
+      ),
+    ),
+    actions: [
+      Tooltip(
+        message: AppLocalizations.of(context)!.homeScreenNotificationsTooltip,
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  AppLocalizations.of(context)!.homeScreenNoNotifications,
+                ),
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(6),
+            child: Image.asset(
+              'assets/03_characters_mascot/cat_home_face_notification.png',
+              width: 32,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
+      ),
+      const SizedBox(width: 8),
+    ],
+  );
+}
 
-  final String title;
-  final String subtitle;
-  final Color accent;
+class _ScanCard extends StatelessWidget {
+  const _ScanCard({required this.document, required this.onTap});
+
+  final ScannedDocument document;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(18),
-          child: Container(
-            height: 150,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  accent.withValues(alpha: 0.85),
-                  const Color(0xFFDBF1FF),
-                ],
+    final date = document.createdAt;
+    final subtitle = '${_monthName(date.month)} ${date.day}, ${date.year}';
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(18),
+            child: SizedBox(
+              height: 150,
+              width: double.infinity,
+              child: Image.file(
+                File(document.path),
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => ColoredBox(
+                  color: YomiNowPalette.softBlue,
+                  child: Icon(
+                    Icons.image_outlined,
+                    size: 44,
+                    color: YomiNowPalette.indigo.withValues(alpha: 0.6),
+                  ),
+                ),
               ),
             ),
-            child: Stack(
-              children: [
-                Positioned(
-                  left: 18,
-                  top: 18,
-                  child: Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.32),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  right: 18,
-                  bottom: 18,
-                  child: Container(
-                    width: 70,
-                    height: 70,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: 36,
-                  bottom: 24,
-                  child: Container(
-                    width: 90,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.6),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-              ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            document.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontFamily: 'NotoSansJP',
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: colorScheme.onSurface,
             ),
           ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          title,
-          style: TextStyle(
-            fontFamily: 'NotoSansJP',
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: colorScheme.onSurface,
+          const SizedBox(height: 2),
+          Text(
+            subtitle,
+            style: TextStyle(
+              fontFamily: 'Inter',
+              fontSize: 14,
+              color: colorScheme.onSurfaceVariant,
+            ),
           ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          subtitle,
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 14,
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
+
+String _monthName(int month) => const [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+][month - 1];

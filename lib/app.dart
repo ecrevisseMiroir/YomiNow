@@ -13,6 +13,7 @@ import 'screens/splash_screen.dart';
 import 'services/app_appearance.dart';
 import 'services/app_language.dart';
 import 'services/app_services.dart';
+import 'services/app_route_observer.dart';
 import 'theme/yomi_now_theme.dart';
 
 /// The root widget provides app services and the system-aware theme to screens.
@@ -34,6 +35,7 @@ class YomiNowApp extends StatelessWidget {
           final locale = AppLanguage.localeFor(AppLanguage.selected.value);
           return MaterialApp(
             title: 'YomiNow',
+            navigatorObservers: [appRouteObserver],
             locale: locale,
             supportedLocales: AppLocalizations.supportedLocales,
             localizationsDelegates: [

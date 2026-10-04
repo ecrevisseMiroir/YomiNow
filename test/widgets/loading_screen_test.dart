@@ -23,7 +23,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text('Processing Image...'), findsOneWidget);
-    expect(find.text('Looking up dictionary'), findsOneWidget);
+    expect(find.text('Running OCR'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

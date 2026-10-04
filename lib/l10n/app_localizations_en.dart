@@ -25,6 +25,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeScreenSeeAll => 'See all';
 
   @override
+  String get homeScreenNoRecentScans => 'Your recent scans will appear here.';
+
+  @override
   String get homeScreenGreeting => 'Welcome!';
 
   @override
@@ -58,6 +61,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get documentsScreenEmptySubtitle =>
       'Scan your first image or import an existing one to get started.';
+
+  @override
+  String get documentsScreenNoTextDocuments =>
+      'No scanned images with recognized text yet.';
 
   @override
   String get documentsScreenCameraButton => 'Scan with Camera';

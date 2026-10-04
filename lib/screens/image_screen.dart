@@ -12,6 +12,7 @@ import '../widgets/no_japanese_text.dart';
 import '../widgets/tokenized_text.dart';
 import '../widgets/word_overlay.dart';
 import '../theme/yomi_now_theme.dart';
+import 'loading_screen.dart';
 
 import 'package:yominow/l10n/app_localizations.dart';
 
@@ -33,7 +34,8 @@ class _ImageScreenState extends State<ImageScreen> {
   PreparedImage? _image;
   OcrResult? _result;
   Object? _error;
-  bool _isRecognizing = false;
+  bool _isRecognizing = true;
+  int _processingStep = 0;
 
   _ImageScreenMode _mode = _ImageScreenMode.text;
   WordId? _selected;
@@ -54,10 +56,21 @@ class _ImageScreenState extends State<ImageScreen> {
     try {
       final image = await services.imagePreprocessor.prepare(widget.imagePath);
       if (!mounted) return;
-      setState(() => _image = image);
+      setState(() {
+        _image = image;
+        _processingStep = 1;
+      });
 
-      setState(() => _isRecognizing = true);
-      final result = await services.ocr.recognize(image.path);
+      final result = await services.ocr.recognize(
+        image.path,
+        onProgress: (progress, _) {
+          if (!mounted) return;
+          final step = progress >= 1 ? 4 : 1;
+          if (_processingStep != step) {
+            setState(() => _processingStep = step);
+          }
+        },
+      );
       if (mounted) {
         setState(() {
           _result = result;
@@ -101,88 +114,67 @@ class _ImageScreenState extends State<ImageScreen> {
     );
   }
 
+  void _close() {
+    Navigator.of(context).pop(_result?.isEmpty == false);
+  }
+
   @override
   Widget build(BuildContext context) {
     final image = _image;
     final result = _result;
     final hasText = result != null && !result.isEmpty;
     final isLoading = _isRecognizing;
-    final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
-      body: SafeArea(
-        child: Column(
-          children: [
-            _DetectedTextHeader(
-              onBack: () => Navigator.of(context).pop(),
-              onShowImage: hasText
-                  ? () => setState(() => _mode = _ImageScreenMode.image)
-                  : null,
-            ),
-            if (isLoading)
-              Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const CircularProgressIndicator(),
-                      const SizedBox(height: 16),
-                      Text(
-                        l10n.imageScreenProcessingTitle,
-                        style: TextStyle(
-                          fontFamily: 'Fredoka',
-                          fontSize: 24,
-                          fontWeight: FontWeight.w700,
-                          color: colorScheme.onSurface,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        l10n.imageScreenProcessingSubtitle,
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 16,
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
+    return PopScope<bool>(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _close();
+      },
+      child: Scaffold(
+        backgroundColor: colorScheme.surface,
+        body: SafeArea(
+          child: Column(
+            children: [
+              _DetectedTextHeader(
+                onBack: _close,
+                onShowImage: hasText
+                    ? () => setState(() => _mode = _ImageScreenMode.image)
+                    : null,
+              ),
+              if (isLoading)
+                Expanded(child: LoadingScreen(currentStep: _processingStep))
+              else if (hasText) ...[
+                _ViewModeSelector(
+                  mode: _mode,
+                  onChanged: (mode) => setState(() => _mode = mode),
+                ),
+                Expanded(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 180),
+                    child: _mode == _ImageScreenMode.text
+                        ? _DetectedTextList(
+                            key: const ValueKey('detected-text'),
+                            result: result,
+                            onTapOffset: (lineIndex, offset) => _lookup(
+                              result.lines[lineIndex],
+                              lineIndex,
+                              offset,
+                            ),
+                          )
+                        : _buildImageView(image!, result),
                   ),
                 ),
-              )
-            else if (hasText) ...[
-              _ViewModeSelector(
-                mode: _mode,
-                onChanged: (mode) => setState(() => _mode = mode),
-              ),
-              Expanded(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 180),
-                  child: _mode == _ImageScreenMode.text
-                      ? _DetectedTextList(
-                          key: const ValueKey('detected-text'),
-                          result: result,
-                          onTapOffset: (lineIndex, offset) => _lookup(
-                            result.lines[lineIndex],
-                            lineIndex,
-                            offset,
-                          ),
-                        )
-                      : _buildImageView(image!, result),
+                const _LookupHint(),
+              ] else
+                Expanded(
+                  child: Center(
+                    child: _error == null
+                        ? NoJapaneseText(onTryAgain: _close)
+                        : _StatusBanner(result: result, error: _error),
+                  ),
                 ),
-              ),
-              const _LookupHint(),
-            ] else
-              Expanded(
-                child: Center(
-                  child: _error == null
-                      ? NoJapaneseText(
-                          onTryAgain: () => Navigator.of(context).pop(),
-                        )
-                      : _StatusBanner(result: result, error: _error),
-                ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );

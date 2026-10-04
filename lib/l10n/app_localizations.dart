@@ -130,6 +130,12 @@ abstract class AppLocalizations {
   /// **'See all'**
   String get homeScreenSeeAll;
 
+  /// No description provided for @homeScreenNoRecentScans.
+  ///
+  /// In en, this message translates to:
+  /// **'Your recent scans will appear here.'**
+  String get homeScreenNoRecentScans;
+
   /// No description provided for @homeScreenGreeting.
   ///
   /// In en, this message translates to:
@@ -195,6 +201,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Scan your first image or import an existing one to get started.'**
   String get documentsScreenEmptySubtitle;
+
+  /// No description provided for @documentsScreenNoTextDocuments.
+  ///
+  /// In en, this message translates to:
+  /// **'No scanned images with recognized text yet.'**
+  String get documentsScreenNoTextDocuments;
 
   /// No description provided for @documentsScreenCameraButton.
   ///

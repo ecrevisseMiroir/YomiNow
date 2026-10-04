@@ -2,8 +2,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../theme/yomi_now_theme.dart';
-
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({super.key, this.currentStep = 1});
 
@@ -21,13 +19,7 @@ class _LoadingScreenState extends State<LoadingScreen>
     duration: const Duration(seconds: 12),
   )..repeat();
 
-  static const _stages = <String>[
-    'Image preprocessing',
-    'Running OCR',
-    'Extracting text',
-    'Finding words',
-    'Looking up dictionary',
-  ];
+  static const _stages = <String>['Image preprocessing', 'Running OCR'];
 
   @override
   void dispose() {
@@ -40,7 +32,7 @@ class _LoadingScreenState extends State<LoadingScreen>
     final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: YomiNowPalette.cream,
+      backgroundColor: colors.surface,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -98,7 +90,7 @@ class _LoadingScreenState extends State<LoadingScreen>
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildProgressRing(ringSize),
+        _buildProgressRing(ringSize, colors),
         const SizedBox(height: 22),
         _buildHeading(colors),
         const SizedBox(height: 34),
@@ -115,7 +107,7 @@ class _LoadingScreenState extends State<LoadingScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildProgressRing(ringSize),
+              _buildProgressRing(ringSize, colors),
               const SizedBox(height: 12),
               _buildHeading(colors),
             ],
@@ -127,7 +119,7 @@ class _LoadingScreenState extends State<LoadingScreen>
     );
   }
 
-  Widget _buildProgressRing(double size) {
+  Widget _buildProgressRing(double size, ColorScheme colors) {
     return AnimatedBuilder(
       animation: _ringController,
       builder: (context, _) => SizedBox.square(
@@ -135,6 +127,9 @@ class _LoadingScreenState extends State<LoadingScreen>
         child: CustomPaint(
           painter: _ProgressRingPainter(
             rotation: _ringController.value * 2 * math.pi,
+            trackColor: colors.primaryContainer.withValues(alpha: 0.5),
+            primaryColor: colors.primary,
+            secondaryColor: colors.secondary,
           ),
           child: Center(
             child: Image.asset(
@@ -206,10 +201,11 @@ class _StageRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     final isPending = state == _StageState.pending;
     final foreground = isPending
-        ? YomiNowPalette.ink.withValues(alpha: 0.34)
-        : YomiNowPalette.ink;
+        ? colors.onSurface.withValues(alpha: 0.34)
+        : colors.onSurface;
 
     return SizedBox(
       height: 48,
@@ -219,17 +215,17 @@ class _StageRow extends StatelessWidget {
             width: 40,
             child: Center(
               child: switch (state) {
-                _StageState.complete => const Icon(
+                _StageState.complete => Icon(
                   Icons.check_circle_rounded,
                   size: 27,
-                  color: YomiNowPalette.indigo,
+                  color: colors.primary,
                 ),
-                _StageState.active => const SizedBox.square(
+                _StageState.active => SizedBox.square(
                   dimension: 30,
                   child: CircularProgressIndicator(
                     strokeWidth: 4,
-                    color: YomiNowPalette.indigo,
-                    backgroundColor: YomiNowPalette.softBlue,
+                    color: colors.primary,
+                    backgroundColor: colors.primaryContainer,
                   ),
                 ),
                 _StageState.pending => Icon(
@@ -263,9 +259,17 @@ class _StageRow extends StatelessWidget {
 }
 
 class _ProgressRingPainter extends CustomPainter {
-  const _ProgressRingPainter({required this.rotation});
+  const _ProgressRingPainter({
+    required this.rotation,
+    required this.trackColor,
+    required this.primaryColor,
+    required this.secondaryColor,
+  });
 
   final double rotation;
+  final Color trackColor;
+  final Color primaryColor;
+  final Color secondaryColor;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -278,18 +282,18 @@ class _ProgressRingPainter extends CustomPainter {
       center,
       radius - stroke / 2,
       Paint()
-        ..color = YomiNowPalette.softBlue.withValues(alpha: 0.5)
+        ..color = trackColor
         ..style = PaintingStyle.stroke
         ..strokeWidth = stroke,
     );
 
-    final bluePaint = Paint()
-      ..color = YomiNowPalette.indigo
+    final primaryPaint = Paint()
+      ..color = primaryColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = stroke
       ..strokeCap = StrokeCap.round;
-    final coralPaint = Paint()
-      ..color = YomiNowPalette.coral
+    final secondaryPaint = Paint()
+      ..color = secondaryColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = stroke
       ..strokeCap = StrokeCap.round;
@@ -299,12 +303,21 @@ class _ProgressRingPainter extends CustomPainter {
       -math.pi / 2 + rotation,
       math.pi * 0.54,
       false,
-      coralPaint,
+      secondaryPaint,
     );
-    canvas.drawArc(bounds, 0.19 + rotation, math.pi * 1.43, false, bluePaint);
+    canvas.drawArc(
+      bounds,
+      0.19 + rotation,
+      math.pi * 1.43,
+      false,
+      primaryPaint,
+    );
   }
 
   @override
   bool shouldRepaint(covariant _ProgressRingPainter oldDelegate) =>
-      oldDelegate.rotation != rotation;
+      oldDelegate.rotation != rotation ||
+      oldDelegate.trackColor != trackColor ||
+      oldDelegate.primaryColor != primaryColor ||
+      oldDelegate.secondaryColor != secondaryColor;
 }

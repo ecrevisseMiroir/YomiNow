@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'services/app_services.dart';
 import 'services/app_appearance.dart';
 import 'services/default_lookup_service.dart';
+import 'services/document_repository.dart';
 import 'services/image_preprocess.dart';
 import 'services/kuromoji_tokenizer_service.dart';
 import 'services/sqlite_dictionary_service.dart';
@@ -41,6 +42,7 @@ Future<void> main() async {
           tokenizer: tokenizer,
           dictionary: dictionary,
         ),
+        documents: SqliteDocumentRepository(),
       ),
     ),
   );

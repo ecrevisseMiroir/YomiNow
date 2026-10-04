@@ -16,6 +16,7 @@ import 'package:yominow/l10n/app_localizations.dart';
 import 'package:yominow/screens/image_screen.dart';
 import 'package:yominow/services/app_services.dart';
 import 'package:yominow/services/default_lookup_service.dart';
+import 'package:yominow/services/document_repository.dart';
 import 'package:yominow/services/image_preprocess.dart';
 import 'package:yominow/services/kuromoji_tokenizer_service.dart';
 import 'package:yominow/services/ocr/tesseract_ocr_service.dart';
@@ -62,6 +63,7 @@ void main() {
         tokenizer: tokenizer,
         dictionary: SqliteDictionaryService(),
       ),
+      documents: SqliteDocumentRepository(),
     );
     final boundary = GlobalKey();
 
