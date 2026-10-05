@@ -22,12 +22,41 @@ class MainActivity : FlutterActivity() {
 		super.configureFlutterEngine(flutterEngine)
 		MethodChannel(flutterEngine.dartExecutor.binaryMessenger, ANKI_CHANNEL)
 			.setMethodCallHandler { call, result ->
-				if (call.method != "addNote") {
-					result.notImplemented()
-					return@setMethodCallHandler
+				when (call.method) {
+					"addNote" -> addNote(call, result)
+					"isDuplicate" -> isDuplicate(call, result)
+					else -> result.notImplemented()
 				}
-				addNote(call, result)
 			}
+	}
+
+	private fun isDuplicate(call: MethodCall, result: MethodChannel.Result) {
+		val word = call.argument<String>("word")?.trim().orEmpty()
+		if (word.isEmpty() || AddContentApi.getAnkiDroidPackageName(this) == null) {
+			result.success(false)
+			return
+		}
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+			checkSelfPermission(ANKI_PERMISSION) != PackageManager.PERMISSION_GRANTED
+		) {
+			result.success(false)
+			return
+		}
+
+		try {
+			val api = AddContentApi(this)
+			val preferences = getSharedPreferences(ANKI_PREFERENCES, MODE_PRIVATE)
+			val modelIds = existingModelIds(api, preferences)
+			if (modelIds.isEmpty()) {
+				result.success(false)
+				return
+			}
+			result.success(
+				modelIds.any { !api.findDuplicateNotes(it, word).isNullOrEmpty() },
+			)
+		} catch (_: Exception) {
+			result.success(false)
+		}
 	}
 
 	private fun addNote(call: MethodCall, result: MethodChannel.Result) {
@@ -98,16 +127,15 @@ class MainActivity : FlutterActivity() {
 		try {
 			val api = AddContentApi(this)
 			val preferences = getSharedPreferences(ANKI_PREFERENCES, MODE_PRIVATE)
-			val deckId = preferences.getLong(DECK_ID_KEY, 0L).takeIf { it > 0L }
-				?: api.addNewDeck(DECK_NAME)?.also {
-					preferences.edit().putLong(DECK_ID_KEY, it).apply()
-				}
+			val deckId = resolveDeckId(api, preferences)
 				?: throw IllegalStateException("Could not create the YomiNow deck.")
-			val modelId = preferences.getLong(MODEL_ID_KEY, 0L).takeIf { it > 0L }
-				?: api.addNewBasicModel(MODEL_NAME)?.also {
-					preferences.edit().putLong(MODEL_ID_KEY, it).apply()
-				}
+			val modelId = resolveModelId(api, preferences, createIfMissing = true)
 				?: throw IllegalStateException("Could not create the YomiNow card type.")
+			val modelIds = (existingModelIds(api, preferences) + modelId).distinct()
+			if (modelIds.any { !api.findDuplicateNotes(it, word).isNullOrEmpty() }) {
+				result.success("duplicate")
+				return
+			}
 			val noteId = api.addNote(modelId, deckId, arrayOf(word, back), null)
 			if (noteId <= 0L) {
 				throw IllegalStateException("AnkiDroid could not add this note.")
@@ -118,6 +146,49 @@ class MainActivity : FlutterActivity() {
 		} catch (_: Exception) {
 			shareToAnkiDroid(word, back, result)
 		}
+	}
+
+	private fun resolveDeckId(
+		api: AddContentApi,
+		preferences: android.content.SharedPreferences,
+	): Long? {
+		val decks = api.deckList.orEmpty()
+		val savedId = preferences.getLong(DECK_ID_KEY, 0L)
+		val deckId = decks.entries.firstOrNull {
+			it.value.equals(DECK_NAME, ignoreCase = true)
+		}?.key ?: savedId.takeIf { decks.containsKey(it) }
+			?: api.addNewDeck(DECK_NAME)
+		if (deckId != null) preferences.edit().putLong(DECK_ID_KEY, deckId).apply()
+		return deckId
+	}
+
+	private fun resolveModelId(
+		api: AddContentApi,
+		preferences: android.content.SharedPreferences,
+		createIfMissing: Boolean,
+	): Long? {
+		val modelId = existingModelIds(api, preferences).firstOrNull()
+			?: if (createIfMissing) api.addNewBasicModel(MODEL_NAME) else null
+		if (modelId != null) preferences.edit().putLong(MODEL_ID_KEY, modelId).apply()
+		return modelId
+	}
+
+	private fun existingModelIds(
+		api: AddContentApi,
+		preferences: android.content.SharedPreferences,
+	): List<Long> {
+		val models = api.modelList.orEmpty()
+		fun isBasicModel(id: Long) = api.getFieldList(id)?.size == 2
+
+		val namedModel = models.entries.firstOrNull {
+			it.value.equals(MODEL_NAME, ignoreCase = true) && isBasicModel(it.key)
+		}?.key
+		val savedId = preferences.getLong(MODEL_ID_KEY, 0L)
+		val savedModel = savedId.takeIf { models.containsKey(it) && isBasicModel(it) }
+		val previousModel = models.entries.firstOrNull {
+			it.value.equals(LEGACY_MODEL_NAME, ignoreCase = true) && isBasicModel(it.key)
+		}?.key
+		return listOfNotNull(namedModel, savedModel, previousModel).distinct()
 	}
 
 	private fun shareToAnkiDroid(
@@ -156,6 +227,7 @@ class MainActivity : FlutterActivity() {
 		const val DECK_ID_KEY = "deck_id"
 		const val MODEL_ID_KEY = "model_id"
 		const val DECK_NAME = "YomiNow"
-		const val MODEL_NAME = "YomiNow Japanese Vocabulary"
+		const val MODEL_NAME = "YomiNow"
+		const val LEGACY_MODEL_NAME = "YomiNow Japanese Vocabulary"
 	}
 }

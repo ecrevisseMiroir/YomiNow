@@ -1,15 +1,33 @@
 import 'package:flutter/services.dart';
 
+enum AnkiDroidAddResult { added, duplicate, shared }
+
 class AnkiDroidService {
   static const _channel = MethodChannel(
     'io.github.ecrevissemiroir.yominow/anki',
   );
 
-  Future<bool> addNote({required String word, required String back}) async {
+  Future<bool> isDuplicate(String word) async {
+    return await _channel.invokeMethod<bool>('isDuplicate', {'word': word}) ??
+        false;
+  }
+
+  Future<AnkiDroidAddResult> addNote({
+    required String word,
+    required String back,
+  }) async {
     final result = await _channel.invokeMethod<String>('addNote', {
       'word': word,
       'back': back,
     });
-    return result == 'added';
+    return switch (result) {
+      'added' => AnkiDroidAddResult.added,
+      'duplicate' => AnkiDroidAddResult.duplicate,
+      'shared' => AnkiDroidAddResult.shared,
+      _ => throw PlatformException(
+        code: 'INVALID_ANKIDROID_RESULT',
+        message: 'AnkiDroid returned an unknown add result.',
+      ),
+    };
   }
 }
