@@ -39,13 +39,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _SettingsItem(
         icon: Icons.document_scanner_outlined,
         title: AppLocalizations.of(context)!.settingsScreenOCRTitle,
-        subtitle: AppLocalizations.of(context)!.settingsScreenBetaComingSoon,
+        subtitle: AppLocalizations.of(context)!.settingsScreenOCRSubtitle,
       ),
       // TODO: Add dictionary selection flow with saved preference and custom source handling.
       _SettingsItem(
         icon: Icons.menu_book_outlined,
         title: AppLocalizations.of(context)!.settingsScreenDictionaryTitle,
-        subtitle: AppLocalizations.of(context)!.settingsScreenBetaComingSoon,
+        subtitle: AppLocalizations.of(context)!.settingsScreenDictionarySubtitle,
       ),
       _SettingsItem(
         icon: Icons.light_mode_outlined,
