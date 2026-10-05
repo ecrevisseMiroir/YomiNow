@@ -145,7 +145,9 @@ class _SheetBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     if (snapshot.hasError) {
-      return _Message(l10n.lookupFailedMessage(snapshot.error?.toString() ?? ''));
+      return _Message(
+        l10n.lookupFailedMessage(snapshot.error?.toString() ?? ''),
+      );
     }
     if (snapshot.connectionState != ConnectionState.done) {
       return const Padding(

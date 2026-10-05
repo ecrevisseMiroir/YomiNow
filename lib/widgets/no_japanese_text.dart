@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/yomi_now_theme.dart';
+
 import 'package:yominow/l10n/app_localizations.dart';
 
 class NoJapaneseText extends StatelessWidget {
@@ -32,7 +33,7 @@ class NoJapaneseText extends StatelessWidget {
                   ),
                   const SizedBox(height: 18),
                   Text(
-                                    l10n.noJapaneseTextTitle,
+                    l10n.noJapaneseTextTitle,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: 'Fredoka',

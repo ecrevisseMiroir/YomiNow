@@ -35,16 +35,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   List<_SettingsItem> _buildItems() {
     return [
+      // TODO: Replace the beta placeholder with a real OCR settings picker.
       _SettingsItem(
         icon: Icons.document_scanner_outlined,
         title: AppLocalizations.of(context)!.settingsScreenOCRTitle,
-        subtitle: AppLocalizations.of(context)!.settingsScreenOCRSubtitle,
+        subtitle: AppLocalizations.of(context)!.settingsScreenBetaComingSoon,
       ),
+      // TODO: Add dictionary selection flow with saved preference and custom source handling.
       _SettingsItem(
         icon: Icons.menu_book_outlined,
         title: AppLocalizations.of(context)!.settingsScreenDictionaryTitle,
-        subtitle: AppLocalizations.of(context)!
-            .settingsScreenDictionarySubtitle,
+        subtitle: AppLocalizations.of(context)!.settingsScreenBetaComingSoon,
       ),
       _SettingsItem(
         icon: Icons.light_mode_outlined,
@@ -200,6 +201,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  void _handleItemTap(_SettingsItem item) {
+    if (item.route != null) {
+      Navigator.of(context).pushNamed(item.route!);
+      return;
+    }
+
+    switch (item.action) {
+      case _SettingsAction.appearance:
+        _showAppearancePicker();
+      case _SettingsAction.language:
+        _showLanguagePicker();
+      case null:
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)!.settingsScreenFeatureComingSoon,
+            ),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final items = _buildItems();
@@ -263,14 +287,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     itemBuilder: (context, index) {
                       final item = items[index];
                       return InkWell(
-                        onTap: item.route != null
-                            ? () => Navigator.of(context).pushNamed(item.route!)
-                            : switch (item.action) {
-                                _SettingsAction.appearance =>
-                                  _showAppearancePicker,
-                                _SettingsAction.language => _showLanguagePicker,
-                                null => null,
-                              },
+                        onTap: () => _handleItemTap(item),
                         borderRadius: BorderRadius.circular(18),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 2),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/yomi_now_theme.dart';
+
 import 'package:yominow/l10n/app_localizations.dart';
 
 class YomiNowErrorDialog extends StatelessWidget {
@@ -36,7 +37,7 @@ class YomiNowErrorDialog extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                                l10n.errorDialogTitle,
+                l10n.errorDialogTitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'Fredoka',
