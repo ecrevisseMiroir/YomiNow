@@ -101,13 +101,20 @@ class _ImageScreenState extends State<ImageScreen> {
       if (match == null || !mounted || id != _lookupCount) return;
       setState(() => _highlighted = _wordsCovered(line, lineIndex, match));
     }).ignore(); // The sheet reports failures.
+    final ankiService = defaultTargetPlatform == TargetPlatform.android
+        ? AnkiDroidService()
+        : null;
+    // Show the lookup sheet and clear the selected word when the sheet is dismissed.
     LookupSheet.show(
       context,
       result,
-      onAddToAnki: defaultTargetPlatform == TargetPlatform.android
-          ? _addToAnki
-          : null,
-    );
+      onAddToAnki: ankiService == null ? null : _addToAnki,
+      isAlreadyInAnki: ankiService?.isDuplicate,
+    ).then((_) {
+      if (!mounted) return;
+      // After the sheet is closed, keep the highlighted words but clear the selection.
+      setState(() => _selected = null);
+    });
   }
 
   void _lookupWord(OcrResult result, int lineIndex, int wordIndex) {
@@ -133,22 +140,33 @@ class _ImageScreenState extends State<ImageScreen> {
       meanings,
     ].whereType<String>().where((value) => value.isNotEmpty).join('\n');
     try {
-      final added = await AnkiDroidService().addNote(
+      final outcome = await AnkiDroidService().addNote(
         word: result.matchedText,
         back: back,
       );
       if (!mounted) return;
+      final (title, message, kind) = switch (outcome) {
+        AnkiDroidAddResult.added => (
+          l10n.ankiNotificationAddedTitle,
+          l10n.ankiNotificationAddedMessage(result.matchedText),
+          YomiNowNotificationKind.success,
+        ),
+        AnkiDroidAddResult.duplicate => (
+          l10n.ankiNotificationDuplicateTitle,
+          l10n.ankiNotificationDuplicateMessage(result.matchedText),
+          YomiNowNotificationKind.info,
+        ),
+        AnkiDroidAddResult.shared => (
+          l10n.ankiNotificationOpenedTitle,
+          l10n.ankiNotificationOpenedMessage(result.matchedText),
+          YomiNowNotificationKind.info,
+        ),
+      };
       YomiNowNotification.show(
         context,
-        title: added
-            ? l10n.ankiNotificationAddedTitle
-            : l10n.ankiNotificationOpenedTitle,
-        message: added
-            ? l10n.ankiNotificationAddedMessage(result.matchedText)
-            : l10n.ankiNotificationOpenedMessage(result.matchedText),
-        kind: added
-            ? YomiNowNotificationKind.success
-            : YomiNowNotificationKind.info,
+        title: title,
+        message: message,
+        kind: kind,
       );
     } on MissingPluginException {
       if (!mounted) return;

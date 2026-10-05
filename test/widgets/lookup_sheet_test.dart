@@ -49,6 +49,7 @@ void main() {
     Future<LookupResult?> result, {
     Size size = const Size(800, 1600),
     AddToAnkiCallback? onAddToAnki,
+    Future<bool> Function(String word)? isAlreadyInAnki,
   }) async {
     tester.view
       ..physicalSize = size
@@ -61,8 +62,12 @@ void main() {
           builder: (context) => Scaffold(
             body: Center(
               child: ElevatedButton(
-                onPressed: () =>
-                    LookupSheet.show(context, result, onAddToAnki: onAddToAnki),
+                onPressed: () => LookupSheet.show(
+                  context,
+                  result,
+                  onAddToAnki: onAddToAnki,
+                  isAlreadyInAnki: isAlreadyInAnki,
+                ),
                 child: const Text('open'),
               ),
             ),
@@ -110,6 +115,32 @@ void main() {
 
     expect(identical(addedResult, match), isTrue);
     expect(addedResult?.entries.single.senses.first.glosses, ['to eat']);
+  });
+
+  testWidgets('duplicate check changes Add to Anki into an inactive state', (
+    tester,
+  ) async {
+    final duplicateCheck = Completer<bool>();
+    await showSheet(
+      tester,
+      Future.value(_match([_taberu])),
+      onAddToAnki: (_) {},
+      isAlreadyInAnki: (_) => duplicateCheck.future,
+    );
+
+    final checkingButton = tester.widget<ElevatedButton>(
+      find.widgetWithText(ElevatedButton, 'Checking...'),
+    );
+    expect(checkingButton.onPressed, isNull);
+
+    duplicateCheck.complete(true);
+    await tester.pumpAndSettle();
+
+    final duplicateButton = tester.widget<ElevatedButton>(
+      find.widgetWithText(ElevatedButton, 'Already in Anki'),
+    );
+    expect(duplicateButton.onPressed, isNull);
+    expect(find.widgetWithText(ElevatedButton, 'Add to Anki'), findsNothing);
   });
 
   testWidgets('parts of speech are small, muted and italic', (tester) async {
