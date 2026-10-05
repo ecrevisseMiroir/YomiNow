@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -30,7 +31,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get homeScreenGreeting => 'Bienvenue !';
 
   @override
-  String get homeScreenSubtitle => 'Pointez votre caméra sur du texte japonais,\ntapez n’importe quel mot, et lisez‑le immédiatement.';
+  String get homeScreenSubtitle =>
+      'Pointez votre caméra sur du texte japonais,\ntapez n’importe quel mot, et lisez‑le immédiatement.';
 
   @override
   String get homeScreenSettingsTooltip => 'Paramètres';
@@ -57,10 +59,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get documentsScreenEmptyTitle => 'Pas de documents pour le moment';
 
   @override
-  String get documentsScreenEmptySubtitle => 'Scannez votre première image ou importez‑en une existante pour commencer.';
+  String get documentsScreenEmptySubtitle =>
+      'Scannez votre première image ou importez‑en une existante pour commencer.';
 
   @override
-  String get documentsScreenNoTextDocuments => 'Aucune image numérisée avec du texte reconnu pour le moment.';
+  String get documentsScreenNoTextDocuments =>
+      'Aucune image numérisée avec du texte reconnu pour le moment.';
 
   @override
   String get documentsScreenCameraButton => 'Scanner avec l\'appareil photo';
@@ -75,13 +79,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get documentsScreenPopupDelete => 'Supprimer';
 
   @override
-  String get cameraScannerFlashUnavailable => 'Le flash n\'est pas disponible sur cette caméra.';
+  String get cameraScannerFlashUnavailable =>
+      'Le flash n\'est pas disponible sur cette caméra.';
 
   @override
-  String get cameraScannerCaptureFailed => 'Impossible de capturer la photo. Réessayez.';
+  String get cameraScannerCaptureFailed =>
+      'Impossible de capturer la photo. Réessayez.';
 
   @override
-  String get cameraScannerOpenGalleryFailed => 'Impossible d\'ouvrir la galerie de photos.';
+  String get cameraScannerOpenGalleryFailed =>
+      'Impossible d\'ouvrir la galerie de photos.';
 
   @override
   String get cameraScannerCloseCamera => 'Fermer la caméra';
@@ -96,7 +103,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get cameraScannerCameraUnavailable => 'Caméra indisponible';
 
   @override
-  String get cameraScannerAccessInstructions => 'Autorisez l\'accès à la caméra dans les paramètres, puis réessayez.';
+  String get cameraScannerAccessInstructions =>
+      'Autorisez l\'accès à la caméra dans les paramètres, puis réessayez.';
 
   @override
   String get cameraScannerTryAgain => 'Réessayer';
@@ -121,6 +129,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settingsScreenOCRSubtitle => 'Tesseract / ML Kit';
+
+  @override
+  String get settingsScreenBetaComingSoon => 'Bêta • Bientôt disponible';
+
+  @override
+  String get settingsScreenFeatureComingSoon =>
+      'Ce réglage est en bêta et sera bientôt disponible.';
 
   @override
   String get settingsScreenDictionaryTitle => 'Dictionnaire';
@@ -168,7 +183,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get imageScreenModeImage => 'Image';
 
   @override
-  String get imageScreenLookupHint => 'Appuyez sur un mot pour voir sa signification';
+  String get imageScreenLookupHint =>
+      'Appuyez sur un mot pour voir sa signification';
 
   @override
   String get imageScreenNoJapaneseDetected => 'Aucun texte japonais détecté.';
@@ -180,7 +196,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get splashScreenLogoSemantic => 'logo YomiNow';
 
   @override
-  String get splashScreenWordmarkSemantic => 'YomiNow, lire le japonais instantanément';
+  String get splashScreenWordmarkSemantic =>
+      'YomiNow, lire le japonais instantanément';
 
   @override
   String get splashScreenBackgroundSemantic => 'Mont Fuji et une porte torii';
@@ -192,7 +209,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get aboutScreenSubtitle => 'Lire le japonais instantanément';
 
   @override
-  String get aboutScreenDescription => 'Une application OCR japonaise hors ligne et dictionnaire\nconstruite avec Flutter.';
+  String get aboutScreenDescription =>
+      'Une application OCR japonaise hors ligne et dictionnaire\nconstruite avec Flutter.';
 
   @override
   String get aboutScreenLicenses => 'Licences et attribution';
@@ -216,7 +234,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get licensesScreenProjectCredits => 'Crédits du projet';
 
   @override
-  String get licensesScreenProjectDescription => 'Cette application réunit OCR open source, données de dictionnaire et outils mobiles pour rendre le texte japonais instantanément lisible.';
+  String get licensesScreenProjectDescription =>
+      'Cette application réunit OCR open source, données de dictionnaire et outils mobiles pour rendre le texte japonais instantanément lisible.';
 
   @override
   String get licensesScreenAppLabel => 'Application';
@@ -228,19 +247,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String get licensesScreenLicenseStatusLabel => 'Statut de la licence';
 
   @override
-  String get licensesScreenLicenseStatusValue => 'La licence finale du projet est encore en cours de définition.';
+  String get licensesScreenLicenseStatusValue =>
+      'La licence finale du projet est encore en cours de définition.';
 
   @override
   String get licensesScreenAttributionLabel => 'Attribution';
 
   @override
-  String get licensesScreenAttributionValue => 'JMdict, IPADIC, Tesseract et Google ML Kit sont crédités ci-dessous.';
+  String get licensesScreenAttributionValue =>
+      'JMdict, IPADIC, Tesseract et Google ML Kit sont crédités ci-dessous.';
 
   @override
   String get licensesScreenDataSourcesTitle => 'Sources de données';
 
   @override
-  String get licensesScreenDataSourcesBody => 'JMdict est utilisé pour la recherche dans le dictionnaire japonais ; IPADIC alimente le tokenizer ; Tesseract et Google ML Kit alimentent l\'OCR.';
+  String get licensesScreenDataSourcesBody =>
+      'JMdict est utilisé pour la recherche dans le dictionnaire japonais ; IPADIC alimente le tokenizer ; Tesseract et Google ML Kit alimentent l\'OCR.';
 
   @override
   String get thirdPartyLibrariesScreenTitle => 'Bibliothèques tierces';
@@ -252,49 +274,58 @@ class AppLocalizationsFr extends AppLocalizations {
   String get thirdPartyLibrariesScreenFlutter => 'Flutter';
 
   @override
-  String get thirdPartyLibrariesScreenFlutterPurpose => 'Framework d\'application multiplateforme et boîte à outils UI.';
+  String get thirdPartyLibrariesScreenFlutterPurpose =>
+      'Framework d\'application multiplateforme et boîte à outils UI.';
 
   @override
   String get thirdPartyLibrariesScreenCamera => 'camera';
 
   @override
-  String get thirdPartyLibrariesScreenCameraPurpose => 'Flux de capture caméra mobile personnalisé sur Android et iOS.';
+  String get thirdPartyLibrariesScreenCameraPurpose =>
+      'Flux de capture caméra mobile personnalisé sur Android et iOS.';
 
   @override
-  String get thirdPartyLibrariesScreenGoogleMlkit => 'google_mlkit_text_recognition';
+  String get thirdPartyLibrariesScreenGoogleMlkit =>
+      'google_mlkit_text_recognition';
 
   @override
-  String get thirdPartyLibrariesScreenGoogleMlkitPurpose => 'Backend OCR japonais pour le scan mobile.';
+  String get thirdPartyLibrariesScreenGoogleMlkitPurpose =>
+      'Backend OCR japonais pour le scan mobile.';
 
   @override
   String get thirdPartyLibrariesScreenImagePicker => 'image_picker';
 
   @override
-  String get thirdPartyLibrariesScreenImagePickerPurpose => 'Sélection d\'images depuis la galerie et la caméra.';
+  String get thirdPartyLibrariesScreenImagePickerPurpose =>
+      'Sélection d\'images depuis la galerie et la caméra.';
 
   @override
   String get thirdPartyLibrariesScreenKuromoji => 'kuromoji';
 
   @override
-  String get thirdPartyLibrariesScreenKuromojiPurpose => 'Tokenisation morphologique japonaise et analyse de mots.';
+  String get thirdPartyLibrariesScreenKuromojiPurpose =>
+      'Tokenisation morphologique japonaise et analyse de mots.';
 
   @override
   String get thirdPartyLibrariesScreenSqlite3 => 'sqlite3';
 
   @override
-  String get thirdPartyLibrariesScreenSqlite3Purpose => 'Accès à la base de données du dictionnaire hors ligne.';
+  String get thirdPartyLibrariesScreenSqlite3Purpose =>
+      'Accès à la base de données du dictionnaire hors ligne.';
 
   @override
   String get thirdPartyLibrariesScreenPathProvider => 'path_provider';
 
   @override
-  String get thirdPartyLibrariesScreenPathProviderPurpose => 'Accès au système de fichiers pour les données de l\'application et les ressources locales.';
+  String get thirdPartyLibrariesScreenPathProviderPurpose =>
+      'Accès au système de fichiers pour les données de l\'application et les ressources locales.';
 
   @override
   String get thirdPartyLibrariesScreenImage => 'image';
 
   @override
-  String get thirdPartyLibrariesScreenImagePurpose => 'Prétraitement d\'image et gestion de l\'orientation EXIF.';
+  String get thirdPartyLibrariesScreenImagePurpose =>
+      'Prétraitement d\'image et gestion de l\'orientation EXIF.';
 
   @override
   String get openSourceScreenTitle => 'Open Source';
@@ -303,25 +334,29 @@ class AppLocalizationsFr extends AppLocalizations {
   String get openSourceScreenBackTooltip => 'Retour';
 
   @override
-  String get openSourceScreenDescription => 'YomiNow est conçu pour rester ouvert, modulaire et facile à améliorer ensemble.';
+  String get openSourceScreenDescription =>
+      'YomiNow est conçu pour rester ouvert, modulaire et facile à améliorer ensemble.';
 
   @override
   String get openSourceScreenItem1Title => 'Source du projet';
 
   @override
-  String get openSourceScreenItem1Detail => 'Le code de l\'application est conservé dans l\'espace de travail du projet et organisé par fonctionnalité, service et écran UI.';
+  String get openSourceScreenItem1Detail =>
+      'Le code de l\'application est conservé dans l\'espace de travail du projet et organisé par fonctionnalité, service et écran UI.';
 
   @override
   String get openSourceScreenItem2Title => 'Modèle de contribution';
 
   @override
-  String get openSourceScreenItem2Detail => 'Des améliorations peuvent être apportées à l\'OCR, la correspondance du dictionnaire, le polissage de l\'UI et l\'accessibilité sans changer le flux principal.';
+  String get openSourceScreenItem2Detail =>
+      'Des améliorations peuvent être apportées à l\'OCR, la correspondance du dictionnaire, le polissage de l\'UI et l\'accessibilité sans changer le flux principal.';
 
   @override
   String get openSourceScreenItem3Title => 'État d\'esprit du projet';
 
   @override
-  String get openSourceScreenItem3Detail => 'YomiNow est conçu pour être transparent, hors-ligne d\'abord, et facile à étendre pour de futures fonctionnalités d\'apprentissage des langues.';
+  String get openSourceScreenItem3Detail =>
+      'YomiNow est conçu pour être transparent, hors-ligne d\'abord, et facile à étendre pour de futures fonctionnalités d\'apprentissage des langues.';
 
   @override
   String get imageScreenProcessingTitle => 'Traitement de l\'image...';
@@ -366,10 +401,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get ankiNotificationErrorTitle => 'Impossible d\'ajouter la carte';
 
   @override
-  String get ankiNotificationErrorMessage => 'Vérifiez qu\'AnkiDroid est installé et que l\'intégration API est activée dans Paramètres > Avancé.';
+  String get ankiNotificationErrorMessage =>
+      'Vérifiez qu\'AnkiDroid est installé et que l\'intégration API est activée dans Paramètres > Avancé.';
 
   @override
-  String get ankiNotificationRestartMessage => 'Redémarrez YomiNow pour installer l\'intégration AnkiDroid pour Android.';
+  String get ankiNotificationRestartMessage =>
+      'Redémarrez YomiNow pour installer l\'intégration AnkiDroid pour Android.';
 
   @override
   String get notificationHistoryEmpty => 'Tout est à jour';
@@ -415,14 +452,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String get noJapaneseTextTitle => 'Aucun texte japonais trouvé';
 
   @override
-  String get noJapaneseTextMessage => 'Nous n\'avons pas trouvé de texte japonais lisible dans cette image.';
+  String get noJapaneseTextMessage =>
+      'Nous n\'avons pas trouvé de texte japonais lisible dans cette image.';
 
   @override
-  String get noJapaneseTextSuggestion => 'Essayez une photo plus nette avec le texte à l\'intérieur.';
+  String get noJapaneseTextSuggestion =>
+      'Essayez une photo plus nette avec le texte à l\'intérieur.';
 
   @override
   String get noJapaneseTextButton => 'Choisir une autre image';
 
   @override
-  String get lookupAttribution => 'Données d\'attribution : JMdict © EDRDG, CC BY‑SA 4.0';
+  String get lookupAttribution =>
+      'Données d\'attribution : JMdict © EDRDG, CC BY‑SA 4.0';
 }
