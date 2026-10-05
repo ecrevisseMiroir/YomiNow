@@ -137,7 +137,8 @@
   "ankiNotificationRestartMessage": "Redémarrez YomiNow pour installer l'intégration AnkiDroid pour Android.",
   "notificationHistoryEmpty": "Tout est à jour",
   "notificationHistoryClearAll": "Effacer toutes les notifications",
-  "notificationHistoryClearTooltip": "Effacer l'historique des notifications",
+  "notificationHistoryTitle": "Historique des notifications",
+  "notificationHistoryClearTooltip": "Effacer les notifications",
   "lookupNoWordMessage": "Aucun mot à rechercher ici.",
   "lookupNoEntryMessage": "Aucune entrée de dictionnaire pour \"{matchedText}\"",
   "@lookupNoEntryMessage": {
