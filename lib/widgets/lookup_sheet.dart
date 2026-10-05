@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../models/dictionary_entry.dart';
 import '../models/lookup_result.dart';
 
+import 'package:yominow/l10n/app_localizations.dart';
+
 /// Callback for when the user wants to add the looked-up word to Anki.
 typedef AddToAnkiCallback = void Function(LookupResult result);
 
@@ -11,10 +13,16 @@ typedef AddToAnkiCallback = void Function(LookupResult result);
 /// Shows a loading indicator until [result] completes. A null result means
 /// there was no word at the tapped position.
 class LookupSheet extends StatelessWidget {
-  const LookupSheet({super.key, required this.result, this.onAddToAnki});
+  const LookupSheet({
+    super.key,
+    required this.result,
+    this.onAddToAnki,
+    this.isAlreadyInAnki,
+  });
 
   final Future<LookupResult?> result;
   final AddToAnkiCallback? onAddToAnki;
+  final Future<bool> Function(String word)? isAlreadyInAnki;
 
   /// Shows a [LookupSheet] for [result] as a modal bottom sheet.
   /// Optional [onAddToAnki] callback is invoked when the user taps the
@@ -23,6 +31,7 @@ class LookupSheet extends StatelessWidget {
     BuildContext context,
     Future<LookupResult?> result, {
     AddToAnkiCallback? onAddToAnki,
+    Future<bool> Function(String word)? isAlreadyInAnki,
   }) {
     return showModalBottomSheet<void>(
       context: context,
@@ -32,8 +41,11 @@ class LookupSheet extends StatelessWidget {
       // minimum size), so the modal route must not compete for the gesture.
       enableDrag: false,
       backgroundColor: Colors.transparent,
-      builder: (context) =>
-          LookupSheet(result: result, onAddToAnki: onAddToAnki),
+      builder: (context) => LookupSheet(
+        result: result,
+        onAddToAnki: onAddToAnki,
+        isAlreadyInAnki: isAlreadyInAnki,
+      ),
     );
   }
 
@@ -59,8 +71,9 @@ class LookupSheet extends StatelessWidget {
                   FutureBuilder<LookupResult?>(
                     future: result,
                     builder: (context, snapshot) => _SheetBody(
-                      snapshot: snapshot,
+                                                snapshot: snapshot,
                       onAddToAnki: onAddToAnki,
+                      isAlreadyInAnki: isAlreadyInAnki,
                     ),
                   ),
                 ],
@@ -118,16 +131,19 @@ class _Attribution extends StatelessWidget {
 /// Picks what the sheet shows for the state of the lookup future.
 class _SheetBody extends StatelessWidget {
   const _SheetBody({
+    super.key,
     required this.snapshot,
-    this.onAddToAnki, // for Add to Anki callback
+    this.onAddToAnki,
+    this.isAlreadyInAnki,
   });
 
   final AsyncSnapshot<LookupResult?> snapshot;
   final AddToAnkiCallback? onAddToAnki;
+  final Future<bool> Function(String word)? isAlreadyInAnki;
 
   @override
   Widget build(BuildContext context) {
-    if (snapshot.hasError) {
+                if (snapshot.hasError) {
       return _Message('Lookup failed: ${snapshot.error}');
     }
     if (snapshot.connectionState != ConnectionState.done) {
@@ -136,9 +152,13 @@ class _SheetBody extends StatelessWidget {
         child: Center(child: CircularProgressIndicator()),
       );
     }
-    final result = snapshot.data;
+                                    final result = snapshot.data;
     if (result == null) return const _Message('No word to look up here.');
-    return _ResultView(result: result, onAddToAnki2: onAddToAnki);
+    return _ResultView(
+      result: result,
+      onAddToAnki: onAddToAnki,
+      isAlreadyInAnki: isAlreadyInAnki,
+    );
   }
 }
 
@@ -166,11 +186,13 @@ class _Message extends StatelessWidget {
 class _ResultView extends StatelessWidget {
   const _ResultView({
     required this.result,
-    this.onAddToAnki2, // for Add to Anki callback
+    this.onAddToAnki,
+    this.isAlreadyInAnki,
   });
 
   final LookupResult result;
-  final AddToAnkiCallback? onAddToAnki2;
+  final AddToAnkiCallback? onAddToAnki;
+  final Future<bool> Function(String word)? isAlreadyInAnki;
 
   @override
   Widget build(BuildContext context) {
@@ -199,14 +221,11 @@ class _ResultView extends StatelessWidget {
                 ],
               ),
             ),
-            if (onAddToAnki2 != null)
-              ElevatedButton.icon(
-                onPressed: () {
-                  onAddToAnki2!(result);
-                  Navigator.of(context).pop();
-                },
-                icon: const Icon(Icons.add),
-                label: const Text('Add to Anki'),
+            if (onAddToAnki != null)
+              _AnkiAddButton(
+                result: result,
+                onAddToAnki: onAddToAnki!,
+                isAlreadyInAnki: isAlreadyInAnki,
               ),
           ],
         ),
@@ -220,6 +239,76 @@ class _ResultView extends StatelessWidget {
           ],
         const SizedBox(height: 16),
       ],
+    );
+  }
+}
+
+class _AnkiAddButton extends StatefulWidget {
+  const _AnkiAddButton({
+    required this.result,
+    required this.onAddToAnki,
+    this.isAlreadyInAnki,
+  });
+
+  final LookupResult result;
+  final AddToAnkiCallback onAddToAnki;
+  final Future<bool> Function(String word)? isAlreadyInAnki;
+
+  @override
+  State<_AnkiAddButton> createState() => _AnkiAddButtonState();
+}
+
+class _AnkiAddButtonState extends State<_AnkiAddButton> {
+  late final Future<bool>? _duplicateCheck = widget.isAlreadyInAnki?.call(
+    widget.result.matchedText,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final duplicateCheck = _duplicateCheck;
+    if (duplicateCheck == null) return _buildButton(context);
+
+    final l10n = AppLocalizations.of(context)!;
+    return FutureBuilder<bool>(
+      future: duplicateCheck,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return _buildButton(context, label: l10n.ankiAddChecking);
+        }
+        if (snapshot.data == true) {
+          return _buildButton(
+            context,
+            alreadyAdded: true,
+            label: l10n.ankiAddAlreadyAdded,
+          );
+        }
+        return _buildButton(context, label: l10n.ankiAddAction);
+      },
+    );
+  }
+
+  Widget _buildButton(
+    BuildContext context, {
+    String? label,
+    bool alreadyAdded = false,
+  }) {
+    final l10n = AppLocalizations.of(context)!;
+    final isChecking = label == l10n.ankiAddChecking;
+    final canAdd = !alreadyAdded && !isChecking;
+    return ElevatedButton.icon(
+      onPressed: canAdd
+          ? () {
+              widget.onAddToAnki(widget.result);
+              Navigator.of(context).pop();
+            }
+          : null,
+      icon: isChecking
+          ? const SizedBox.square(
+              dimension: 18,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : Icon(alreadyAdded ? Icons.check_rounded : Icons.add),
+      label: Text(label ?? l10n.ankiAddAction, maxLines: 1),
     );
   }
 }
