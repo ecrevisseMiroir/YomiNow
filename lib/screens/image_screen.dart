@@ -1,22 +1,23 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../models/lookup_result.dart';
 import '../models/ocr_result.dart';
+import '../services/anki_droid_service.dart';
 import '../services/app_services.dart';
 import '../services/image_preprocessor.dart';
 import '../services/ocr/ocr_service.dart';
+import '../services/yomi_now_notification_history.dart';
 import '../widgets/lookup_sheet.dart';
 import '../widgets/no_japanese_text.dart';
-import '../widgets/tokenized_text.dart';
+import '../widgets/yomi_now_notification.dart';
 import '../widgets/word_overlay.dart';
-import '../theme/yomi_now_theme.dart';
 import 'loading_screen.dart';
 
 import 'package:yominow/l10n/app_localizations.dart';
-
-enum _ImageScreenMode { text, image }
 
 /// Shows a photo, runs OCR on it and lets the user tap the detected words to
 /// look them up.
@@ -37,7 +38,6 @@ class _ImageScreenState extends State<ImageScreen> {
   bool _isRecognizing = true;
   int _processingStep = 0;
 
-  _ImageScreenMode _mode = _ImageScreenMode.text;
   WordId? _selected;
   Set<WordId> _highlighted = const {};
 
@@ -101,7 +101,13 @@ class _ImageScreenState extends State<ImageScreen> {
       if (match == null || !mounted || id != _lookupCount) return;
       setState(() => _highlighted = _wordsCovered(line, lineIndex, match));
     }).ignore(); // The sheet reports failures.
-    LookupSheet.show(context, result);
+    LookupSheet.show(
+      context,
+      result,
+      onAddToAnki: defaultTargetPlatform == TargetPlatform.android
+          ? _addToAnki
+          : null,
+    );
   }
 
   void _lookupWord(OcrResult result, int lineIndex, int wordIndex) {
@@ -112,6 +118,55 @@ class _ImageScreenState extends State<ImageScreen> {
       line.words[wordIndex].start,
       selected: (line: lineIndex, word: wordIndex),
     );
+  }
+
+  void _addToAnki(LookupResult result) async {
+    final l10n = AppLocalizations.of(context)!;
+    final meanings = result.entries
+        .expand((entry) => entry.senses)
+        .expand((sense) => sense.glosses)
+        .toSet()
+        .take(5)
+        .join('; ');
+    final back = [
+      result.reading,
+      meanings,
+    ].whereType<String>().where((value) => value.isNotEmpty).join('\n');
+    try {
+      final added = await AnkiDroidService().addNote(
+        word: result.matchedText,
+        back: back,
+      );
+      if (!mounted) return;
+      YomiNowNotification.show(
+        context,
+        title: added
+            ? l10n.ankiNotificationAddedTitle
+            : l10n.ankiNotificationOpenedTitle,
+        message: added
+            ? l10n.ankiNotificationAddedMessage(result.matchedText)
+            : l10n.ankiNotificationOpenedMessage(result.matchedText),
+        kind: added
+            ? YomiNowNotificationKind.success
+            : YomiNowNotificationKind.info,
+      );
+    } on MissingPluginException {
+      if (!mounted) return;
+      YomiNowNotification.show(
+        context,
+        title: l10n.ankiNotificationErrorTitle,
+        message: l10n.ankiNotificationRestartMessage,
+        kind: YomiNowNotificationKind.error,
+      );
+    } on PlatformException catch (error) {
+      if (!mounted) return;
+      YomiNowNotification.show(
+        context,
+        title: l10n.ankiNotificationErrorTitle,
+        message: error.message ?? l10n.ankiNotificationErrorMessage,
+        kind: YomiNowNotificationKind.error,
+      );
+    }
   }
 
   void _close() {
@@ -135,33 +190,14 @@ class _ImageScreenState extends State<ImageScreen> {
         body: SafeArea(
           child: Column(
             children: [
-              _DetectedTextHeader(
-                onBack: _close,
-                onShowImage: hasText
-                    ? () => setState(() => _mode = _ImageScreenMode.image)
-                    : null,
-              ),
+              _DetectedTextHeader(onBack: _close),
               if (isLoading)
                 Expanded(child: LoadingScreen(currentStep: _processingStep))
               else if (hasText) ...[
-                _ViewModeSelector(
-                  mode: _mode,
-                  onChanged: (mode) => setState(() => _mode = mode),
-                ),
                 Expanded(
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 180),
-                    child: _mode == _ImageScreenMode.text
-                        ? _DetectedTextList(
-                            key: const ValueKey('detected-text'),
-                            result: result,
-                            onTapOffset: (lineIndex, offset) => _lookup(
-                              result.lines[lineIndex],
-                              lineIndex,
-                              offset,
-                            ),
-                          )
-                        : _buildImageView(image!, result),
+                    child: _buildImageView(image!, result),
                   ),
                 ),
                 const _LookupHint(),
@@ -203,10 +239,9 @@ class _ImageScreenState extends State<ImageScreen> {
 }
 
 class _DetectedTextHeader extends StatelessWidget {
-  const _DetectedTextHeader({required this.onBack, required this.onShowImage});
+  const _DetectedTextHeader({required this.onBack});
 
   final VoidCallback onBack;
-  final VoidCallback? onShowImage;
 
   @override
   Widget build(BuildContext context) {
@@ -234,115 +269,6 @@ class _DetectedTextHeader extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _ViewModeSelector extends StatelessWidget {
-  const _ViewModeSelector({required this.mode, required this.onChanged});
-
-  final _ImageScreenMode mode;
-  final ValueChanged<_ImageScreenMode> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(22, 10, 22, 16),
-      child: Container(
-        height: 52,
-        padding: const EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHigh,
-          borderRadius: BorderRadius.circular(28),
-        ),
-        child: Row(
-          children: [
-            _modeButton(
-              context,
-              AppLocalizations.of(context)!.imageScreenModeText,
-              _ImageScreenMode.text,
-            ),
-            _modeButton(
-              context,
-              AppLocalizations.of(context)!.imageScreenModeImage,
-              _ImageScreenMode.image,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _modeButton(
-    BuildContext context,
-    String label,
-    _ImageScreenMode value,
-  ) {
-    final selected = mode == value;
-    final colorScheme = Theme.of(context).colorScheme;
-    return Expanded(
-      child: Semantics(
-        button: true,
-        selected: selected,
-        child: InkWell(
-          onTap: () => onChanged(value),
-          borderRadius: BorderRadius.circular(24),
-          child: Container(
-            height: 44,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: selected ? YomiNowPalette.coral : Colors.transparent,
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Text(
-              label,
-              style: TextStyle(
-                color: selected ? YomiNowPalette.cream : colorScheme.onSurface,
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _DetectedTextList extends StatelessWidget {
-  const _DetectedTextList({
-    super.key,
-    required this.result,
-    required this.onTapOffset,
-  });
-
-  final OcrResult result;
-  final void Function(int lineIndex, int offset) onTapOffset;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(24, 4, 24, 20),
-      itemCount: result.lines.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 14),
-      itemBuilder: (context, index) {
-        final line = result.lines[index];
-        return Container(
-          constraints: const BoxConstraints(minHeight: 62),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHigh,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: TokenizedText(
-            key: ValueKey('text-line-$index'),
-            text: line.text,
-            onTapOffset: (offset) => onTapOffset(index, offset),
-          ),
-        );
-      },
     );
   }
 }
