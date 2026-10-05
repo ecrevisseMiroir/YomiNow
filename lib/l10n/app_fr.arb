@@ -107,5 +107,25 @@
   "openSourceScreenItem3Title": "État d'esprit du projet",
   "openSourceScreenItem3Detail": "YomiNow est conçu pour être transparent, hors-ligne d'abord, et facile à étendre pour de futures fonctionnalités d'apprentissage des langues.",
   "imageScreenProcessingTitle": "Traitement de l'image...",
-  "imageScreenProcessingSubtitle": "Exécution de l'OCR"
+  "imageScreenProcessingSubtitle": "Exécution de l'OCR",
+  "ankiNotificationAddedTitle": "Ajouté à AnkiDroid",
+  "ankiNotificationAddedMessage": "{word} a été ajouté au paquet YomiNow.",
+  "@ankiNotificationAddedMessage": {
+    "placeholders": {
+      "word": {}
+    }
+  },
+  "ankiNotificationOpenedTitle": "Terminer dans AnkiDroid",
+  "ankiNotificationOpenedMessage": "Terminez l'ajout de {word} dans AnkiDroid.",
+  "@ankiNotificationOpenedMessage": {
+    "placeholders": {
+      "word": {}
+    }
+  },
+  "ankiNotificationErrorTitle": "Impossible d'ajouter la carte",
+  "ankiNotificationErrorMessage": "Vérifiez qu'AnkiDroid est installé et que l'intégration API est activée dans Paramètres > Avancé.",
+  "ankiNotificationRestartMessage": "Redémarrez YomiNow pour installer l'intégration AnkiDroid pour Android.",
+  "notificationHistoryEmpty": "Tout est à jour",
+  "notificationHistoryClearAll": "Effacer toutes les notifications",
+  "notificationHistoryClearTooltip": "Effacer l'historique des notifications"
 }

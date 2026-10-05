@@ -741,6 +741,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Running OCR'**
   String get imageScreenProcessingSubtitle;
+
+  /// No description provided for @ankiNotificationAddedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to AnkiDroid'**
+  String get ankiNotificationAddedTitle;
+
+  /// No description provided for @ankiNotificationAddedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{word} was added to the YomiNow deck.'**
+  String ankiNotificationAddedMessage(Object word);
+
+  /// No description provided for @ankiNotificationOpenedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish in AnkiDroid'**
+  String get ankiNotificationOpenedTitle;
+
+  /// No description provided for @ankiNotificationOpenedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete adding {word} in AnkiDroid.'**
+  String ankiNotificationOpenedMessage(Object word);
+
+  /// No description provided for @ankiNotificationErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not add card'**
+  String get ankiNotificationErrorTitle;
+
+  /// No description provided for @ankiNotificationErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Check that AnkiDroid is installed and API Integration is enabled in Settings > Advanced.'**
+  String get ankiNotificationErrorMessage;
+
+  /// No description provided for @ankiNotificationRestartMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart YomiNow to install the Android AnkiDroid integration.'**
+  String get ankiNotificationRestartMessage;
+
+  /// No description provided for @notificationHistoryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re all caught up'**
+  String get notificationHistoryEmpty;
+
+  /// No description provided for @notificationHistoryClearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear all notifications'**
+  String get notificationHistoryClearAll;
+
+  /// No description provided for @notificationHistoryClearTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear notification history'**
+  String get notificationHistoryClearTooltip;
 }
 
 class _AppLocalizationsDelegate

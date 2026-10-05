@@ -10,11 +10,13 @@ import '../theme/yomi_now_theme.dart';
 import '../models/scanned_document.dart';
 import '../services/app_route_observer.dart';
 import '../services/app_services.dart';
+import '../services/yomi_now_notification_history.dart';
 
 import 'package:yominow/l10n/app_localizations.dart';
 
 import '../widgets/yomi_now_bottom_nav.dart';
 import '../widgets/error_dialog.dart';
+import '../widgets/yomi_now_notification_history_sheet.dart';
 import 'camera_scanner.dart';
 import 'image_screen.dart';
 
@@ -37,6 +39,12 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   bool _isLoadingScans = true;
   bool _didLoadScans = false;
   bool _didSubscribeToRoute = false;
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(YomiNowNotificationHistory.instance.load());
+  }
 
   @override
   void didChangeDependencies() {
@@ -448,25 +456,34 @@ PreferredSizeWidget _buildHeaderBar(BuildContext context) {
     actions: [
       Tooltip(
         message: AppLocalizations.of(context)!.homeScreenNotificationsTooltip,
-        child: InkWell(
-          customBorder: const CircleBorder(),
-          onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  AppLocalizations.of(context)!.homeScreenNoNotifications,
+        child: AnimatedBuilder(
+          animation: YomiNowNotificationHistory.instance,
+          builder: (context, _) {
+            final unreadCount = YomiNowNotificationHistory.instance.unreadCount;
+            return Semantics(
+              button: true,
+              label: AppLocalizations.of(context)!
+                  .homeScreenNotificationsTooltip,
+              child: InkWell(
+                customBorder: const CircleBorder(),
+                onTap: () => unawaited(showYomiNowNotificationHistory(context)),
+                child: Padding(
+                  padding: const EdgeInsets.all(6),
+                  child: Badge(
+                    isLabelVisible: unreadCount > 0,
+                    label: Text(unreadCount > 99 ? '99+' : '$unreadCount'),
+                    backgroundColor: YomiNowPalette.coral,
+                    textColor: YomiNowPalette.ink,
+                    child: Image.asset(
+                      'assets/03_characters_mascot/cat_home_face_notification.png',
+                      width: 32,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
                 ),
               ),
             );
           },
-          child: Padding(
-            padding: const EdgeInsets.all(6),
-            child: Image.asset(
-              'assets/03_characters_mascot/cat_home_face_notification.png',
-              width: 32,
-              fit: BoxFit.contain,
-            ),
-          ),
         ),
       ),
       const SizedBox(width: 8),

@@ -354,4 +354,40 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get imageScreenProcessingSubtitle => 'Running OCR';
+
+  @override
+  String get ankiNotificationAddedTitle => 'Added to AnkiDroid';
+
+  @override
+  String ankiNotificationAddedMessage(Object word) {
+    return '$word was added to the YomiNow deck.';
+  }
+
+  @override
+  String get ankiNotificationOpenedTitle => 'Finish in AnkiDroid';
+
+  @override
+  String ankiNotificationOpenedMessage(Object word) {
+    return 'Complete adding $word in AnkiDroid.';
+  }
+
+  @override
+  String get ankiNotificationErrorTitle => 'Could not add card';
+
+  @override
+  String get ankiNotificationErrorMessage =>
+      'Check that AnkiDroid is installed and API Integration is enabled in Settings > Advanced.';
+
+  @override
+  String get ankiNotificationRestartMessage =>
+      'Restart YomiNow to install the Android AnkiDroid integration.';
+
+  @override
+  String get notificationHistoryEmpty => 'You\'re all caught up';
+
+  @override
+  String get notificationHistoryClearAll => 'Clear all notifications';
+
+  @override
+  String get notificationHistoryClearTooltip => 'Clear notification history';
 }

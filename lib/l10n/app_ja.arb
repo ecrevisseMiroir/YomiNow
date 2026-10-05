@@ -107,5 +107,25 @@
   "openSourceScreenItem3Title": "プロジェクトの考え方",
   "openSourceScreenItem3Detail": "YomiNowは、透明性があり、オフラインファーストで、将来の言語学習機能に簡単に拡張できるように設計されています。",
   "imageScreenProcessingTitle": "画像を処理中...",
-  "imageScreenProcessingSubtitle": "OCRを実行中"
+  "imageScreenProcessingSubtitle": "OCRを実行中",
+  "ankiNotificationAddedTitle": "AnkiDroidに追加しました",
+  "ankiNotificationAddedMessage": "「{word}」をYomiNowデッキに追加しました。",
+  "@ankiNotificationAddedMessage": {
+    "placeholders": {
+      "word": {}
+    }
+  },
+  "ankiNotificationOpenedTitle": "AnkiDroidで完了してください",
+  "ankiNotificationOpenedMessage": "AnkiDroidで「{word}」の追加を完了してください。",
+  "@ankiNotificationOpenedMessage": {
+    "placeholders": {
+      "word": {}
+    }
+  },
+  "ankiNotificationErrorTitle": "カードを追加できませんでした",
+  "ankiNotificationErrorMessage": "AnkiDroidがインストールされ、設定 > 詳細設定でAPI連携が有効になっていることを確認してください。",
+  "ankiNotificationRestartMessage": "Android版AnkiDroid連携をインストールするため、YomiNowを再起動してください。",
+  "notificationHistoryEmpty": "新しい通知はありません",
+  "notificationHistoryClearAll": "すべての通知を消去",
+  "notificationHistoryClearTooltip": "通知履歴を消去"
 }

@@ -107,5 +107,25 @@
   "openSourceScreenItem3Title": "Project mindset",
   "openSourceScreenItem3Detail": "YomiNow is designed to be transparent, offline-first, and easy to extend for future language-learning features.",
   "imageScreenProcessingTitle": "Processing Image...",
-  "imageScreenProcessingSubtitle": "Running OCR"
+  "imageScreenProcessingSubtitle": "Running OCR",
+  "ankiNotificationAddedTitle": "Added to AnkiDroid",
+  "ankiNotificationAddedMessage": "{word} was added to the YomiNow deck.",
+  "@ankiNotificationAddedMessage": {
+    "placeholders": {
+      "word": {}
+    }
+  },
+  "ankiNotificationOpenedTitle": "Finish in AnkiDroid",
+  "ankiNotificationOpenedMessage": "Complete adding {word} in AnkiDroid.",
+  "@ankiNotificationOpenedMessage": {
+    "placeholders": {
+      "word": {}
+    }
+  },
+  "ankiNotificationErrorTitle": "Could not add card",
+  "ankiNotificationErrorMessage": "Check that AnkiDroid is installed and API Integration is enabled in Settings > Advanced.",
+  "ankiNotificationRestartMessage": "Restart YomiNow to install the Android AnkiDroid integration.",
+  "notificationHistoryEmpty": "You're all caught up",
+  "notificationHistoryClearAll": "Clear all notifications",
+  "notificationHistoryClearTooltip": "Clear notification history"
 }

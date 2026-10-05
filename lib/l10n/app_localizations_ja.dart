@@ -343,4 +343,40 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get imageScreenProcessingSubtitle => 'OCRを実行中';
+
+  @override
+  String get ankiNotificationAddedTitle => 'AnkiDroidに追加しました';
+
+  @override
+  String ankiNotificationAddedMessage(Object word) {
+    return '「$word」をYomiNowデッキに追加しました。';
+  }
+
+  @override
+  String get ankiNotificationOpenedTitle => 'AnkiDroidで完了してください';
+
+  @override
+  String ankiNotificationOpenedMessage(Object word) {
+    return 'AnkiDroidで「$word」の追加を完了してください。';
+  }
+
+  @override
+  String get ankiNotificationErrorTitle => 'カードを追加できませんでした';
+
+  @override
+  String get ankiNotificationErrorMessage =>
+      'AnkiDroidがインストールされ、設定 > 詳細設定でAPI連携が有効になっていることを確認してください。';
+
+  @override
+  String get ankiNotificationRestartMessage =>
+      'Android版AnkiDroid連携をインストールするため、YomiNowを再起動してください。';
+
+  @override
+  String get notificationHistoryEmpty => '新しい通知はありません';
+
+  @override
+  String get notificationHistoryClearAll => 'すべての通知を消去';
+
+  @override
+  String get notificationHistoryClearTooltip => '通知履歴を消去';
 }
