@@ -45,7 +45,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _SettingsItem(
         icon: Icons.menu_book_outlined,
         title: AppLocalizations.of(context)!.settingsScreenDictionaryTitle,
-        subtitle: AppLocalizations.of(context)!.settingsScreenDictionarySubtitle,
+        subtitle: AppLocalizations.of(context)!
+            .settingsScreenDictionarySubtitle,
       ),
       _SettingsItem(
         icon: Icons.light_mode_outlined,

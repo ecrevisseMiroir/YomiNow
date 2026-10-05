@@ -314,6 +314,7 @@ class _LookupHint extends StatelessWidget {
             style: TextStyle(
               color: colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w600,
+              fontSize: 12,
             ),
           ),
         ],
