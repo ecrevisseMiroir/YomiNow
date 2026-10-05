@@ -63,8 +63,7 @@ import 'app_localizations_ja.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale)
-    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -72,8 +71,7 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate =
-      _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -85,19 +83,18 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
-      <LocalizationsDelegate<dynamic>>[
-        delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
+    delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+  ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
     Locale('fr'),
-    Locale('ja'),
+    Locale('ja')
   ];
 
   /// No description provided for @homeScreenTitleTakePhoto.
@@ -826,15 +823,98 @@ abstract class AppLocalizations {
   /// **'Clear all notifications'**
   String get notificationHistoryClearAll;
 
+  /// No description provided for @notificationHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification History'**
+  String get notificationHistoryTitle;
+
   /// No description provided for @notificationHistoryClearTooltip.
   ///
   /// In en, this message translates to:
-  /// **'Clear notification history'**
+  /// **'Clear notifications'**
   String get notificationHistoryClearTooltip;
+
+  /// No description provided for @lookupNoWordMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No word to look up here.'**
+  String get lookupNoWordMessage;
+
+  /// No description provided for @lookupNoEntryMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No dictionary entry for 「{matchedText}」'**
+  String lookupNoEntryMessage(Object matchedText);
+
+  /// No description provided for @lookupFailedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Lookup failed: {error}'**
+  String lookupFailedMessage(Object error);
+
+  /// No description provided for @errorDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong'**
+  String get errorDialogTitle;
+
+  /// No description provided for @errorDialogMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t process the image.'**
+  String get errorDialogMessage;
+
+  /// No description provided for @errorDialogRetryPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Please try again.'**
+  String get errorDialogRetryPrompt;
+
+  /// No description provided for @errorDialogRetryButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get errorDialogRetryButton;
+
+  /// No description provided for @errorDialogGoBackButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Go back'**
+  String get errorDialogGoBackButton;
+
+  /// No description provided for @noJapaneseTextTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No Japanese text found'**
+  String get noJapaneseTextTitle;
+
+  /// No description provided for @noJapaneseTextMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t find readable Japanese in this image.'**
+  String get noJapaneseTextMessage;
+
+  /// No description provided for @noJapaneseTextSuggestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Try a sharper photo with the text in view.'**
+  String get noJapaneseTextSuggestion;
+
+  /// No description provided for @noJapaneseTextButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose another image'**
+  String get noJapaneseTextButton;
+
+  /// No description provided for @lookupAttribution.
+  ///
+  /// In en, this message translates to:
+  /// **'Dictionary data: JMdict © EDRDG, CC BY-SA 4.0'**
+  String get lookupAttribution;
 }
 
-class _AppLocalizationsDelegate
-    extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -843,28 +923,26 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['en', 'fr', 'ja'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>['en', 'fr', 'ja'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
+
+
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'en':
-      return AppLocalizationsEn();
-    case 'fr':
-      return AppLocalizationsFr();
-    case 'ja':
-      return AppLocalizationsJa();
+    case 'en': return AppLocalizationsEn();
+    case 'fr': return AppLocalizationsFr();
+    case 'ja': return AppLocalizationsJa();
   }
 
   throw FlutterError(
     'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
     'an issue with the localizations generation tool. Please file an issue '
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.',
+    'that was used.'
   );
 }

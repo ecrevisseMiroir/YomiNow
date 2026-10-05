@@ -360,7 +360,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                 AppLocalizations.of(context)!.homeScreenSeeAll,
                 style: const TextStyle(
                   fontFamily: 'Inter',
-                  fontSize: 18,
+                  fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),
               ),

@@ -67,7 +67,7 @@ class _NotificationHistorySheet extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      l10n.homeScreenNotificationsTooltip,
+                      l10n.notificationHistoryTitle,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontFamily: 'Fredoka',
                         fontWeight: FontWeight.w600,
