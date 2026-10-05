@@ -1,6 +1,8 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:yominow/l10n/app_localizations.dart';
+import 'package:yominow/l10n/app_localizations_en.dart';
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({super.key, this.currentStep = 1});
@@ -19,7 +21,7 @@ class _LoadingScreenState extends State<LoadingScreen>
     duration: const Duration(seconds: 12),
   )..repeat();
 
-  static const _stages = <String>['Image preprocessing', 'Running OCR'];
+  // Stages will be built dynamically based on localization
 
   @override
   void dispose() {
@@ -30,6 +32,11 @@ class _LoadingScreenState extends State<LoadingScreen>
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context) ?? AppLocalizationsEn();
+    final stages = <String>[
+      l10n.loadingStageImagePreprocessing,
+      l10n.loadingStageRunningOCR,
+    ];
 
     return Scaffold(
       backgroundColor: colors.surface,
@@ -37,7 +44,7 @@ class _LoadingScreenState extends State<LoadingScreen>
         child: LayoutBuilder(
           builder: (context, constraints) {
             final isLandscape = constraints.maxWidth > constraints.maxHeight;
-            final activeStep = widget.currentStep.clamp(0, _stages.length - 1);
+            final activeStep = widget.currentStep.clamp(0, stages.length - 1);
             final ringSize = isLandscape ? 156.0 : 190.0;
 
             return Stack(
@@ -72,8 +79,20 @@ class _LoadingScreenState extends State<LoadingScreen>
                               constraints.maxHeight - (isLandscape ? 24 : 40),
                         ),
                         child: isLandscape
-                            ? _buildLandscape(activeStep, ringSize, colors)
-                            : _buildPortrait(activeStep, ringSize, colors),
+                            ? _buildLandscape(
+                                activeStep,
+                                ringSize,
+                                colors,
+                                l10n,
+                                stages,
+                              )
+                            : _buildPortrait(
+                                activeStep,
+                                ringSize,
+                                colors,
+                                l10n,
+                                stages,
+                              ),
                       ),
                     ),
                   ),
@@ -86,20 +105,32 @@ class _LoadingScreenState extends State<LoadingScreen>
     );
   }
 
-  Widget _buildPortrait(int activeStep, double ringSize, ColorScheme colors) {
+  Widget _buildPortrait(
+    int activeStep,
+    double ringSize,
+    ColorScheme colors,
+    AppLocalizations l10n,
+    List<String> stages,
+  ) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _buildProgressRing(ringSize, colors),
         const SizedBox(height: 22),
-        _buildHeading(colors),
+        _buildHeading(colors, l10n),
         const SizedBox(height: 34),
-        _buildStageList(activeStep),
+        _buildStageList(activeStep, stages),
       ],
     );
   }
 
-  Widget _buildLandscape(int activeStep, double ringSize, ColorScheme colors) {
+  Widget _buildLandscape(
+    int activeStep,
+    double ringSize,
+    ColorScheme colors,
+    AppLocalizations l10n,
+    List<String> stages,
+  ) {
     return Row(
       children: [
         Expanded(
@@ -109,12 +140,12 @@ class _LoadingScreenState extends State<LoadingScreen>
             children: [
               _buildProgressRing(ringSize, colors),
               const SizedBox(height: 12),
-              _buildHeading(colors),
+              _buildHeading(colors, l10n),
             ],
           ),
         ),
         const SizedBox(width: 32),
-        Expanded(flex: 4, child: _buildStageList(activeStep)),
+        Expanded(flex: 4, child: _buildStageList(activeStep, stages)),
       ],
     );
   }
@@ -145,11 +176,11 @@ class _LoadingScreenState extends State<LoadingScreen>
     );
   }
 
-  Widget _buildHeading(ColorScheme colors) {
+  Widget _buildHeading(ColorScheme colors, AppLocalizations l10n) {
     return Column(
       children: [
         Text(
-          'Processing Image...',
+          l10n.imageScreenProcessingTitle,
           textAlign: TextAlign.center,
           style: TextStyle(
             fontFamily: 'Fredoka',
@@ -158,28 +189,18 @@ class _LoadingScreenState extends State<LoadingScreen>
             color: colors.onSurface,
           ),
         ),
-        const SizedBox(height: 4),
-        Text(
-          'Enhancing image and running OCR',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontFamily: 'Fredoka',
-            fontSize: 17,
-            color: colors.onSurface.withValues(alpha: 0.62),
-          ),
-        ),
       ],
     );
   }
 
-  Widget _buildStageList(int activeStep) {
+  Widget _buildStageList(int activeStep, List<String> stages) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (var index = 0; index < _stages.length; index++)
+        for (var index = 0; index < stages.length; index++)
           _StageRow(
-            label: _stages[index],
+            label: stages[index],
             state: index < activeStep
                 ? _StageState.complete
                 : index == activeStep
