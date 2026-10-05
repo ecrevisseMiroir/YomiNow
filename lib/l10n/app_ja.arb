@@ -38,6 +38,8 @@
   "cameraScannerSwitchCamera": "カメラを切り替える",
   "settingsScreenOCRTitle": "OCR 設定",
   "settingsScreenOCRSubtitle": "Tesseract / ML Kit",
+  "settingsScreenBetaComingSoon": "ベータ版 • 近日公開",
+  "settingsScreenFeatureComingSoon": "この設定はベータ版で、近日公開予定です。",
   "settingsScreenDictionaryTitle": "辞書",
   "settingsScreenDictionarySubtitle": "JMdict（オフライン）",
   "settingsScreenAppearanceTitle": "外観",

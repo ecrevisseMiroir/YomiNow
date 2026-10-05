@@ -38,6 +38,8 @@
   "cameraScannerSwitchCamera": "Changer de caméra",
   "settingsScreenOCRTitle": "Réglages OCR",
   "settingsScreenOCRSubtitle": "Tesseract / ML Kit",
+  "settingsScreenBetaComingSoon": "Bêta • Bientôt disponible",
+  "settingsScreenFeatureComingSoon": "Ce réglage est en bêta et sera bientôt disponible.",
   "settingsScreenDictionaryTitle": "Dictionnaire",
   "settingsScreenDictionarySubtitle": "JMdict (hors ligne)",
   "settingsScreenAppearanceTitle": "Apparence",
