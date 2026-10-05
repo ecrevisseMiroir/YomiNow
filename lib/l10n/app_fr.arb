@@ -122,6 +122,16 @@
       "word": {}
     }
   },
+  "ankiNotificationDuplicateTitle": "Déjà dans AnkiDroid",
+  "ankiNotificationDuplicateMessage": "{word} est déjà dans votre paquet YomiNow.",
+  "@ankiNotificationDuplicateMessage": {
+    "placeholders": {
+      "word": {}
+    }
+  },
+  "ankiAddAction": "Ajouter à Anki",
+  "ankiAddChecking": "Vérification...",
+  "ankiAddAlreadyAdded": "Déjà dans Anki",
   "ankiNotificationErrorTitle": "Impossible d'ajouter la carte",
   "ankiNotificationErrorMessage": "Vérifiez qu'AnkiDroid est installé et que l'intégration API est activée dans Paramètres > Avancé.",
   "ankiNotificationRestartMessage": "Redémarrez YomiNow pour installer l'intégration AnkiDroid pour Android.",

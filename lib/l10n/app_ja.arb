@@ -122,6 +122,16 @@
       "word": {}
     }
   },
+  "ankiNotificationDuplicateTitle": "AnkiDroidに登録済み",
+  "ankiNotificationDuplicateMessage": "「{word}」はYomiNowデッキにすでにあります。",
+  "@ankiNotificationDuplicateMessage": {
+    "placeholders": {
+      "word": {}
+    }
+  },
+  "ankiAddAction": "Ankiに追加",
+  "ankiAddChecking": "確認中...",
+  "ankiAddAlreadyAdded": "Ankiに追加済み",
   "ankiNotificationErrorTitle": "カードを追加できませんでした",
   "ankiNotificationErrorMessage": "AnkiDroidがインストールされ、設定 > 詳細設定でAPI連携が有効になっていることを確認してください。",
   "ankiNotificationRestartMessage": "Android版AnkiDroid連携をインストールするため、YomiNowを再起動してください。",

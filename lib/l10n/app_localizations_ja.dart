@@ -361,6 +361,23 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get ankiNotificationDuplicateTitle => 'AnkiDroidに登録済み';
+
+  @override
+  String ankiNotificationDuplicateMessage(Object word) {
+    return '「$word」はYomiNowデッキにすでにあります。';
+  }
+
+  @override
+  String get ankiAddAction => 'Ankiに追加';
+
+  @override
+  String get ankiAddChecking => '確認中...';
+
+  @override
+  String get ankiAddAlreadyAdded => 'Ankiに追加済み';
+
+  @override
   String get ankiNotificationErrorTitle => 'カードを追加できませんでした';
 
   @override

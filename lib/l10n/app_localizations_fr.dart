@@ -374,6 +374,23 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get ankiNotificationDuplicateTitle => 'Déjà dans AnkiDroid';
+
+  @override
+  String ankiNotificationDuplicateMessage(Object word) {
+    return '$word est déjà dans votre paquet YomiNow.';
+  }
+
+  @override
+  String get ankiAddAction => 'Ajouter à Anki';
+
+  @override
+  String get ankiAddChecking => 'Vérification...';
+
+  @override
+  String get ankiAddAlreadyAdded => 'Déjà dans Anki';
+
+  @override
   String get ankiNotificationErrorTitle => 'Impossible d\'ajouter la carte';
 
   @override

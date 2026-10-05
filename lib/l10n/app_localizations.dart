@@ -766,6 +766,36 @@ abstract class AppLocalizations {
   /// **'Complete adding {word} in AnkiDroid.'**
   String ankiNotificationOpenedMessage(Object word);
 
+  /// No description provided for @ankiNotificationDuplicateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Already in AnkiDroid'**
+  String get ankiNotificationDuplicateTitle;
+
+  /// No description provided for @ankiNotificationDuplicateMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{word} is already in your YomiNow deck.'**
+  String ankiNotificationDuplicateMessage(Object word);
+
+  /// No description provided for @ankiAddAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Anki'**
+  String get ankiAddAction;
+
+  /// No description provided for @ankiAddChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking...'**
+  String get ankiAddChecking;
+
+  /// No description provided for @ankiAddAlreadyAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Already in Anki'**
+  String get ankiAddAlreadyAdded;
+
   /// No description provided for @ankiNotificationErrorTitle.
   ///
   /// In en, this message translates to:
