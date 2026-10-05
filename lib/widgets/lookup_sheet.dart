@@ -3,17 +3,27 @@ import 'package:flutter/material.dart';
 import '../models/dictionary_entry.dart';
 import '../models/lookup_result.dart';
 
+/// Callback for when the user wants to add the looked-up word to Anki.
+typedef AddToAnkiCallback = void Function(LookupResult result);
+
 /// A draggable bottom sheet with the dictionary entries for one lookup.
 ///
 /// Shows a loading indicator until [result] completes. A null result means
 /// there was no word at the tapped position.
 class LookupSheet extends StatelessWidget {
-  const LookupSheet({super.key, required this.result});
+  const LookupSheet({super.key, required this.result, this.onAddToAnki});
 
   final Future<LookupResult?> result;
+  final AddToAnkiCallback? onAddToAnki;
 
   /// Shows a [LookupSheet] for [result] as a modal bottom sheet.
-  static Future<void> show(BuildContext context, Future<LookupResult?> result) {
+  /// Optional [onAddToAnki] callback is invoked when the user taps the
+  /// "Add to Anki" button.
+  static Future<void> show(
+    BuildContext context,
+    Future<LookupResult?> result, {
+    AddToAnkiCallback? onAddToAnki,
+  }) {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -22,7 +32,8 @@ class LookupSheet extends StatelessWidget {
       // minimum size), so the modal route must not compete for the gesture.
       enableDrag: false,
       backgroundColor: Colors.transparent,
-      builder: (context) => LookupSheet(result: result),
+      builder: (context) =>
+          LookupSheet(result: result, onAddToAnki: onAddToAnki),
     );
   }
 
@@ -47,8 +58,10 @@ class LookupSheet extends StatelessWidget {
                   const _DragHandle(),
                   FutureBuilder<LookupResult?>(
                     future: result,
-                    builder: (context, snapshot) =>
-                        _SheetBody(snapshot: snapshot),
+                    builder: (context, snapshot) => _SheetBody(
+                      snapshot: snapshot,
+                      onAddToAnki: onAddToAnki,
+                    ),
                   ),
                 ],
               ),
@@ -104,9 +117,13 @@ class _Attribution extends StatelessWidget {
 
 /// Picks what the sheet shows for the state of the lookup future.
 class _SheetBody extends StatelessWidget {
-  const _SheetBody({required this.snapshot});
+  const _SheetBody({
+    required this.snapshot,
+    this.onAddToAnki, // for Add to Anki callback
+  });
 
   final AsyncSnapshot<LookupResult?> snapshot;
+  final AddToAnkiCallback? onAddToAnki;
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +138,7 @@ class _SheetBody extends StatelessWidget {
     }
     final result = snapshot.data;
     if (result == null) return const _Message('No word to look up here.');
-    return _ResultView(result: result);
+    return _ResultView(result: result, onAddToAnki2: onAddToAnki);
   }
 }
 
@@ -147,9 +164,13 @@ class _Message extends StatelessWidget {
 
 /// The matched text and reading, followed by its dictionary entries.
 class _ResultView extends StatelessWidget {
-  const _ResultView({required this.result});
+  const _ResultView({
+    required this.result,
+    this.onAddToAnki2, // for Add to Anki callback
+  });
 
   final LookupResult result;
+  final AddToAnkiCallback? onAddToAnki2;
 
   @override
   Widget build(BuildContext context) {
@@ -159,9 +180,36 @@ class _ResultView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(result.matchedText, style: theme.textTheme.headlineLarge),
-        if (reading != null)
-          Text(reading, style: theme.textTheme.titleMedium?.merge(muted)),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    result.matchedText,
+                    style: theme.textTheme.headlineLarge,
+                  ),
+                  if (reading != null)
+                    Text(
+                      reading,
+                      style: theme.textTheme.titleMedium?.merge(muted),
+                    ),
+                ],
+              ),
+            ),
+            if (onAddToAnki2 != null)
+              ElevatedButton.icon(
+                onPressed: () {
+                  onAddToAnki2!(result);
+                  Navigator.of(context).pop();
+                },
+                icon: const Icon(Icons.add),
+                label: const Text('Add to Anki'),
+              ),
+          ],
+        ),
         const SizedBox(height: 8),
         if (result.isEmpty)
           _Message('No dictionary entry for 「${result.matchedText}」')

@@ -48,6 +48,7 @@ void main() {
     WidgetTester tester,
     Future<LookupResult?> result, {
     Size size = const Size(800, 1600),
+    AddToAnkiCallback? onAddToAnki,
   }) async {
     tester.view
       ..physicalSize = size
@@ -60,7 +61,8 @@ void main() {
           builder: (context) => Scaffold(
             body: Center(
               child: ElevatedButton(
-                onPressed: () => LookupSheet.show(context, result),
+                onPressed: () =>
+                    LookupSheet.show(context, result, onAddToAnki: onAddToAnki),
                 child: const Text('open'),
               ),
             ),
@@ -93,6 +95,21 @@ void main() {
     expect(find.text('ふりがな'), findsOneWidget);
     expect(find.text('furigana'), findsOneWidget);
     expect(find.text(_attribution), findsOneWidget);
+  });
+
+  testWidgets('Add to Anki passes the complete lookup result', (tester) async {
+    final match = _match([_taberu]);
+    LookupResult? addedResult;
+    await showSheet(
+      tester,
+      Future.value(match),
+      onAddToAnki: (result) => addedResult = result,
+    );
+
+    await tester.tap(find.text('Add to Anki'));
+
+    expect(identical(addedResult, match), isTrue);
+    expect(addedResult?.entries.single.senses.first.glosses, ['to eat']);
   });
 
   testWidgets('parts of speech are small, muted and italic', (tester) async {
