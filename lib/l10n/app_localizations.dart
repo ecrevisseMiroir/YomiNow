@@ -166,6 +166,12 @@ abstract class AppLocalizations {
   /// **'No new notifications'**
   String get homeScreenNoNotifications;
 
+  /// No description provided for @homeScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get homeScreenTitle;
+
   /// No description provided for @documentsScreenTitle.
   ///
   /// In en, this message translates to:
@@ -441,6 +447,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No Japanese text detected.'**
   String get imageScreenNoJapaneseDetected;
+
+  /// No description provided for @loadingStageImagePreprocessing.
+  ///
+  /// In en, this message translates to:
+  /// **'Image preprocessing'**
+  String get loadingStageImagePreprocessing;
+
+  /// No description provided for @loadingStageRunningOCR.
+  ///
+  /// In en, this message translates to:
+  /// **'Running OCR'**
+  String get loadingStageRunningOCR;
 
   /// No description provided for @splashScreenLoading.
   ///

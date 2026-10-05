@@ -43,6 +43,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get homeScreenNoNotifications => '新しい通知はありません';
 
   @override
+  String get homeScreenTitle => 'ホーム';
+
+  @override
   String get documentsScreenTitle => 'ドキュメント';
 
   @override
@@ -349,6 +352,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get imageScreenProcessingSubtitle => 'OCRを実行中';
+  @override
+  String get loadingStageImagePreprocessing => '画像前処理';
+  @override
+  String get loadingStageRunningOCR => 'OCR実行中';
 
   @override
   String get ankiNotificationAddedTitle => 'AnkiDroidに追加しました';

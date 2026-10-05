@@ -11,6 +11,7 @@
   "homeScreenSettingsTooltip": "Settings",
   "homeScreenNotificationsTooltip": "Notifications",
   "homeScreenNoNotifications": "No new notifications",
+  "homeScreenTitle": "Home",
   "documentsScreenTitle": "Documents",
   "documentsScreenTabAll": "All",
   "documentsScreenTabImages": "Images",

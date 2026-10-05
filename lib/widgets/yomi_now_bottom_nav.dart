@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../theme/yomi_now_theme.dart';
+import 'package:yominow/l10n/app_localizations.dart';
 
 class YomiNowBottomNav extends StatelessWidget {
   const YomiNowBottomNav({super.key, this.selectedIndex = 0});
@@ -12,15 +13,15 @@ class YomiNowBottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final items = [
-      _BottomNavItem(icon: LucideIcons.home, label: 'Home', link: '/home'),
+      _BottomNavItem(icon: LucideIcons.home, label: AppLocalizations.of(context)!.homeScreenTitle, link: '/home'),
       _BottomNavItem(
         icon: LucideIcons.fileText,
-        label: 'Documents',
+        label: AppLocalizations.of(context)!.documentsScreenTitle,
         link: '/documents',
       ),
       _BottomNavItem(
         icon: LucideIcons.settings,
-        label: 'Settings',
+        label: AppLocalizations.of(context)!.settingsScreenTitle,
         link: '/settings',
       ),
     ];
