@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:yominow/screens/documents_screen.dart';
+import 'package:yominow/screens/settings_screen.dart';
 import 'package:yominow/theme/yomi_now_theme.dart';
 
 import '../fakes.dart';
@@ -85,4 +86,18 @@ void main() {
       expect(find.text('Go back'), findsOneWidget);
     },
   );
+
+  testWidgets('dictionary settings item shows beta coming soon feedback', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      withServices(fakeServices(), const SettingsScreen()),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Dictionary'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('This setting is beta and coming soon.'), findsOneWidget);
+  });
 }
