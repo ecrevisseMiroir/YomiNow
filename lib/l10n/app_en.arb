@@ -137,5 +137,28 @@
   "ankiNotificationRestartMessage": "Restart YomiNow to install the Android AnkiDroid integration.",
   "notificationHistoryEmpty": "You're all caught up",
   "notificationHistoryClearAll": "Clear all notifications",
-  "notificationHistoryClearTooltip": "Clear notification history"
+  "notificationHistoryClearTooltip": "Clear notification history",
+  "lookupNoWordMessage": "No word to look up here.",
+  "lookupNoEntryMessage": "No dictionary entry for 「{matchedText}」",
+  "@lookupNoEntryMessage": {
+    "placeholders": {
+      "matchedText": {}
+    }
+  },
+  "lookupFailedMessage": "Lookup failed: {error}",
+  "@lookupFailedMessage": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "errorDialogTitle": "Something went wrong",
+  "errorDialogMessage": "We couldn't process the image.",
+  "errorDialogRetryPrompt": "Please try again.",
+  "errorDialogRetryButton": "Retry",
+  "errorDialogGoBackButton": "Go back",
+  "noJapaneseTextTitle": "No Japanese text found",
+  "noJapaneseTextMessage": "We couldn't find readable Japanese in this image.",
+  "noJapaneseTextSuggestion": "Try a sharper photo with the text in view.",
+  "noJapaneseTextButton": "Choose another image",
+  "lookupAttribution": "Dictionary data: JMdict © EDRDG, CC BY-SA 4.0"
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/yomi_now_theme.dart';
+import 'package:yominow/l10n/app_localizations.dart';
 
 class YomiNowErrorDialog extends StatelessWidget {
   const YomiNowErrorDialog({super.key});
@@ -15,6 +16,7 @@ class YomiNowErrorDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Dialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 18),
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -34,7 +36,7 @@ class YomiNowErrorDialog extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                'Something went wrong',
+                                l10n.errorDialogTitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'Fredoka',
@@ -46,7 +48,7 @@ class YomiNowErrorDialog extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                "We couldn't process the image.",
+                l10n.errorDialogMessage,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'Fredoka',
@@ -58,7 +60,7 @@ class YomiNowErrorDialog extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                'Please try again.',
+                l10n.errorDialogRetryPrompt,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'Fredoka',
@@ -87,7 +89,7 @@ class YomiNowErrorDialog extends StatelessWidget {
                     color: YomiNowPalette.cream,
                   ),
                   label: Text(
-                    'Retry',
+                    l10n.errorDialogRetryButton,
                     style: TextStyle(
                       fontFamily: 'Fredoka',
                       fontSize: 24,
@@ -107,7 +109,7 @@ class YomiNowErrorDialog extends StatelessWidget {
                 ),
                 icon: const Icon(Icons.arrow_back_rounded, size: 22),
                 label: Text(
-                  'Go back',
+                  l10n.errorDialogGoBackButton,
                   style: TextStyle(
                     fontFamily: 'Fredoka',
                     fontSize: 22,

@@ -112,12 +112,13 @@ class _Attribution extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return SafeArea(
       top: false,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Text(
-          'Dictionary data: JMdict © EDRDG, CC BY-SA 4.0',
+          l10n.lookupAttribution,
           textAlign: TextAlign.center,
           style: theme.textTheme.labelSmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
@@ -131,7 +132,6 @@ class _Attribution extends StatelessWidget {
 /// Picks what the sheet shows for the state of the lookup future.
 class _SheetBody extends StatelessWidget {
   const _SheetBody({
-    super.key,
     required this.snapshot,
     this.onAddToAnki,
     this.isAlreadyInAnki,
@@ -143,8 +143,9 @@ class _SheetBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (snapshot.hasError) {
-      return _Message('Lookup failed: ${snapshot.error}');
+      return _Message(l10n.lookupFailedMessage(snapshot.error?.toString() ?? ''));
     }
     if (snapshot.connectionState != ConnectionState.done) {
       return const Padding(
@@ -153,7 +154,7 @@ class _SheetBody extends StatelessWidget {
       );
     }
     final result = snapshot.data;
-    if (result == null) return const _Message('No word to look up here.');
+    if (result == null) return _Message(l10n.lookupNoWordMessage);
     return _ResultView(
       result: result,
       onAddToAnki: onAddToAnki,
@@ -197,6 +198,7 @@ class _ResultView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final muted = TextStyle(color: theme.colorScheme.onSurfaceVariant);
     final reading = result.reading;
     return Column(
@@ -231,7 +233,7 @@ class _ResultView extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         if (result.isEmpty)
-          _Message('No dictionary entry for 「${result.matchedText}」')
+          _Message(l10n.lookupNoEntryMessage(result.matchedText))
         else
           for (final entry in result.entries) ...[
             const Divider(),

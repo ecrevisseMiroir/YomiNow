@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/yomi_now_theme.dart';
+import 'package:yominow/l10n/app_localizations.dart';
 
 class NoJapaneseText extends StatelessWidget {
   const NoJapaneseText({super.key, required this.onTryAgain});
@@ -10,6 +11,7 @@ class NoJapaneseText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
     return LayoutBuilder(
       builder: (context, constraints) {
         final imageSize = constraints.maxHeight < 520 ? 180.0 : 250.0;
@@ -30,7 +32,7 @@ class NoJapaneseText extends StatelessWidget {
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    'No Japanese text found',
+                                    l10n.noJapaneseTextTitle,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: 'Fredoka',
@@ -41,7 +43,7 @@ class NoJapaneseText extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    "We couldn't find readable Japanese in this image.",
+                    l10n.noJapaneseTextMessage,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: 'Inter',
@@ -52,7 +54,7 @@ class NoJapaneseText extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Try a sharper photo with the text in view.',
+                    l10n.noJapaneseTextSuggestion,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: 'Inter',
@@ -67,7 +69,7 @@ class NoJapaneseText extends StatelessWidget {
                     child: FilledButton.icon(
                       onPressed: onTryAgain,
                       icon: const Icon(Icons.add_a_photo_outlined),
-                      label: const Text('Choose another image'),
+                      label: Text(l10n.noJapaneseTextButton),
                       style: FilledButton.styleFrom(
                         backgroundColor: YomiNowPalette.coral,
                         foregroundColor: YomiNowPalette.cream,
