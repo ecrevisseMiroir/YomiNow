@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:yominow/screens/home_screen.dart';
 import 'package:yominow/screens/image_screen.dart';
+import 'package:yominow/services/yomi_now_notification_history.dart';
 import 'package:yominow/theme/yomi_now_theme.dart';
 
 import '../fakes.dart';
@@ -39,6 +41,8 @@ final _mobile = TargetPlatformVariant({
 });
 
 void main() {
+  setUpAll(() => SharedPreferences.setMockInitialValues({}));
+
   Future<void> pumpHomeWithTheme(WidgetTester tester, ThemeMode mode) {
     return tester.pumpWidget(
       withServices(
@@ -69,6 +73,35 @@ void main() {
 
     expect(find.text('YomiNow'), findsOneWidget);
     expect(find.textContaining('tap any word'), findsOneWidget);
+  });
+
+  testWidgets('notification bell opens and clears notification history', (
+    tester,
+  ) async {
+    final history = YomiNowNotificationHistory.instance;
+    await history.clear();
+    await history.add(
+      title: 'Added to AnkiDroid',
+      message: '日本語 was added to the YomiNow deck.',
+      kind: YomiNowNotificationKind.success,
+    );
+    await pumpHome(tester);
+    await tester.pumpAndSettle();
+
+    expect(history.unreadCount, 1);
+    expect(find.text('1'), findsOneWidget);
+    await tester.tap(find.byTooltip('Notifications'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Added to AnkiDroid'), findsOneWidget);
+    expect(find.text('日本語 was added to the YomiNow deck.'), findsOneWidget);
+    expect(history.unreadCount, 0);
+
+    await tester.tap(find.byKey(const ValueKey('notification-history-clear')));
+    await tester.pumpAndSettle();
+
+    expect(find.text("You're all caught up"), findsOneWidget);
+    await history.clear();
   });
 
   testWidgets('home text follows light and dark theme colors', (tester) async {
