@@ -282,7 +282,7 @@ void main() {
       await pumpScreen(tester, ocrDelay: const Duration(seconds: 2));
 
       expect(find.text('Processing Image...'), findsOneWidget);
-      expect(find.text('Running OCR'), findsOneWidget);
+            expect(find.text('Running OCR...'), findsOneWidget);
       expect(find.byType(WordBox), findsNothing);
       expect(find.text('Text'), findsNothing);
 
