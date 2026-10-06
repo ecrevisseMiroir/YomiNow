@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:yominow/services/lookup_history.dart';
 
 import '../theme/yomi_now_theme.dart';
 import '../models/scanned_document.dart';
@@ -17,6 +18,7 @@ import 'package:yominow/l10n/app_localizations.dart';
 import '../widgets/yomi_now_bottom_nav.dart';
 import '../widgets/error_dialog.dart';
 import '../widgets/yomi_now_notification_history_sheet.dart';
+import '../widgets/lookup_history_sheet.dart';
 import 'camera_scanner.dart';
 import 'image_screen.dart';
 
@@ -214,6 +216,10 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                         _buildRecentScansHeader(),
                         const SizedBox(height: 12),
                         _buildRecentScansGrid(),
+                        const SizedBox(height: 28),
+                        _buildRecentLookupsHeader(),
+                        const SizedBox(height: 12),
+                        _buildRecentLookupsButton(),
                       ],
                     ),
                   ),
@@ -334,24 +340,24 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     );
   }
 
-  Widget _buildRecentScansHeader() {
+  Widget _buildRecentLookupsHeader() {
     final colorScheme = Theme.of(context).colorScheme;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          AppLocalizations.of(context)!.homeScreenRecentScans,
+          AppLocalizations.of(context)!.homeScreenRecentLookups,
           style: TextStyle(
             fontFamily: 'Inter',
-            fontSize: 34,
+            fontSize: 25,
             fontWeight: FontWeight.w700,
             color: colorScheme.onSurface,
           ),
         ),
         TextButton(
-          onPressed: () => Navigator.of(context).pushNamed('/documents'),
-          style: TextButton.styleFrom(
-            foregroundColor: colorScheme.onSurfaceVariant,
+          onPressed: () => showModalBottomSheet(
+            context: context,
+            builder: (_) => const LookupHistorySheet(),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -365,7 +371,100 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                 ),
               ),
               const SizedBox(width: 4),
-              const Icon(Icons.arrow_forward_rounded, size: 18),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRecentLookupsButton() {
+    final l10n = AppLocalizations.of(context)!;
+    return FutureBuilder(
+      future: LookupHistory.instance.load(),
+      builder: (context, snapshot) {
+        final records = LookupHistory.instance.records;
+        final display = records.take(6).toList();
+        return GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: 2,
+          childAspectRatio: 3,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+          children: [
+            ...display.map((r) => Card(
+                  elevation: 1,
+                  child: ListTile(
+                    dense: true,
+                    onTap: () => showDialog(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        title: Text(r.word),
+                        content: Text('Reading: ${r.reading.isNotEmpty ? r.reading : r.gloss}\nGloss: ${r.gloss}'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: const Text('Close'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Added "${r.word}" to Anki')),
+                              );
+                            },
+                            child: const Text('Add to Anki'),
+                          ),
+                        ],
+                      ),
+                    ),
+                    title: Text(r.word, maxLines: 1, overflow: TextOverflow.ellipsis),
+                    subtitle: Text(r.reading.isNotEmpty ? r.reading : r.gloss, maxLines: 1, overflow: TextOverflow.ellipsis),
+   
+                  ),
+                )),
+            if (display.isEmpty)
+              Card(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8),
+                  child: Center(child: Text(l10n.homeScreenNoRecentLookups)),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildRecentScansHeader() {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          AppLocalizations.of(context)!.homeScreenRecentScans,
+          style: TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 25,
+            fontWeight: FontWeight.w700,
+            color: colorScheme.onSurface,
+          ),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pushNamed('/documents'),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                AppLocalizations.of(context)!.homeScreenSeeAll,
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(width: 4),
             ],
           ),
         ),

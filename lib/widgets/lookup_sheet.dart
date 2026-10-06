@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/dictionary_entry.dart';
 import '../models/lookup_result.dart';
+import '../services/lookup_history.dart';
 
 import 'package:yominow/l10n/app_localizations.dart';
 
@@ -203,6 +204,13 @@ class _ResultView extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final muted = TextStyle(color: theme.colorScheme.onSurfaceVariant);
     final reading = result.reading;
+    // Save to recent lookups history
+    LookupHistory.instance.add(LookupRecord(
+      word: result.matchedText,
+      reading: reading ?? '',
+      gloss: result.entries.isNotEmpty ? result.entries.first.senses.first.glosses.join(', ') : '',
+      createdAt: DateTime.now(),
+    ));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
