@@ -1,6 +1,6 @@
 // End-to-end check on a desktop device: real Tesseract OCR, kuromoji and the
-// bundled JMdict on test/fixtures/ja_sample.png ("日本語を勉強しています" /
-// "東京に行きました").
+// bundled JMdict on test/fixtures/ja_sample.png (\"日本語を勉強しています\" /
+// \"東京に行きました\").
 //
 //   xvfb-run flutter test integration_test -d linux
 //
@@ -47,65 +47,77 @@ Future<void> _saveScreenshot(GlobalKey key, String path) async {
   await File(path).writeAsBytes(png!.buffer.asUint8List());
 }
 
+bool get _hasTesseract {
+  try {
+    return Process.runSync('tesseract', ['--version']).exitCode == 0;
+  } on ProcessException {
+    return false;
+  }
+}
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('OCR a photo, tap a word, see its JMdict entry', (tester) async {
-    final fixture = File('test/fixtures/ja_sample.png').absolute.path;
-    expect(File(fixture).existsSync(), isTrue, reason: 'run from repo root');
+  testWidgets(
+    'OCR a photo, tap a word, see its JMdict entry',
+    (tester) async {
+      final fixture = File('test/fixtures/ja_sample.png').absolute.path;
+      expect(File(fixture).existsSync(), isTrue, reason: 'run from repo root');
 
-    final tokenizer = KuromojiTokenizerService();
-    final services = AppServices(
-      ocr: TesseractOcrService(),
-      imagePreprocessor: DefaultImagePreprocessor(),
-      tokenizer: tokenizer,
-      lookup: DefaultLookupService(
+      final tokenizer = KuromojiTokenizerService();
+      final services = AppServices(
+        ocr: TesseractOcrService(),
+        imagePreprocessor: DefaultImagePreprocessor(),
         tokenizer: tokenizer,
-        dictionary: SqliteDictionaryService(),
-      ),
-      documents: SqliteDocumentRepository(),
-    );
-    final boundary = GlobalKey();
+        lookup: DefaultLookupService(
+          tokenizer: tokenizer,
+          dictionary: SqliteDictionaryService(),
+        ),
+        documents: SqliteDocumentRepository(),
+      );
+      final boundary = GlobalKey();
 
-    await tester.pumpWidget(
-      RepaintBoundary(
-        key: boundary,
-        child: AppServicesScope(
-          services: services,
-          child: MaterialApp(
-            theme: ThemeData(),
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: ImageScreen(imagePath: fixture),
+      await tester.pumpWidget(
+        RepaintBoundary(
+          key: boundary,
+          child: AppServicesScope(
+            services: services,
+            child: MaterialApp(
+              theme: ThemeData(),
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: ImageScreen(imagePath: fixture),
+            ),
           ),
         ),
-      ),
-    );
+      );
 
-    // Wait for the detected text list to appear (first line)
-    // and then switch to image view mode to access the word overlay.
-    await _pumpUntil(
-      tester,
-      find.byKey(const ValueKey('text-line-0')),
-      timeout: const Duration(seconds: 180),
-    );
-    // Tap the "Image" mode button.
-    await tester.tap(find.text('Image'));
-    await tester.pumpAndSettle();
+      // Wait for the detected text list to appear (first line)
+      // and then switch to image view mode to access the word overlay.
+      await _pumpUntil(
+        tester,
+        find.byKey(const ValueKey('text-line-0')),
+        timeout: const Duration(seconds: 180),
+      );
+      // Tap the "Image" mode button.
+      await tester.tap(find.text('Image'));
+      await tester.pumpAndSettle();
 
-    // Tap 日 in the first line; the word there is 日本語.
-    final firstChar = find.byKey(const ValueKey('word-0-0'));
-    await _pumpUntil(tester, firstChar, timeout: const Duration(seconds: 180));
-    await tester.tap(firstChar);
+      // Tap 日 in the first line; the word there is 日本語.
+      final firstChar = find.byKey(const ValueKey('word-0-0'));
+      await _pumpUntil(tester, firstChar, timeout: const Duration(seconds: 180));
+      await tester.tap(firstChar);
 
-    await _pumpUntil(
-      tester,
-      find.textContaining('Japanese (language)'),
-      timeout: const Duration(seconds: 180),
-    );
-    expect(find.text('日本語'), findsWidgets);
-    expect(find.textContaining('JMdict'), findsOneWidget);
+      await _pumpUntil(
+        tester,
+        find.textContaining('Japanese (language)'),
+        timeout: const Duration(seconds: 180),
+      );
+      expect(find.text('日本語'), findsWidgets);
+      expect(find.textContaining('JMdict'), findsOneWidget);
 
-    if (_screenshot.isNotEmpty) await _saveScreenshot(boundary, _screenshot);
-  });
+      if (_screenshot.isNotEmpty) await _saveScreenshot(boundary, _screenshot);
+    },
+    skip: !_hasTesseract,
+  );
 }
