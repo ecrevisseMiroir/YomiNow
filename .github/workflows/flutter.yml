@@ -44,7 +44,15 @@ jobs:
       - run: flutter analyze
       - run: flutter test
       - name: End-to-end test (OCR → tap → JMdict) on the Linux app
-        run: xvfb-run -a flutter test integration_test -d linux
+        timeout-minutes: 15
+        run: | 
+          xvfb-run -a flutter test integration_test -d linux --reporter expanded 2>&1 | tee e2e.log
+      - name: Upload E2E log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-log
+          path: e2e.log
       - name: Build Linux release
         run: flutter build linux --release
       - name: Archive Linux build
