@@ -211,7 +211,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aboutScreenDescription =>
-      'An offline Japanese OCR and dictionary\napp built with Flutter.';
+      'An offline Japanese OCR and dictionary\napp.';
 
   @override
   String get aboutScreenLicenses => 'Licenses & Attribution';
@@ -364,10 +364,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get imageScreenProcessingSubtitle => 'Running OCR';
+
   @override
-  String get loadingStageImagePreprocessing => 'Image preprocessing';
+  String get loadingStageImagePreprocessing => 'Preparing image...';
+
   @override
-  String get loadingStageRunningOCR => 'Running OCR';
+  String get loadingStageRunningOCR => 'Running OCR...';
 
   @override
   String get ankiNotificationAddedTitle => 'Added to AnkiDroid';

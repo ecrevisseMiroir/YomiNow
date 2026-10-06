@@ -164,7 +164,9 @@ class _LoadingScreenState extends State<LoadingScreen>
           ),
           child: Center(
             child: Image.asset(
-              'assets/03_characters_mascot/cat_loading.png',
+              Theme.of(context).brightness == Brightness.dark
+                  ? 'assets/03_characters_mascot/cat_loading_dark_mode.png'
+                  : 'assets/03_characters_mascot/cat_loading_light_mode.png',
               width: size * 0.43,
               height: size * 0.43,
               fit: BoxFit.contain,

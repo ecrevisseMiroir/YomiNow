@@ -65,7 +65,7 @@
   "splashScreenBackgroundSemantic": "富士山と鳥居",
   "aboutScreenTitle": "概要",
   "aboutScreenSubtitle": "日本語をすぐに読む",
-  "aboutScreenDescription": "オフラインの日本語OCRと辞書アプリ\nFlutterで作成",
+  "aboutScreenDescription": "オフラインの日本語OCRと辞書アプリ",
   "aboutScreenLicenses": "ライセンスと帰属",
   "aboutScreenThirdPartyLibraries": "サードパーティライブラリ",
   "aboutScreenOpenSource": "オープンソース",
@@ -111,6 +111,8 @@
   "openSourceScreenItem3Detail": "YomiNowは、透明性があり、オフラインファーストで、将来の言語学習機能に簡単に拡張できるように設計されています。",
   "imageScreenProcessingTitle": "画像を処理中...",
   "imageScreenProcessingSubtitle": "OCRを実行中",
+  "loadingStageImagePreprocessing": "画像を準備中...",
+  "loadingStageRunningOCR": "OCRを実行中...",
   "ankiNotificationAddedTitle": "AnkiDroidに追加しました",
   "ankiNotificationAddedMessage": "「{word}」をYomiNowデッキに追加しました。",
   "@ankiNotificationAddedMessage": {

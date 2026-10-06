@@ -65,7 +65,7 @@
   "splashScreenBackgroundSemantic": "Mont Fuji et une porte torii",
   "aboutScreenTitle": "À propos",
   "aboutScreenSubtitle": "Lire le japonais instantanément",
-  "aboutScreenDescription": "Une application OCR japonaise hors ligne et dictionnaire\nconstruite avec Flutter.",
+  "aboutScreenDescription": "Une application OCR japonaise hors ligne et dictionnaire.",
   "aboutScreenLicenses": "Licences et attribution",
   "aboutScreenThirdPartyLibraries": "Bibliothèques tierces",
   "aboutScreenOpenSource": "Open Source",
@@ -111,6 +111,8 @@
   "openSourceScreenItem3Detail": "YomiNow est conçu pour être transparent, hors-ligne d'abord, et facile à étendre pour de futures fonctionnalités d'apprentissage des langues.",
   "imageScreenProcessingTitle": "Traitement de l'image...",
   "imageScreenProcessingSubtitle": "Exécution de l'OCR",
+  "loadingStageImagePreprocessing": "Préparation de l'image...",
+  "loadingStageRunningOCR": "Exécution de l'OCR...",
   "ankiNotificationAddedTitle": "Ajouté à AnkiDroid",
   "ankiNotificationAddedMessage": "{word} a été ajouté au paquet YomiNow.",
   "@ankiNotificationAddedMessage": {

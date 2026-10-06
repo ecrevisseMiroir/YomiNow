@@ -213,7 +213,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get aboutScreenDescription =>
-      'Une application OCR japonaise hors ligne et dictionnaire\nconstruite avec Flutter.';
+      'Une application OCR japonaise hors ligne et dictionnaire.';
 
   @override
   String get aboutScreenLicenses => 'Licences et attribution';
@@ -366,10 +366,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get imageScreenProcessingSubtitle => 'Exécution de l\'OCR';
+
   @override
-  String get loadingStageImagePreprocessing => 'Prétraitement d\'image';
+  String get loadingStageImagePreprocessing => 'Préparation de l\'image...';
+
   @override
-  String get loadingStageRunningOCR => 'Exécution de l\'OCR';
+  String get loadingStageRunningOCR => 'Exécution de l\'OCR...';
 
   @override
   String get ankiNotificationAddedTitle => 'Ajouté à AnkiDroid';

@@ -65,7 +65,7 @@
   "splashScreenBackgroundSemantic": "Mount Fuji and a torii gate",
   "aboutScreenTitle": "About",
   "aboutScreenSubtitle": "Read Japanese Instantly",
-  "aboutScreenDescription": "An offline Japanese OCR and dictionary\napp built with Flutter.",
+  "aboutScreenDescription": "An offline Japanese OCR and dictionary\napp.",
   "aboutScreenLicenses": "Licenses & Attribution",
   "aboutScreenThirdPartyLibraries": "Third-party Libraries",
   "aboutScreenOpenSource": "Open Source",
@@ -111,6 +111,8 @@
   "openSourceScreenItem3Detail": "YomiNow is designed to be transparent, offline-first, and easy to extend for future language-learning features.",
   "imageScreenProcessingTitle": "Processing Image...",
   "imageScreenProcessingSubtitle": "Running OCR",
+  "loadingStageImagePreprocessing": "Preparing image...",
+  "loadingStageRunningOCR": "Running OCR...",
   "ankiNotificationAddedTitle": "Added to AnkiDroid",
   "ankiNotificationAddedMessage": "{word} was added to the YomiNow deck.",
   "@ankiNotificationAddedMessage": {

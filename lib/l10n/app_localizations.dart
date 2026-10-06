@@ -448,18 +448,6 @@ abstract class AppLocalizations {
   /// **'No Japanese text detected.'**
   String get imageScreenNoJapaneseDetected;
 
-  /// No description provided for @loadingStageImagePreprocessing.
-  ///
-  /// In en, this message translates to:
-  /// **'Image preprocessing'**
-  String get loadingStageImagePreprocessing;
-
-  /// No description provided for @loadingStageRunningOCR.
-  ///
-  /// In en, this message translates to:
-  /// **'Running OCR'**
-  String get loadingStageRunningOCR;
-
   /// No description provided for @splashScreenLoading.
   ///
   /// In en, this message translates to:
@@ -499,7 +487,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutScreenDescription.
   ///
   /// In en, this message translates to:
-  /// **'An offline Japanese OCR and dictionary\napp built with Flutter.'**
+  /// **'An offline Japanese OCR and dictionary\napp.'**
   String get aboutScreenDescription;
 
   /// No description provided for @aboutScreenLicenses.
@@ -771,6 +759,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Running OCR'**
   String get imageScreenProcessingSubtitle;
+
+  /// No description provided for @loadingStageImagePreprocessing.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing image...'**
+  String get loadingStageImagePreprocessing;
+
+  /// No description provided for @loadingStageRunningOCR.
+  ///
+  /// In en, this message translates to:
+  /// **'Running OCR...'**
+  String get loadingStageRunningOCR;
 
   /// No description provided for @ankiNotificationAddedTitle.
   ///

@@ -123,14 +123,18 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Image.asset(
-              'assets/02_brand_logo/logo_splash.png',
+              Theme.of(context).brightness == Brightness.dark
+                  ? 'assets/02_brand_logo/logo_splash_dark_mode.png'
+                  : 'assets/02_brand_logo/logo_splash_light_mode.png',
               width: 200,
               height: 150,
               fit: BoxFit.contain,
               semanticLabel: 'YomiNow logo',
             ),
             Image.asset(
-              'assets/02_brand_logo/wordmark_splash.png',
+              Theme.of(context).brightness == Brightness.dark
+                  ? 'assets/02_brand_logo/YomiNow_dark_mode.png'
+                  : 'assets/02_brand_logo/YomiNow_light_mode.png',
               width: 200,
               height: 84,
               fit: BoxFit.contain,

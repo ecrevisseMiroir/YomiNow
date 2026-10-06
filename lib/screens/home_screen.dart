@@ -475,7 +475,9 @@ PreferredSizeWidget _buildHeaderBar(BuildContext context) {
                     backgroundColor: YomiNowPalette.coral,
                     textColor: YomiNowPalette.ink,
                     child: Image.asset(
-                      'assets/03_characters_mascot/cat_home_face_notification.png',
+                      Theme.of(context).brightness == Brightness.dark
+                          ? 'assets/03_characters_mascot/cat_notification_dark_mode_icon.png'
+                          : 'assets/03_characters_mascot/cat_notification_light_mode_icon.png',
                       width: 32,
                       fit: BoxFit.contain,
                     ),

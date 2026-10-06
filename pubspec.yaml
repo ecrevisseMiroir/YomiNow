@@ -48,13 +48,23 @@ flutter:
     - assets/02_brand_logo/wordmark_splash.png
     - assets/04_scenery_backgrounds/splash_fuji_torii_scene.png
     - assets/03_characters_mascot/cat_home_face_notification.png
+    - assets/03_characters_mascot/cat_notification_dark_mode_icon.png
+    - assets/03_characters_mascot/cat_notification_light_mode_icon.png
     - assets/04_scenery_backgrounds/background.png
     - assets/02_brand_logo/logo_about.png
-    - assets/04_scenery_backgrounds/about-background.png
+    - assets/04_scenery_backgrounds/about_background_light.png
+    - assets/04_scenery_backgrounds/about_background_dark.png
     - assets/04_scenery_backgrounds/loading.png
     - assets/03_characters_mascot/cat_empty_state.png
     - assets/03_characters_mascot/cat_error.png
-    - assets/03_characters_mascot/cat_loading.png
+    - assets/03_characters_mascot/cat_loading_light_mode.png
+    - assets/03_characters_mascot/cat_loading_dark_mode.png
+    - assets/02_brand_logo/YomiNow_dark_mode.png
+    - assets/02_brand_logo/YomiNow_light_mode.png
+    - assets/02_brand_logo/logo_splash_dark_mode.png
+    - assets/02_brand_logo/logo_splash_light_mode.png
+    - assets/02_brand_logo/logo_brand_panel_dark_mode.png
+    - assets/02_brand_logo/logo_brand_panel_light_mode.png
   fonts:
     - family: NotoSansJP
       fonts:

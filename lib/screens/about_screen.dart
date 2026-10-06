@@ -85,7 +85,9 @@ class AboutScreen extends StatelessWidget {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(38),
                           child: Image.asset(
-                            'assets/02_brand_logo/logo_about.png',
+                            Theme.of(context).brightness == Brightness.dark
+                                ? 'assets/02_brand_logo/logo_brand_panel_dark_mode.png'
+                                : 'assets/02_brand_logo/logo_brand_panel_light_mode.png',
                             width: logoSize,
                             height: logoSize,
                             fit: BoxFit.cover,
@@ -131,7 +133,9 @@ class AboutScreen extends StatelessWidget {
                       const SizedBox(height: 12),
                       Center(
                         child: Image.asset(
-                          'assets/04_scenery_backgrounds/about-background.png',
+                          Theme.of(context).brightness == Brightness.dark
+                              ? 'assets/04_scenery_backgrounds/about_background_dark.png'
+                              : 'assets/04_scenery_backgrounds/about_background_light.png',
                           width: isLandscape
                               ? constraints.maxWidth
                               : constraints.maxWidth * 0.9,

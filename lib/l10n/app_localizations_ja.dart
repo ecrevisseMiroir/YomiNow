@@ -203,7 +203,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get aboutScreenSubtitle => '日本語をすぐに読む';
 
   @override
-  String get aboutScreenDescription => 'オフラインの日本語OCRと辞書アプリ\nFlutterで作成';
+  String get aboutScreenDescription => 'オフラインの日本語OCRと辞書アプリ';
 
   @override
   String get aboutScreenLicenses => 'ライセンスと帰属';
@@ -352,10 +352,12 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get imageScreenProcessingSubtitle => 'OCRを実行中';
+
   @override
-  String get loadingStageImagePreprocessing => '画像前処理';
+  String get loadingStageImagePreprocessing => '画像を準備中...';
+
   @override
-  String get loadingStageRunningOCR => 'OCR実行中';
+  String get loadingStageRunningOCR => 'OCRを実行中...';
 
   @override
   String get ankiNotificationAddedTitle => 'AnkiDroidに追加しました';
