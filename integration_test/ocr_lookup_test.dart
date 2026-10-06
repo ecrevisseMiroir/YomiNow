@@ -49,7 +49,8 @@ Future<void> _saveScreenshot(GlobalKey key, String path) async {
 
 bool get _hasTesseract {
   try {
-    return Process.runSync('tesseract', ['--version']).exitCode == 0;
+    final r = Process.runSync('tesseract', ['--list-langs']);
+    return r.exitCode == 0 && r.stdout.toString().contains('jpn');
   } on ProcessException {
     return false;
   }

@@ -27,7 +27,12 @@ jobs:
       - name: Install Linux build dependencies and Tesseract
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev tesseract-ocr xvfb
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev tesseract-ocr tesseract-ocr-jpn xvfb
+      
+      - name: Verify Tesseract reads the Japanese fixture
+        run: |
+          tesseract --list-langs
+          tesseract test/fixtures/ja_sample.png - -l jpn
 
       - uses: subosito/flutter-action@v2
         with:
