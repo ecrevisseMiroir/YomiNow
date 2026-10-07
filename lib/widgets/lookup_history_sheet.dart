@@ -1,5 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:yominow/services/anki_droid_service.dart';
+import 'package:yominow/services/yomi_now_notification_history.dart';
+import 'package:yominow/widgets/yomi_now_notification.dart';
 
 import '../services/lookup_history.dart';
 
@@ -26,30 +30,107 @@ class LookupHistorySheet extends StatefulWidget {
 
 class _LookupHistorySheetState extends State<LookupHistorySheet> {
   // Created once so rebuilds don't re-trigger load().
-  late final Future<void> _loadFuture = LookupHistory.instance.load();
+  late final Future<void> _loadFuture = _load();
 
-  // Words the user has sent to Anki during this session.
+  // Words that are already in Anki.
   final Set<String> _added = {};
 
-  void _addToAnki(LookupRecord r) {
-    // TODO: hook up real Anki integration.
+  final AnkiDroidService? _anki =
+      defaultTargetPlatform == TargetPlatform.android
+      ? AnkiDroidService()
+      : null;
+
+  final Set<String> _adding = {};
+
+  Future<void> _addToAnki(LookupRecord r) async {
+    final anki = _anki;
+    if (anki == null || _adding.contains(r.word)) return;
+
     final l10n = AppLocalizations.of(context)!;
+
     HapticFeedback.lightImpact();
-    setState(() => _added.add(r.word));
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          behavior: SnackBarBehavior.floating,
-          content: Text(l10n.lookupHistoryAddedToAnki(r.word)),
-        ),
+
+    setState(() => _adding.add(r.word));
+
+    try {
+      final result = await anki.addNote(word: r.word, back: r.gloss);
+
+      if (!mounted) return;
+
+      switch (result) {
+        case AnkiDroidAddResult.added:
+          setState(() => _added.add(r.word));
+
+          YomiNowNotification.show(
+            context,
+            title: l10n.ankiNotificationAddedTitle,
+            message: l10n.ankiNotificationAddedMessage(r.word),
+            kind: YomiNowNotificationKind.success,
+          );
+
+        case AnkiDroidAddResult.duplicate:
+          setState(() => _added.add(r.word));
+
+          YomiNowNotification.show(
+            context,
+            title: l10n.ankiNotificationDuplicateTitle,
+            message: l10n.ankiNotificationDuplicateMessage(r.word),
+            kind: YomiNowNotificationKind.error,
+          );
+
+        case AnkiDroidAddResult.shared:
+          // AnkiDroid opened for the user to confirm; not added yet.
+          break;
+      }
+    } catch (_) {
+      if (!mounted) return;
+
+      YomiNowNotification.show(
+        context,
+        title: l10n.ankiNotificationFailedTitle,
+        message: l10n.ankiNotificationFailedMessage,
+        kind: YomiNowNotificationKind.error,
       );
+    } finally {
+      if (mounted) {
+        setState(() => _adding.remove(r.word));
+      }
+    }
+  }
+
+  Future<void> _checkExistingAnkiWords() async {
+    final anki = _anki;
+    if (anki == null) return;
+
+    final records = LookupHistory.instance.records;
+
+    for (final record in records) {
+      try {
+        final exists = await anki.isDuplicate(record.word);
+
+        if (exists && mounted) {
+          setState(() {
+            _added.add(record.word);
+          });
+        }
+      } catch (_) {
+        // Ignore individual lookup errors.
+      }
+    }
+  }
+
+  Future<void> _load() async {
+    await LookupHistory.instance.load();
+    await _checkExistingAnkiWords();
   }
 
   void _copy(LookupRecord r) {
     final l10n = AppLocalizations.of(context)!;
+
     Clipboard.setData(ClipboardData(text: r.word));
+
     HapticFeedback.selectionClick();
+
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
@@ -92,6 +173,7 @@ class _LookupHistorySheetState extends State<LookupHistorySheet> {
                       SliverToBoxAdapter(
                         child: _Header(count: loading ? null : records.length),
                       ),
+
                       if (loading)
                         const SliverFillRemaining(
                           hasScrollBody: false,
@@ -116,6 +198,7 @@ class _LookupHistorySheetState extends State<LookupHistorySheet> {
                                 const SizedBox(height: 8),
                             itemBuilder: (context, i) {
                               final r = records[i];
+
                               return _LookupTile(
                                 record: r,
                                 added: _added.contains(r.word),
@@ -151,6 +234,7 @@ class _Header extends StatelessWidget {
     return Column(
       children: [
         const SizedBox(height: 12),
+
         Container(
           width: 36,
           height: 4,
@@ -159,6 +243,7 @@ class _Header extends StatelessWidget {
             borderRadius: BorderRadius.circular(2),
           ),
         ),
+
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
           child: Row(
@@ -200,6 +285,7 @@ class _LookupTile extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final l10n = AppLocalizations.of(context)!;
+
     final showReading =
         record.reading.isNotEmpty && record.reading != record.word;
 
@@ -231,6 +317,7 @@ class _LookupTile extends StatelessWidget {
                             ),
                           ),
                         ),
+
                         if (showReading) ...[
                           const SizedBox(width: 10),
                           Flexible(
@@ -246,7 +333,9 @@ class _LookupTile extends StatelessWidget {
                         ],
                       ],
                     ),
+
                     const SizedBox(height: 4),
+
                     Text(
                       record.gloss,
                       maxLines: 2,
@@ -255,7 +344,9 @@ class _LookupTile extends StatelessWidget {
                         color: scheme.onSurface,
                       ),
                     ),
+
                     const SizedBox(height: 6),
+
                     Text(
                       _relativeTime(record.createdAt, l10n),
                       style: theme.textTheme.bodySmall?.copyWith(
@@ -265,7 +356,9 @@ class _LookupTile extends StatelessWidget {
                   ],
                 ),
               ),
+
               const SizedBox(width: 4),
+
               IconButton.filledTonal(
                 tooltip: added
                     ? l10n.lookupHistoryTooltipAddedToAnki
@@ -274,7 +367,7 @@ class _LookupTile extends StatelessWidget {
                 icon: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 200),
                   child: Icon(
-                    added ? Icons.check : Icons.note_add_outlined,
+                    added ? Icons.library_add_check : Icons.note_add_outlined,
                     key: ValueKey(added),
                   ),
                 ),
@@ -303,12 +396,16 @@ class _EmptyState extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.history, size: 48, color: scheme.onSurfaceVariant),
+
           const SizedBox(height: 12),
+
           Text(
             l10n.lookupHistoryEmptyTitle,
             style: theme.textTheme.titleMedium,
           ),
+
           const SizedBox(height: 4),
+
           Text(
             l10n.lookupHistoryEmptySubtitle,
             textAlign: TextAlign.center,
@@ -324,15 +421,24 @@ class _EmptyState extends StatelessWidget {
 
 String _relativeTime(DateTime t, AppLocalizations l10n) {
   final diff = DateTime.now().difference(t);
-  if (diff.inMinutes < 1) return l10n.lookupHistoryJustNow;
-  if (diff.inMinutes < 60) return l10n.lookupHistoryMinutesAgo(diff.inMinutes);
+
+  if (diff.inMinutes < 1) {
+    return l10n.lookupHistoryJustNow;
+  }
+
+  if (diff.inMinutes < 60) {
+    return l10n.lookupHistoryMinutesAgo(diff.inMinutes);
+  }
+
   if (diff.inHours < 24) {
     final h = diff.inHours;
     return l10n.lookupHistoryHoursAgo(h);
   }
+
   if (diff.inDays < 7) {
     final d = diff.inDays;
     return l10n.lookupHistoryDaysAgo(d);
   }
+
   return '${t.year}-${t.month.toString().padLeft(2, '0')}-${t.day.toString().padLeft(2, '0')}';
 }
