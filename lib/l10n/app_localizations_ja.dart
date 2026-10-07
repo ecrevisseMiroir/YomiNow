@@ -22,6 +22,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get homeScreenRecentScans => '最近のスキャン';
 
   @override
+  String get homeScreenRecentLookups => '最近の検索';
+
+  @override
+  String get homeScreenNoRecentLookups => '最近の検索はありません。';
+
+  @override
+  String get homeScreenRecentLookupsButton => '最近の検索';
+
+  @override
   String get homeScreenSeeAll => 'すべて見る';
 
   @override
@@ -180,6 +189,23 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get imageScreenLookupHint => '単語をタップして意味を見る';
+
+  @override
+  String get dialogClose => '閉じる';
+
+  @override
+  String get dialogAddToAnki => 'Ankiに追加';
+
+  @override
+  String get dialogReadingLabel => '読み：';
+
+  @override
+  String get dialogGlossLabel => '意味：';
+
+  @override
+  String ankiAddedMessage(String word) {
+    return '「$word」をAnkiに追加しました';
+  }
 
   @override
   String get imageScreenNoJapaneseDetected => '日本語のテキストが検出されませんでした。';
@@ -400,6 +426,13 @@ class AppLocalizationsJa extends AppLocalizations {
       'AnkiDroidがインストールされ、設定 > 詳細設定でAPI連携が有効になっていることを確認してください。';
 
   @override
+  String get ankiNotificationFailedTitle => 'カードを追加できませんでした';
+
+  @override
+  String get ankiNotificationFailedMessage =>
+      'AnkiDroidへのカード追加に失敗しました。もう一度お試しください。';
+
+  @override
   String get ankiNotificationRestartMessage =>
       'Android版AnkiDroid連携をインストールするため、YomiNowを再起動してください。';
 
@@ -457,4 +490,48 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get lookupAttribution => '辞書データ: JMdict © EDRDG, CC BY‑SA 4.0';
+
+  @override
+  String lookupHistoryAddedToAnki(Object word) {
+    return '「$word」をAnkiに追加しました';
+  }
+
+  @override
+  String lookupHistoryCopied(Object word) {
+    return '「$word」をコピーしました';
+  }
+
+  @override
+  String get lookupHistoryTitle => '最近の検索';
+
+  @override
+  String get lookupHistoryTooltipAddedToAnki => 'Ankiに追加済み';
+
+  @override
+  String get lookupHistoryTooltipAddToAnki => 'Ankiに追加';
+
+  @override
+  String get lookupHistoryEmptyTitle => '検索履歴がありません';
+
+  @override
+  String get lookupHistoryEmptySubtitle =>
+      '検索した単語がここに表示されるので、復習したりAnkiに追加したりできます。';
+
+  @override
+  String get lookupHistoryJustNow => 'たった今';
+
+  @override
+  String lookupHistoryMinutesAgo(Object count) {
+    return '$count分前';
+  }
+
+  @override
+  String lookupHistoryHoursAgo(num count) {
+    return '$count時間前';
+  }
+
+  @override
+  String lookupHistoryDaysAgo(num count) {
+    return '$count日前';
+  }
 }

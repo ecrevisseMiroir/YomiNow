@@ -22,6 +22,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get homeScreenRecentScans => 'Scans récents';
 
   @override
+  String get homeScreenRecentLookups => 'Recherches récentes';
+
+  @override
+  String get homeScreenNoRecentLookups => 'Aucune recherche récente.';
+
+  @override
+  String get homeScreenRecentLookupsButton => 'Recherches récentes';
+
+  @override
   String get homeScreenSeeAll => 'Voir tout';
 
   @override
@@ -188,6 +197,23 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get imageScreenLookupHint =>
       'Appuyez sur un mot pour voir sa signification';
+
+  @override
+  String get dialogClose => 'Fermer';
+
+  @override
+  String get dialogAddToAnki => 'Ajouter à Anki';
+
+  @override
+  String get dialogReadingLabel => 'Lecture :';
+
+  @override
+  String get dialogGlossLabel => 'Glossaire :';
+
+  @override
+  String ankiAddedMessage(String word) {
+    return '« $word » ajouté à Anki';
+  }
 
   @override
   String get imageScreenNoJapaneseDetected => 'Aucun texte japonais détecté.';
@@ -414,6 +440,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Vérifiez qu\'AnkiDroid est installé et que l\'intégration API est activée dans Paramètres > Avancé.';
 
   @override
+  String get ankiNotificationFailedTitle => 'Impossible d\'ajouter la carte';
+
+  @override
+  String get ankiNotificationFailedMessage =>
+      'Échec de l\'ajout de la carte à AnkiDroid. Veuillez réessayer.';
+
+  @override
   String get ankiNotificationRestartMessage =>
       'Redémarrez YomiNow pour installer l\'intégration AnkiDroid pour Android.';
 
@@ -474,4 +507,60 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get lookupAttribution =>
       'Données d\'attribution : JMdict © EDRDG, CC BY‑SA 4.0';
+
+  @override
+  String lookupHistoryAddedToAnki(Object word) {
+    return '$word a été ajouté à Anki';
+  }
+
+  @override
+  String lookupHistoryCopied(Object word) {
+    return '$word copié';
+  }
+
+  @override
+  String get lookupHistoryTitle => 'Recherches récentes';
+
+  @override
+  String get lookupHistoryTooltipAddedToAnki => 'Ajouté à Anki';
+
+  @override
+  String get lookupHistoryTooltipAddToAnki => 'Ajouter à Anki';
+
+  @override
+  String get lookupHistoryEmptyTitle => 'Aucune recherche pour le moment';
+
+  @override
+  String get lookupHistoryEmptySubtitle =>
+      'Les mots que vous recherchez apparaîtront ici pour que vous puissiez les réviser ou les ajouter à Anki.';
+
+  @override
+  String get lookupHistoryJustNow => 'À l\'instant';
+
+  @override
+  String lookupHistoryMinutesAgo(Object count) {
+    return 'il y a $count min';
+  }
+
+  @override
+  String lookupHistoryHoursAgo(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'heures',
+      one: 'heure',
+    );
+    return 'il y a $count $_temp0';
+  }
+
+  @override
+  String lookupHistoryDaysAgo(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'jours',
+      one: 'jour',
+    );
+    return 'il y a $count $_temp0';
+  }
 }

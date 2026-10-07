@@ -142,12 +142,17 @@
   "ankiAddAlreadyAdded": "Déjà dans Anki",
   "ankiNotificationErrorTitle": "Impossible d'ajouter la carte",
   "ankiNotificationErrorMessage": "Vérifiez qu'AnkiDroid est installé et que l'intégration API est activée dans Paramètres > Avancé.",
+  "ankiNotificationFailedTitle": "Impossible d'ajouter la carte",
+  "ankiNotificationFailedMessage": "Échec de l'ajout de la carte à AnkiDroid. Veuillez réessayer.",
   "ankiNotificationRestartMessage": "Redémarrez YomiNow pour installer l'intégration AnkiDroid pour Android.",
   "notificationHistoryEmpty": "Tout est à jour",
   "notificationHistoryClearAll": "Effacer toutes les notifications",
   "notificationHistoryTitle": "Historique des notifications",
   "notificationHistoryClearTooltip": "Effacer les notifications",
   "lookupNoWordMessage": "Aucun mot à rechercher ici.",
+  "dialogClose": "Fermer",
+  "dialogAddToAnki": "Ajouter à Anki",
+  "ankiAddedMessage": "« {word} » ajouté à Anki",
   "lookupNoEntryMessage": "Aucune entrée de dictionnaire pour \"{matchedText}\"",
   "@lookupNoEntryMessage": {
     "placeholders": {
@@ -169,5 +174,33 @@
   "noJapaneseTextMessage": "Nous n'avons pas trouvé de texte japonais lisible dans cette image.",
   "noJapaneseTextSuggestion": "Essayez une photo plus nette avec le texte à l'intérieur.",
   "noJapaneseTextButton": "Choisir une autre image",
-  "lookupAttribution": "Données d'attribution : JMdict © EDRDG, CC BY‑SA 4.0"
-}
+  "lookupAttribution": "Données d'attribution : JMdict © EDRDG, CC BY‑SA 4.0",
+  "dialogReadingLabel": "Lecture :",
+    "dialogGlossLabel": "Glossaire :",
+    "lookupHistoryAddedToAnki": "{word} a été ajouté à Anki",
+    "@lookupHistoryAddedToAnki": {
+      "placeholders": {
+        "word": {}
+      }
+    },
+    "lookupHistoryCopied": "{word} copié",
+    "@lookupHistoryCopied": {
+      "placeholders": {
+        "word": {}
+      }
+    },
+    "lookupHistoryTitle": "Recherches récentes",
+    "lookupHistoryTooltipAddedToAnki": "Ajouté à Anki",
+    "lookupHistoryTooltipAddToAnki": "Ajouter à Anki",
+    "lookupHistoryEmptyTitle": "Aucune recherche pour le moment",
+    "lookupHistoryEmptySubtitle": "Les mots que vous recherchez apparaîtront ici pour que vous puissiez les réviser ou les ajouter à Anki.",
+    "lookupHistoryJustNow": "À l'instant",
+    "lookupHistoryMinutesAgo": "il y a {count} min",
+    "@lookupHistoryMinutesAgo": {
+      "placeholders": {
+        "count": {}
+      }
+    },
+    "lookupHistoryHoursAgo": "il y a {count} {count, plural, one{heure} other{heures}}",
+    "lookupHistoryDaysAgo": "il y a {count} {count, plural, one{jour} other{jours}}"
+  }

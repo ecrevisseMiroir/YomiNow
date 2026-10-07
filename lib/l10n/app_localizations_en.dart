@@ -22,6 +22,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeScreenRecentScans => 'Recent Scans';
 
   @override
+  String get homeScreenRecentLookups => 'Recent Lookups';
+
+  @override
+  String get homeScreenNoRecentLookups => 'No recent lookups yet.';
+
+  @override
+  String get homeScreenRecentLookupsButton => 'Recent Lookups';
+
+  @override
   String get homeScreenSeeAll => 'See all';
 
   @override
@@ -187,6 +196,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get imageScreenLookupHint => 'Tap a word to see its meaning';
+
+  @override
+  String get dialogClose => 'Close';
+
+  @override
+  String get dialogAddToAnki => 'Add to Anki';
+
+  @override
+  String get dialogReadingLabel => 'Reading:';
+
+  @override
+  String get dialogGlossLabel => 'Gloss:';
+
+  @override
+  String ankiAddedMessage(String word) {
+    return 'Added \"$word\" to Anki';
+  }
 
   @override
   String get imageScreenNoJapaneseDetected => 'No Japanese text detected.';
@@ -412,6 +438,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Check that AnkiDroid is installed and API Integration is enabled in Settings > Advanced.';
 
   @override
+  String get ankiNotificationFailedTitle => 'Could not add card';
+
+  @override
+  String get ankiNotificationFailedMessage =>
+      'Failed to add card to AnkiDroid. Please try again.';
+
+  @override
   String get ankiNotificationRestartMessage =>
       'Restart YomiNow to install the Android AnkiDroid integration.';
 
@@ -472,4 +505,60 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get lookupAttribution =>
       'Dictionary data: JMdict © EDRDG, CC BY-SA 4.0';
+
+  @override
+  String lookupHistoryAddedToAnki(Object word) {
+    return 'Added \"$word\" to Anki';
+  }
+
+  @override
+  String lookupHistoryCopied(Object word) {
+    return 'Copied \"$word\"';
+  }
+
+  @override
+  String get lookupHistoryTitle => 'Recent lookups';
+
+  @override
+  String get lookupHistoryTooltipAddedToAnki => 'Added to Anki';
+
+  @override
+  String get lookupHistoryTooltipAddToAnki => 'Add to Anki';
+
+  @override
+  String get lookupHistoryEmptyTitle => 'No lookups yet';
+
+  @override
+  String get lookupHistoryEmptySubtitle =>
+      'Words you look up will show up here so you can review them or add them to Anki.';
+
+  @override
+  String get lookupHistoryJustNow => 'Just now';
+
+  @override
+  String lookupHistoryMinutesAgo(Object count) {
+    return '$count min ago';
+  }
+
+  @override
+  String lookupHistoryHoursAgo(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'hours',
+      one: 'hour',
+    );
+    return '$count $_temp0 ago';
+  }
+
+  @override
+  String lookupHistoryDaysAgo(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'days',
+      one: 'day',
+    );
+    return '$count $_temp0 ago';
+  }
 }

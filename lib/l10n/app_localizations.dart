@@ -124,6 +124,24 @@ abstract class AppLocalizations {
   /// **'Recent Scans'**
   String get homeScreenRecentScans;
 
+  /// No description provided for @homeScreenRecentLookups.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Lookups'**
+  String get homeScreenRecentLookups;
+
+  /// No description provided for @homeScreenNoRecentLookups.
+  ///
+  /// In en, this message translates to:
+  /// **'No recent lookups yet.'**
+  String get homeScreenNoRecentLookups;
+
+  /// No description provided for @homeScreenRecentLookupsButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Lookups'**
+  String get homeScreenRecentLookupsButton;
+
   /// No description provided for @homeScreenSeeAll.
   ///
   /// In en, this message translates to:
@@ -441,6 +459,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tap a word to see its meaning'**
   String get imageScreenLookupHint;
+
+  /// No description provided for @dialogClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get dialogClose;
+
+  /// No description provided for @dialogAddToAnki.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Anki'**
+  String get dialogAddToAnki;
+
+  /// No description provided for @dialogReadingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading:'**
+  String get dialogReadingLabel;
+
+  /// No description provided for @dialogGlossLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Gloss:'**
+  String get dialogGlossLabel;
+
+  /// Snackbar shown after adding a looked-up word to Anki.
+  ///
+  /// In en, this message translates to:
+  /// **'Added \"{word}\" to Anki'**
+  String ankiAddedMessage(String word);
 
   /// No description provided for @imageScreenNoJapaneseDetected.
   ///
@@ -838,6 +886,18 @@ abstract class AppLocalizations {
   /// **'Check that AnkiDroid is installed and API Integration is enabled in Settings > Advanced.'**
   String get ankiNotificationErrorMessage;
 
+  /// No description provided for @ankiNotificationFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not add card'**
+  String get ankiNotificationFailedTitle;
+
+  /// No description provided for @ankiNotificationFailedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to add card to AnkiDroid. Please try again.'**
+  String get ankiNotificationFailedMessage;
+
   /// No description provided for @ankiNotificationRestartMessage.
   ///
   /// In en, this message translates to:
@@ -945,6 +1005,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dictionary data: JMdict © EDRDG, CC BY-SA 4.0'**
   String get lookupAttribution;
+
+  /// No description provided for @lookupHistoryAddedToAnki.
+  ///
+  /// In en, this message translates to:
+  /// **'Added \"{word}\" to Anki'**
+  String lookupHistoryAddedToAnki(Object word);
+
+  /// No description provided for @lookupHistoryCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied \"{word}\"'**
+  String lookupHistoryCopied(Object word);
+
+  /// No description provided for @lookupHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent lookups'**
+  String get lookupHistoryTitle;
+
+  /// No description provided for @lookupHistoryTooltipAddedToAnki.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to Anki'**
+  String get lookupHistoryTooltipAddedToAnki;
+
+  /// No description provided for @lookupHistoryTooltipAddToAnki.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Anki'**
+  String get lookupHistoryTooltipAddToAnki;
+
+  /// No description provided for @lookupHistoryEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No lookups yet'**
+  String get lookupHistoryEmptyTitle;
+
+  /// No description provided for @lookupHistoryEmptySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Words you look up will show up here so you can review them or add them to Anki.'**
+  String get lookupHistoryEmptySubtitle;
+
+  /// No description provided for @lookupHistoryJustNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Just now'**
+  String get lookupHistoryJustNow;
+
+  /// No description provided for @lookupHistoryMinutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} min ago'**
+  String lookupHistoryMinutesAgo(Object count);
+
+  /// No description provided for @lookupHistoryHoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} {count, plural, one{hour} other{hours}} ago'**
+  String lookupHistoryHoursAgo(num count);
+
+  /// No description provided for @lookupHistoryDaysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} {count, plural, one{day} other{days}} ago'**
+  String lookupHistoryDaysAgo(num count);
 }
 
 class _AppLocalizationsDelegate

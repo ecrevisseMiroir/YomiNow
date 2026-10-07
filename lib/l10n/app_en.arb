@@ -55,12 +55,22 @@
   "settingsScreenVersionLabel": "Version",
   "settingsScreenTitle": "Settings",
   "settingsScreenChooseLanguage": "Choose language",
-
   "imageScreenBackButtonTooltip": "Back",
   "imageScreenDetectedTextTitle": "Detected Text",
   "imageScreenModeText": "Text",
   "imageScreenModeImage": "Image",
   "imageScreenLookupHint": "Tap a word to see its meaning",
+  "dialogClose": "Close",
+  "dialogAddToAnki": "Add to Anki",
+  "dialogReadingLabel": "Reading:",
+  "dialogGlossLabel": "Gloss:",
+  "ankiAddedMessage": "Added \"{word}\" to Anki",
+  "@ankiAddedMessage": {
+    "description": "Snackbar shown after adding a looked-up word to Anki.",
+    "placeholders": {
+      "word": { "type": "String" }
+    }
+  },
   "imageScreenNoJapaneseDetected": "No Japanese text detected.",
   "splashScreenLoading": "Loading...",
   "splashScreenLogoSemantic": "YomiNow logo",
@@ -142,6 +152,8 @@
   "ankiAddAlreadyAdded": "Already in Anki",
   "ankiNotificationErrorTitle": "Could not add card",
   "ankiNotificationErrorMessage": "Check that AnkiDroid is installed and API Integration is enabled in Settings > Advanced.",
+  "ankiNotificationFailedTitle": "Could not add card",
+  "ankiNotificationFailedMessage": "Failed to add card to AnkiDroid. Please try again.",
   "ankiNotificationRestartMessage": "Restart YomiNow to install the Android AnkiDroid integration.",
   "notificationHistoryEmpty": "You're all caught up",
   "notificationHistoryClearAll": "Clear all notifications",
@@ -169,5 +181,31 @@
   "noJapaneseTextMessage": "We couldn't find readable Japanese in this image.",
   "noJapaneseTextSuggestion": "Try a sharper photo with the text in view.",
   "noJapaneseTextButton": "Choose another image",
-  "lookupAttribution": "Dictionary data: JMdict © EDRDG, CC BY-SA 4.0"
+  "lookupAttribution": "Dictionary data: JMdict © EDRDG, CC BY-SA 4.0",
+  "lookupHistoryAddedToAnki": "Added \"{word}\" to Anki",
+  "@lookupHistoryAddedToAnki": {
+    "placeholders": {
+      "word": {}
+    }
+  },
+  "lookupHistoryCopied": "Copied \"{word}\"",
+  "@lookupHistoryCopied": {
+    "placeholders": {
+      "word": {}
+    }
+  },
+  "lookupHistoryTitle": "Recent lookups",
+  "lookupHistoryTooltipAddedToAnki": "Added to Anki",
+  "lookupHistoryTooltipAddToAnki": "Add to Anki",
+  "lookupHistoryEmptyTitle": "No lookups yet",
+  "lookupHistoryEmptySubtitle": "Words you look up will show up here so you can review them or add them to Anki.",
+  "lookupHistoryJustNow": "Just now",
+  "lookupHistoryMinutesAgo": "{count} min ago",
+  "@lookupHistoryMinutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "lookupHistoryHoursAgo": "{count} {count, plural, one{hour} other{hours}} ago",
+  "lookupHistoryDaysAgo": "{count} {count, plural, one{day} other{days}} ago"
 }
