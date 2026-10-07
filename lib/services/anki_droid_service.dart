@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 enum AnkiDroidAddResult { added, duplicate, shared }
 
 class AnkiDroidService {
+  // TODO here we need to change the channel name to something more generic, since this service is not only for AnkiDroid but also for other apps that support the AnkiConnect protocol.
   static const _channel = MethodChannel(
     'io.github.ecrevissemiroir.yominow/anki',
   );

@@ -5,7 +5,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:yominow/services/anki_droid_service.dart';
 import 'package:yominow/services/lookup_history.dart';
+import 'package:yominow/widgets/yomi_now_notification.dart';
 
 import '../theme/yomi_now_theme.dart';
 import '../models/scanned_document.dart';
@@ -41,6 +43,10 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   bool _isLoadingScans = true;
   bool _didLoadScans = false;
   bool _didSubscribeToRoute = false;
+  final AnkiDroidService? _anki =
+      defaultTargetPlatform == TargetPlatform.android
+      ? AnkiDroidService()
+      : null;
 
   @override
   void initState() {
@@ -393,37 +399,141 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
           crossAxisSpacing: 8,
           mainAxisSpacing: 8,
           children: [
-            ...display.map((r) => Card(
-                  elevation: 1,
-                  child: ListTile(
-                    dense: true,
-                    onTap: () => showDialog(
-                      context: context,
-                      builder: (_) => AlertDialog(
-                        title: Text(r.word),
-                        content: Text('Reading: ${r.reading.isNotEmpty ? r.reading : r.gloss}\nGloss: ${r.gloss}'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            child: const Text('Close'),
+            ...display.map(
+              (r) => Card(
+                elevation: 1,
+                child: ListTile(
+                  dense: true,
+                  onTap: () => showDialog(
+                    context: context,
+                    builder: (_) => AlertDialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(28),
+                      ),
+                      icon: const Icon(Icons.translate_rounded),
+                      title: Text(
+                        r.word,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.headlineMedium
+                            ?.copyWith(fontWeight: FontWeight.w600),
+                      ),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            r.reading.isNotEmpty ? r.reading : r.gloss,
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
                           ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Added "${r.word}" to Anki')),
-                              );
-                            },
-                            child: const Text('Add to Anki'),
+                          const SizedBox(height: 12),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainerHighest
+                                  .withValues(alpha: 0.6),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              r.gloss,
+                              style: Theme.of(context).textTheme.bodyLarge
+                                  ?.copyWith(height: 1.4),
+                            ),
                           ),
                         ],
                       ),
+                      actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: Text(
+                            MaterialLocalizations.of(context).closeButtonLabel,
+                          ),
+                        ),
+                        if (_anki != null)
+                          FilledButton.icon(
+                            icon: const Icon(Icons.add_rounded),
+                            onPressed: () async {
+                              Navigator.of(context).pop();
+                              try {
+                                final isDuplicate = await _anki.isDuplicate(
+                                  r.word,
+                                );
+                                if (!context.mounted) return;
+                                if (isDuplicate) {
+                                  YomiNowNotification.show(
+                                    context,
+                                    title: l10n.ankiNotificationDuplicateTitle,
+                                    message: l10n
+                                        .ankiNotificationDuplicateMessage(
+                                          r.word,
+                                        ),
+                                    kind: YomiNowNotificationKind.error,
+                                  );
+                                  return;
+                                }
+
+                                final result = await _anki.addNote(
+                                  word: r.word,
+                                  back: r.gloss,
+                                );
+                                if (!context.mounted) return;
+                                switch (result) {
+                                  case AnkiDroidAddResult.added:
+                                    YomiNowNotification.show(
+                                      context,
+                                      title: l10n.ankiNotificationAddedTitle,
+                                      message: l10n
+                                          .ankiNotificationAddedMessage(r.word),
+                                      kind: YomiNowNotificationKind.success,
+                                    );
+                                  case AnkiDroidAddResult.duplicate:
+                                    YomiNowNotification.show(
+                                      context,
+                                      title:
+                                          l10n.ankiNotificationDuplicateTitle,
+                                      message: l10n
+                                          .ankiNotificationDuplicateMessage(
+                                            r.word,
+                                          ),
+                                      kind: YomiNowNotificationKind.error,
+                                    );
+                                  case AnkiDroidAddResult.shared:
+                                    break; // AnkiDroid opened for the user to confirm.
+                                }
+                              } catch (_) {
+                                if (!context.mounted) return;
+                                YomiNowNotification.show(
+                                  context,
+                                  title: l10n.ankiNotificationFailedTitle,
+                                  message: l10n.ankiNotificationFailedMessage,
+                                  kind: YomiNowNotificationKind.error,
+                                );
+                              }
+                            },
+                            label: Text(l10n.ankiAddAction),
+                          ),
+                      ],
                     ),
-                    title: Text(r.word, maxLines: 1, overflow: TextOverflow.ellipsis),
-                    subtitle: Text(r.reading.isNotEmpty ? r.reading : r.gloss, maxLines: 1, overflow: TextOverflow.ellipsis),
-   
                   ),
-                )),
+                  title: Text(
+                    r.word,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  subtitle: Text(
+                    r.reading.isNotEmpty ? r.reading : r.gloss,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            ),
             if (display.isEmpty)
               Card(
                 child: Padding(
