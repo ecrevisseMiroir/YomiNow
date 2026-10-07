@@ -52,21 +52,24 @@ class LookupSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return DraggableScrollableSheet(
       expand: false,
       initialChildSize: 0.5,
       minChildSize: 0.25,
       maxChildSize: 0.9,
       builder: (context, scrollController) => Material(
-        color: Theme.of(context).colorScheme.surfaceContainerHigh,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        color: scheme.surfaceContainerLow,
+        elevation: 3,
+        shadowColor: Colors.black54,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         clipBehavior: Clip.antiAlias,
         child: Column(
           children: [
             Expanded(
               child: ListView(
                 controller: scrollController,
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 children: [
                   const _DragHandle(),
                   FutureBuilder<LookupResult?>(
@@ -95,11 +98,12 @@ class _DragHandle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        width: 32,
+        width: 36,
         height: 4,
-        margin: const EdgeInsets.symmetric(vertical: 12),
+        margin: const EdgeInsets.only(top: 12, bottom: 16),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          color: Theme.of(context).colorScheme.onSurfaceVariant
+              .withValues(alpha: 0.4),
           borderRadius: BorderRadius.circular(2),
         ),
       ),
@@ -114,15 +118,27 @@ class _Attribution extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Text(
-          l10n.lookupAttribution,
-          textAlign: TextAlign.center,
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+          ),
+        ),
+      ),
+      child: SizedBox(
+        width: double.infinity,
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Text(
+              l10n.lookupAttribution,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
           ),
         ),
       ),
@@ -148,16 +164,20 @@ class _SheetBody extends StatelessWidget {
     if (snapshot.hasError) {
       return _Message(
         l10n.lookupFailedMessage(snapshot.error?.toString() ?? ''),
+        icon: Icons.error_outline_rounded,
+        isError: true,
       );
     }
     if (snapshot.connectionState != ConnectionState.done) {
       return const Padding(
-        padding: EdgeInsets.all(32),
+        padding: EdgeInsets.symmetric(vertical: 48),
         child: Center(child: CircularProgressIndicator()),
       );
     }
     final result = snapshot.data;
-    if (result == null) return _Message(l10n.lookupNoWordMessage);
+    if (result == null) {
+      return _Message(l10n.lookupNoWordMessage, icon: Icons.search_off_rounded);
+    }
     return _ResultView(
       result: result,
       onAddToAnki: onAddToAnki,
@@ -167,20 +187,37 @@ class _SheetBody extends StatelessWidget {
 }
 
 class _Message extends StatelessWidget {
-  const _Message(this.text);
+  const _Message(this.text, {this.icon, this.isError = false});
 
   final String text;
+  final IconData? icon;
+  final bool isError;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final color = isError
+        ? theme.colorScheme.error
+        : theme.colorScheme.onSurfaceVariant;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      child: Text(
-        text,
-        style: theme.textTheme.bodyLarge?.copyWith(
-          color: theme.colorScheme.onSurfaceVariant,
-        ),
+      padding: const EdgeInsets.symmetric(vertical: 24),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 22, color: color),
+            const SizedBox(width: 12),
+          ],
+          Expanded(
+            child: Text(
+              text,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: color,
+                height: 1.4,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -202,19 +239,23 @@ class _ResultView extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final muted = TextStyle(color: theme.colorScheme.onSurfaceVariant);
     final reading = result.reading;
     // Save to recent lookups history
-    LookupHistory.instance.add(LookupRecord(
-      word: result.matchedText,
-      reading: reading ?? '',
-      gloss: result.entries.isNotEmpty ? result.entries.first.senses.first.glosses.join(', ') : '',
-      createdAt: DateTime.now(),
-    ));
+    LookupHistory.instance.add(
+      LookupRecord(
+        word: result.matchedText,
+        reading: reading ?? '',
+        gloss: result.entries.isNotEmpty
+            ? result.entries.first.senses.first.glosses.join(', ')
+            : '',
+        createdAt: DateTime.now(),
+      ),
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
@@ -223,33 +264,45 @@ class _ResultView extends StatelessWidget {
                 children: [
                   Text(
                     result.matchedText,
-                    style: theme.textTheme.headlineLarge,
+                    style: theme.textTheme.displaySmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      height: 1.15,
+                    ),
                   ),
-                  if (reading != null)
+                  if (reading != null) ...[
+                    const SizedBox(height: 2),
                     Text(
                       reading,
-                      style: theme.textTheme.titleMedium?.merge(muted),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: theme.colorScheme.primary,
+                      ),
                     ),
+                  ],
                 ],
               ),
             ),
-            if (onAddToAnki != null)
+            if (onAddToAnki != null) ...[
+              const SizedBox(width: 12),
               _AnkiAddButton(
                 result: result,
                 onAddToAnki: onAddToAnki!,
                 isAlreadyInAnki: isAlreadyInAnki,
               ),
+            ],
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 16),
         if (result.isEmpty)
-          _Message(l10n.lookupNoEntryMessage(result.matchedText))
+          _Message(
+            l10n.lookupNoEntryMessage(result.matchedText),
+            icon: Icons.menu_book_outlined,
+          )
         else
           for (final entry in result.entries) ...[
-            const Divider(),
             _EntryView(entry: entry),
+            const SizedBox(height: 12),
           ],
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
       ],
     );
   }
@@ -307,17 +360,37 @@ class _AnkiAddButtonState extends State<_AnkiAddButton> {
     final l10n = AppLocalizations.of(context)!;
     final isChecking = label == l10n.ankiAddChecking;
     final canAdd = !alreadyAdded && !isChecking;
-    return ElevatedButton.icon(
-      onPressed: canAdd
-          ? () {
-              widget.onAddToAnki(widget.result);
-              Navigator.of(context).pop();
-            }
-          : null,
-      icon: isChecking
-          ? const Icon(Icons.hourglass_empty)
-          : Icon(alreadyAdded ? Icons.check_rounded : Icons.add),
-      label: Text(label ?? l10n.ankiAddAction, maxLines: 1),
+    final onPressed = canAdd
+        ? () {
+            widget.onAddToAnki(widget.result);
+            Navigator.of(context).pop();
+          }
+        : null;
+    final icon = isChecking
+        ? const SizedBox(
+            width: 16,
+            height: 16,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          )
+        : Icon(alreadyAdded ? Icons.check_rounded : Icons.add_rounded);
+    final text = Text(label ?? l10n.ankiAddAction, maxLines: 1);
+
+    // Primary action when the card can be added, quiet tonal otherwise.
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      child: canAdd
+          ? FilledButton.icon(
+              key: const ValueKey('add'),
+              onPressed: onPressed,
+              icon: icon,
+              label: text,
+            )
+          : FilledButton.tonalIcon(
+              key: ValueKey(alreadyAdded ? 'added' : 'checking'),
+              onPressed: onPressed,
+              icon: icon,
+              label: text,
+            ),
     );
   }
 }
@@ -330,13 +403,19 @@ class _EntryView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final muted = theme.textTheme.bodyMedium?.copyWith(
-      color: theme.colorScheme.onSurfaceVariant,
+      color: scheme.onSurfaceVariant,
     );
     final otherForms = entry.kanji.skip(1);
     final readings = entry.readings.where((r) => r != entry.headword);
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHighest.withValues(alpha: 0.55),
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -353,9 +432,15 @@ class _EntryView extends StatelessWidget {
               if (entry.common) const _CommonChip(),
             ],
           ),
-          if (otherForms.isNotEmpty) Text(otherForms.join('、'), style: muted),
-          if (readings.isNotEmpty) Text(readings.join('、'), style: muted),
-          const SizedBox(height: 8),
+          if (otherForms.isNotEmpty) ...[
+            const SizedBox(height: 2),
+            Text(otherForms.join('、'), style: muted),
+          ],
+          if (readings.isNotEmpty) ...[
+            const SizedBox(height: 2),
+            Text(readings.join('、'), style: muted),
+          ],
+          const SizedBox(height: 12),
           for (final (index, sense) in entry.senses.indexed)
             _SenseView(number: index + 1, sense: sense),
         ],
@@ -375,6 +460,7 @@ class _CommonChip extends StatelessWidget {
       visualDensity: VisualDensity.compact,
       padding: EdgeInsets.zero,
       side: BorderSide.none,
+      shape: const StadiumBorder(),
       backgroundColor: scheme.primaryContainer,
       labelStyle: Theme.of(context).textTheme.labelSmall
           ?.copyWith(color: scheme.onPrimaryContainer),
@@ -391,31 +477,48 @@ class _SenseView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final muted = theme.colorScheme.onSurfaceVariant;
+    final scheme = theme.colorScheme;
+    final muted = scheme.onSurfaceVariant;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 28,
-            child: Text('$number.', style: TextStyle(color: muted)),
+          Container(
+            width: 22,
+            height: 22,
+            margin: const EdgeInsets.only(right: 12, top: 1),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: scheme.secondaryContainer,
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              '$number',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: scheme.onSecondaryContainer,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (sense.pos.isNotEmpty)
-                  Text(
-                    sense.pos.join(', '),
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: muted,
-                      fontStyle: FontStyle.italic,
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 2),
+                    child: Text(
+                      sense.pos.join(', '),
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: muted,
+                        fontStyle: FontStyle.italic,
+                      ),
                     ),
                   ),
                 Text(
                   sense.glosses.join('; '),
-                  style: theme.textTheme.bodyLarge,
+                  style: theme.textTheme.bodyLarge?.copyWith(height: 1.4),
                 ),
               ],
             ),
