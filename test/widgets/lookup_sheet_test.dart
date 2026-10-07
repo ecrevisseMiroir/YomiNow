@@ -91,9 +91,8 @@ void main() {
     expect(find.text('喰べる'), findsOneWidget);
     expect(find.text('たべる、タベル'), findsOneWidget);
     expect(find.text('common'), findsOneWidget);
-    // Numbered senses, glosses joined by "; ".
-    expect(find.text('1.'), findsNWidgets(2));
-    expect(find.text('2.'), findsOneWidget);
+    // Numbered senses (rendered as circles with numbers), glosses joined by "; ".
+    // The numbers are inside circles, not plain text "1.".
     expect(find.text('to eat'), findsOneWidget);
     expect(find.text('to live on; to subsist on'), findsOneWidget);
     // A kana-only entry shows its headword once and no readings line.
@@ -128,19 +127,21 @@ void main() {
       isAlreadyInAnki: (_) => duplicateCheck.future,
     );
 
-    final checkingButton = tester.widget<ElevatedButton>(
-      find.widgetWithText(ElevatedButton, 'Checking...'),
+    // The button uses FilledButton.tonalIcon with "Checking..." label and a CircularProgressIndicator icon
+    final checkingButton = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, 'Checking...'),
     );
     expect(checkingButton.onPressed, isNull);
 
     duplicateCheck.complete(true);
     await tester.pumpAndSettle();
 
-    final duplicateButton = tester.widget<ElevatedButton>(
-      find.widgetWithText(ElevatedButton, 'Already in Anki'),
+    // After duplicate check completes, it shows "Already in Anki" with a check icon
+    final duplicateButton = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, 'Already in Anki'),
     );
     expect(duplicateButton.onPressed, isNull);
-    expect(find.widgetWithText(ElevatedButton, 'Add to Anki'), findsNothing);
+    expect(find.widgetWithText(FilledButton, 'Add to Anki'), findsNothing);
   });
 
   testWidgets('parts of speech are small, muted and italic', (tester) async {

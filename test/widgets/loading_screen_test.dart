@@ -15,7 +15,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text('Processing Image...'), findsOneWidget);
-        expect(find.text('Running OCR...'), findsOneWidget);
+    expect(find.text('Running OCR...'), findsOneWidget);
     expect(tester.takeException(), isNull);
 
     tester.view.physicalSize = const Size(844, 390);
@@ -23,7 +23,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text('Processing Image...'), findsOneWidget);
-        expect(find.text('Running OCR...'), findsOneWidget);
+    expect(find.text('Running OCR...'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }
