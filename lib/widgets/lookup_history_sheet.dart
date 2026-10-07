@@ -83,8 +83,6 @@ class _LookupHistorySheetState extends State<LookupHistorySheet> {
           break;
       }
     } catch (_) {
-      if (!mounted) return;
-
       YomiNowNotification.show(
         context,
         title: l10n.ankiNotificationFailedTitle,
