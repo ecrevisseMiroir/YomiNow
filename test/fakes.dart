@@ -2,13 +2,18 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image/image.dart' as img;
+import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
+import 'package:yominow/l10n/app_localizations.dart';
 import 'package:yominow/models/ja_token.dart';
 import 'package:yominow/models/lookup_result.dart';
 import 'package:yominow/models/ocr_result.dart';
+import 'package:yominow/models/scanned_document.dart';
 import 'package:yominow/services/app_services.dart';
+import 'package:yominow/services/document_repository.dart';
 import 'package:yominow/services/image_preprocessor.dart';
 import 'package:yominow/services/lookup_service.dart';
 import 'package:yominow/services/ocr/ocr_service.dart';
@@ -157,27 +162,80 @@ class FakeLookupService implements LookupService {
   }
 }
 
+class FakeDocumentRepository implements DocumentRepository {
+  final documents = <ScannedDocument>[];
+  var _nextId = 0;
+
+  @override
+  Future<List<ScannedDocument>> getAll() async => [...documents];
+
+  @override
+  Future<ScannedDocument> addImage(XFile source) async {
+    final document = ScannedDocument(
+      id: 'fake-${_nextId++}',
+      title: source.name,
+      path: source.path,
+      createdAt: DateTime.now(),
+    );
+    documents.insert(0, document);
+    return document;
+  }
+
+  @override
+  Future<void> updateHasText(String id, bool hasText) async {
+    final index = documents.indexWhere((document) => document.id == id);
+    if (index >= 0) {
+      documents[index] = documents[index].copyWith(hasText: hasText);
+    }
+  }
+
+  @override
+  Future<void> delete(String id) async {
+    documents.removeWhere((document) => document.id == id);
+  }
+}
+
 /// [AppServices] made of fakes; pass the ones a test wants to inspect.
 AppServices fakeServices({
   OcrService? ocr,
   ImagePreprocessor? imagePreprocessor,
   TokenizerService? tokenizer,
   LookupService? lookup,
+  DocumentRepository? documents,
 }) {
   return AppServices(
     ocr: ocr ?? FakeOcrService(),
     imagePreprocessor: imagePreprocessor ?? FakeImagePreprocessor(),
     tokenizer: tokenizer ?? FakeTokenizerService(),
     lookup: lookup ?? FakeLookupService(),
+    documents: documents ?? FakeDocumentRepository(),
   );
 }
 
 /// Wraps [child] in the app's service scope and a dark [MaterialApp], like
 /// the real app does.
-Widget withServices(AppServices services, Widget child) {
+Widget withServices(
+  AppServices services,
+  Widget child, {
+  ThemeData? theme,
+  ThemeData? darkTheme,
+  ThemeMode? themeMode,
+}) {
   return AppServicesScope(
     services: services,
-    child: MaterialApp(theme: ThemeData.dark(), home: child),
+    child: MaterialApp(
+      theme: theme ?? ThemeData.dark(),
+      darkTheme: darkTheme,
+      themeMode: themeMode,
+      home: child,
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+    ),
   );
 }
 

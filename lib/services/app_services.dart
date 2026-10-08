@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import 'image_preprocessor.dart';
+import 'document_repository.dart';
 import 'lookup_service.dart';
 import 'ocr/ocr_service.dart';
 import 'tokenizer_service.dart';
@@ -13,12 +14,14 @@ class AppServices {
     required this.imagePreprocessor,
     required this.tokenizer,
     required this.lookup,
+    required this.documents,
   });
 
   final OcrService ocr;
   final ImagePreprocessor imagePreprocessor;
   final TokenizerService tokenizer;
   final LookupService lookup;
+  final DocumentRepository documents;
 }
 
 /// Makes [AppServices] available to the widget tree.
@@ -32,8 +35,8 @@ class AppServicesScope extends InheritedWidget {
   final AppServices services;
 
   static AppServices of(BuildContext context) {
-    final scope =
-        context.dependOnInheritedWidgetOfExactType<AppServicesScope>();
+    final scope = context
+        .dependOnInheritedWidgetOfExactType<AppServicesScope>();
     assert(scope != null, 'No AppServicesScope found in context');
     return scope!.services;
   }

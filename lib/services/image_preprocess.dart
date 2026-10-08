@@ -65,8 +65,7 @@ img.Image _decode(String path) {
           );
   }
 
-  File(
-    outputPath,
-  ).writeAsBytesSync(img.encodeJpg(image, quality: _jpegQuality));
+  File(outputPath)
+      .writeAsBytesSync(img.encodeJpg(image, quality: _jpegQuality));
   return (image.width, image.height);
 }

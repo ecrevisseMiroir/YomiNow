@@ -1,10 +1,6 @@
 /// One sense (meaning group) of a JMdict entry.
 class Sense {
-  const Sense({
-    required this.pos,
-    required this.glosses,
-    this.misc = const [],
-  });
+  const Sense({required this.pos, required this.glosses, this.misc = const []});
 
   /// Part-of-speech labels as expanded JMdict entity text, e.g.
   /// `Godan verb with 'ru' ending`.
@@ -18,16 +14,16 @@ class Sense {
   final List<String> misc;
 
   factory Sense.fromJson(Map<String, dynamic> json) => Sense(
-        pos: _strings(json['p']),
-        glosses: _strings(json['g']),
-        misc: _strings(json['m']),
-      );
+    pos: _strings(json['p']),
+    glosses: _strings(json['g']),
+    misc: _strings(json['m']),
+  );
 
   Map<String, dynamic> toJson() => {
-        'p': pos,
-        'g': glosses,
-        if (misc.isNotEmpty) 'm': misc,
-      };
+    'p': pos,
+    'g': glosses,
+    if (misc.isNotEmpty) 'm': misc,
+  };
 }
 
 /// A JMdict entry. The compact JSON form ([toJson]/[fromJson]) is what the
@@ -69,11 +65,11 @@ class DictionaryEntry {
       );
 
   Map<String, dynamic> toJson() => {
-        if (kanji.isNotEmpty) 'k': kanji,
-        'r': readings,
-        's': [for (final s in senses) s.toJson()],
-        if (common) 'c': true,
-      };
+    if (kanji.isNotEmpty) 'k': kanji,
+    'r': readings,
+    's': [for (final s in senses) s.toJson()],
+    if (common) 'c': true,
+  };
 
   /// Headword to display: first kanji form, else first reading.
   String get headword => kanji.isNotEmpty ? kanji.first : readings.first;

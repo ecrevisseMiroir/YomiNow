@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:yominow/screens/home_screen.dart';
 import 'package:yominow/screens/image_screen.dart';
+import 'package:yominow/services/yomi_now_notification_history.dart';
+import 'package:yominow/theme/yomi_now_theme.dart';
 
 import '../fakes.dart';
 
@@ -38,6 +41,20 @@ final _mobile = TargetPlatformVariant({
 });
 
 void main() {
+  setUpAll(() => SharedPreferences.setMockInitialValues({}));
+
+  Future<void> pumpHomeWithTheme(WidgetTester tester, ThemeMode mode) {
+    return tester.pumpWidget(
+      withServices(
+        fakeServices(),
+        const HomeScreen(),
+        theme: YomiNowTheme.light,
+        darkTheme: YomiNowTheme.dark,
+        themeMode: mode,
+      ),
+    );
+  }
+
   Future<void> pumpHome(
     WidgetTester tester, {
     ImagePicker? picker,
@@ -56,6 +73,54 @@ void main() {
 
     expect(find.text('YomiNow'), findsOneWidget);
     expect(find.textContaining('tap any word'), findsOneWidget);
+  });
+
+  testWidgets('notification bell opens and clears notification history', (
+    tester,
+  ) async {
+    final history = YomiNowNotificationHistory.instance;
+    await history.clear();
+    await history.add(
+      title: 'Added to AnkiDroid',
+      message: '日本語 was added to the YomiNow deck.',
+      kind: YomiNowNotificationKind.success,
+    );
+    await pumpHome(tester);
+    await tester.pumpAndSettle();
+
+    expect(history.unreadCount, 1);
+    expect(find.text('1'), findsOneWidget);
+    await tester.tap(find.byTooltip('Notifications'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Added to AnkiDroid'), findsOneWidget);
+    expect(find.text('日本語 was added to the YomiNow deck.'), findsOneWidget);
+    expect(history.unreadCount, 0);
+
+    await tester.tap(find.byKey(const ValueKey('notification-history-clear')));
+    await tester.pumpAndSettle();
+
+    expect(find.text("You're all caught up"), findsOneWidget);
+    await history.clear();
+  });
+
+  testWidgets('home text follows light and dark theme colors', (tester) async {
+    for (final mode in [ThemeMode.light, ThemeMode.dark]) {
+      await pumpHomeWithTheme(tester, mode);
+      await tester.pumpAndSettle();
+      final colorScheme = mode == ThemeMode.dark
+          ? YomiNowTheme.dark.colorScheme
+          : YomiNowTheme.light.colorScheme;
+
+      expect(
+        tester.widget<Text>(find.text('Welcome!')).style?.color,
+        colorScheme.onSurface,
+      );
+      expect(
+        tester.widget<Text>(find.textContaining('tap any word')).style?.color,
+        colorScheme.onSurfaceVariant,
+      );
+    }
   });
 
   testWidgets('desktop offers only "Open image"', variant: _desktop, (
@@ -126,19 +191,23 @@ void main() {
     },
   );
 
-  testWidgets('a picker error shows a snack bar', variant: _mobile, (
-    tester,
-  ) async {
-    final picker = FakePicker(
-      error: PlatformException(code: 'camera_access_denied'),
-    );
-    await pumpHome(tester, picker: picker);
+  testWidgets(
+    'a picker error shows the shared error dialog',
+    variant: _mobile,
+    (tester) async {
+      final picker = FakePicker(
+        error: PlatformException(code: 'camera_access_denied'),
+      );
+      await pumpHome(tester, picker: picker);
 
-    await tester.tap(find.text('Take photo'));
-    await tester.pump();
+      await tester.tap(find.text('Take photo'));
+      await tester.pump();
 
-    expect(find.byType(SnackBar), findsOneWidget);
-    expect(find.textContaining('camera_access_denied'), findsOneWidget);
-    expect(find.byType(ImageScreen), findsNothing);
-  });
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SnackBar), findsNothing);
+      expect(find.text('Something went wrong'), findsOneWidget);
+      expect(find.byType(ImageScreen), findsNothing);
+    },
+  );
 }

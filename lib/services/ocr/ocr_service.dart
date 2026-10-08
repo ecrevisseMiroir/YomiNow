@@ -23,6 +23,7 @@ class OcrUnavailableException implements Exception {
   final String? hint;
 
   @override
-  String toString() =>
-      hint == null ? 'OcrUnavailableException: $message' : 'OcrUnavailableException: $message ($hint)';
+  String toString() => hint == null
+      ? 'OcrUnavailableException: $message'
+      : 'OcrUnavailableException: $message ($hint)';
 }
