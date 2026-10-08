@@ -526,6 +526,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lookupHistoryTooltipAddToAnki => 'Add to Anki';
 
   @override
+  String get lookupHistoryTooltipPronounce => 'Pronounce';
+
+  @override
   String get lookupHistoryEmptyTitle => 'No lookups yet';
 
   @override

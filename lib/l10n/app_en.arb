@@ -197,6 +197,7 @@
   "lookupHistoryTitle": "Recent lookups",
   "lookupHistoryTooltipAddedToAnki": "Added to Anki",
   "lookupHistoryTooltipAddToAnki": "Add to Anki",
+  "lookupHistoryTooltipPronounce": "Pronounce",
   "lookupHistoryEmptyTitle": "No lookups yet",
   "lookupHistoryEmptySubtitle": "Words you look up will show up here so you can review them or add them to Anki.",
   "lookupHistoryJustNow": "Just now",

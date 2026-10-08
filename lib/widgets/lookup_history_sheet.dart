@@ -6,6 +6,7 @@ import 'package:yominow/services/yomi_now_notification_history.dart';
 import 'package:yominow/widgets/yomi_now_notification.dart';
 
 import '../services/lookup_history.dart';
+import '../services/tts_service.dart';
 
 import 'package:yominow/l10n/app_localizations.dart';
 
@@ -357,6 +358,13 @@ class _LookupTile extends StatelessWidget {
 
               const SizedBox(width: 4),
 
+              IconButton.filledTonal(
+                tooltip: l10n.lookupHistoryTooltipPronounce,
+                onPressed: () {
+                  TtsService.instance.speak(record.reading);
+                },
+                icon: const Icon(Icons.volume_up_outlined),
+              ),
               IconButton.filledTonal(
                 tooltip: added
                     ? l10n.lookupHistoryTooltipAddedToAnki

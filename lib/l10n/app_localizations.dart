@@ -1036,6 +1036,12 @@ abstract class AppLocalizations {
   /// **'Add to Anki'**
   String get lookupHistoryTooltipAddToAnki;
 
+  /// No description provided for @lookupHistoryTooltipPronounce.
+  ///
+  /// In en, this message translates to:
+  /// **'Pronounce'**
+  String get lookupHistoryTooltipPronounce;
+
   /// No description provided for @lookupHistoryEmptyTitle.
   ///
   /// In en, this message translates to:

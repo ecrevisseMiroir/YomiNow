@@ -192,6 +192,7 @@
   "lookupHistoryTitle": "最近の検索",
   "lookupHistoryTooltipAddedToAnki": "Ankiに追加済み",
   "lookupHistoryTooltipAddToAnki": "Ankiに追加",
+  "lookupHistoryTooltipPronounce": "発音を聞く",
   "lookupHistoryEmptyTitle": "検索履歴がありません",
   "lookupHistoryEmptySubtitle": "検索した単語がここに表示されるので、復習したりAnkiに追加したりできます。",
   "lookupHistoryJustNow": "たった今",

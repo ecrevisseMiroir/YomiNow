@@ -511,6 +511,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get lookupHistoryTooltipAddToAnki => 'Ankiに追加';
 
   @override
+  String get lookupHistoryTooltipPronounce => '発音を聞く';
+
+  @override
   String get lookupHistoryEmptyTitle => '検索履歴がありません';
 
   @override
