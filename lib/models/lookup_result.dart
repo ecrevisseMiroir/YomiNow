@@ -27,4 +27,5 @@ class LookupResult {
   final JaToken? token;
 
   bool get isEmpty => entries.isEmpty;
+  String get pronunciationText => reading ?? matchedText;
 }

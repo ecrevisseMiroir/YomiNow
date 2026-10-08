@@ -219,10 +219,12 @@ void main() {
 
   test('the bundled asset matches its committed version file', () {
     final gz = File('assets/dict/jmdict.db.gz').readAsBytesSync();
-    expect(
-      File('assets/dict/jmdict.version').readAsStringSync(),
-      '${sha256.convert(gz)} ${gz.length}\n',
-    );
+    final expected = '${sha256.convert(gz)} ${gz.length}';
+    final versionContent = File('assets/dict/jmdict.version')
+        .readAsStringSync()
+        .replaceAll('\r\n', '\n')
+        .trim();
+    expect(versionContent, expected);
   });
 
   test('reads gzipped XML', () async {

@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:yominow/screens/licenses/open_source_screen.dart';
+import 'package:yominow/screens/licenses/third_party_libraries_screen.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:yominow/l10n/app_localizations.dart';
 
+import 'screens/about_screen.dart';
+import 'screens/documents_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/licenses/licenses_screen.dart';
+import 'screens/settings_screen.dart';
+import 'screens/splash_screen.dart';
+import 'services/app_appearance.dart';
+import 'services/app_language.dart';
 import 'services/app_services.dart';
+import 'services/app_route_observer.dart';
+import 'theme/yomi_now_theme.dart';
 
-/// The app's dark Material 3 theme.
-ThemeData yomiNowTheme() => ThemeData(
-  useMaterial3: true,
-  colorScheme: ColorScheme.fromSeed(
-    seedColor: const Color(0xFF38BDF8), // sky blue
-    brightness: Brightness.dark,
-  ),
-  scaffoldBackgroundColor: Colors.black,
-);
-
-/// The root widget: a dark Material 3 app that provides [services] to every
-/// screen.
+/// The root widget provides app services and the system-aware theme to screens.
 class YomiNowApp extends StatelessWidget {
   const YomiNowApp({super.key, required this.services});
 
@@ -24,10 +26,40 @@ class YomiNowApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppServicesScope(
       services: services,
-      child: MaterialApp(
-        title: 'YomiNow',
-        theme: yomiNowTheme(),
-        home: const HomeScreen(),
+      child: ListenableBuilder(
+        listenable: Listenable.merge([
+          AppLanguage.selected,
+          AppAppearance.selected,
+        ]),
+        builder: (context, _) {
+          final locale = AppLanguage.localeFor(AppLanguage.selected.value);
+          return MaterialApp(
+            title: 'YomiNow',
+            navigatorObservers: [appRouteObserver],
+            locale: locale,
+            supportedLocales: AppLocalizations.supportedLocales,
+            localizationsDelegates: [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            theme: YomiNowTheme.light,
+            darkTheme: YomiNowTheme.dark,
+            themeMode: AppAppearance.selected.value,
+            home: const SplashScreen(),
+            routes: {
+              '/home': (_) => const HomeScreen(),
+              '/documents': (_) => const DocumentsScreen(),
+              '/settings': (_) => const SettingsScreen(),
+              '/about': (_) => const AboutScreen(),
+              '/licenses': (_) => const LicensesScreen(),
+              '/third-party-libraries': (_) =>
+                  const ThirdPartyLibrariesScreen(),
+              '/open-source': (_) => const OpenSourceScreen(),
+            },
+          );
+        },
       ),
     );
   }

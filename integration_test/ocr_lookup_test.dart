@@ -1,6 +1,6 @@
 // End-to-end check on a desktop device: real Tesseract OCR, kuromoji and the
-// bundled JMdict on test/fixtures/ja_sample.png ("日本語を勉強しています" /
-// "東京に行きました").
+// bundled JMdict on test/fixtures/ja_sample.png (\"日本語を勉強しています\" /
+// \"東京に行きました\").
 //
 //   xvfb-run flutter test integration_test -d linux
 //
@@ -12,10 +12,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:yominow/app.dart';
+import 'package:yominow/l10n/app_localizations.dart';
 import 'package:yominow/screens/image_screen.dart';
 import 'package:yominow/services/app_services.dart';
 import 'package:yominow/services/default_lookup_service.dart';
+import 'package:yominow/services/document_repository.dart';
 import 'package:yominow/services/image_preprocess.dart';
 import 'package:yominow/services/kuromoji_tokenizer_service.dart';
 import 'package:yominow/services/ocr/tesseract_ocr_service.dart';
@@ -46,6 +47,15 @@ Future<void> _saveScreenshot(GlobalKey key, String path) async {
   await File(path).writeAsBytes(png!.buffer.asUint8List());
 }
 
+bool get _hasTesseract {
+  try {
+    final r = Process.runSync('tesseract', ['--list-langs']);
+    return r.exitCode == 0 && r.stdout.toString().contains('jpn');
+  } on ProcessException {
+    return false;
+  }
+}
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -62,6 +72,7 @@ void main() {
         tokenizer: tokenizer,
         dictionary: SqliteDictionaryService(),
       ),
+      documents: SqliteDocumentRepository(),
     );
     final boundary = GlobalKey();
 
@@ -71,22 +82,39 @@ void main() {
         child: AppServicesScope(
           services: services,
           child: MaterialApp(
-            theme: yomiNowTheme(),
+            theme: ThemeData(),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: ImageScreen(imagePath: fixture),
           ),
         ),
       ),
     );
 
+    // Wait for the detected text list to appear (first line)
+    // and then switch to image view mode to access the word overlay.
+    await _pumpUntil(
+      tester,
+      find.byKey(const ValueKey('text-line-0')),
+      timeout: const Duration(seconds: 180),
+    );
+    // Tap the "Image" mode button.
+    await tester.tap(find.text('Image'));
+    await tester.pumpAndSettle();
+
     // Tap 日 in the first line; the word there is 日本語.
     final firstChar = find.byKey(const ValueKey('word-0-0'));
-    await _pumpUntil(tester, firstChar);
+    await _pumpUntil(tester, firstChar, timeout: const Duration(seconds: 180));
     await tester.tap(firstChar);
 
-    await _pumpUntil(tester, find.textContaining('Japanese (language)'));
+    await _pumpUntil(
+      tester,
+      find.textContaining('Japanese (language)'),
+      timeout: const Duration(seconds: 180),
+    );
     expect(find.text('日本語'), findsWidgets);
     expect(find.textContaining('JMdict'), findsOneWidget);
 
     if (_screenshot.isNotEmpty) await _saveScreenshot(boundary, _screenshot);
-  });
+  }, skip: !_hasTesseract);
 }

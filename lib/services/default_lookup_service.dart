@@ -8,11 +8,7 @@ import 'tokenizer_service.dart';
 /// the token at the tapped position, its dictionary form and the longest
 /// dictionary term starting there.
 class DefaultLookupService implements LookupService {
-  DefaultLookupService({
-    required TokenizerService tokenizer,
-    required DictionaryService dictionary,
-  }) : _tokenizer = tokenizer,
-       _dictionary = dictionary;
+  DefaultLookupService({required this._tokenizer, required this._dictionary});
 
   final TokenizerService _tokenizer;
   final DictionaryService _dictionary;

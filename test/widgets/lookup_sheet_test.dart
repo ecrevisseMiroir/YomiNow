@@ -48,6 +48,8 @@ void main() {
     WidgetTester tester,
     Future<LookupResult?> result, {
     Size size = const Size(800, 1600),
+    AddToAnkiCallback? onAddToAnki,
+    Future<bool> Function(String word)? isAlreadyInAnki,
   }) async {
     tester.view
       ..physicalSize = size
@@ -60,7 +62,12 @@ void main() {
           builder: (context) => Scaffold(
             body: Center(
               child: ElevatedButton(
-                onPressed: () => LookupSheet.show(context, result),
+                onPressed: () => LookupSheet.show(
+                  context,
+                  result,
+                  onAddToAnki: onAddToAnki,
+                  isAlreadyInAnki: isAlreadyInAnki,
+                ),
                 child: const Text('open'),
               ),
             ),
@@ -84,15 +91,57 @@ void main() {
     expect(find.text('喰べる'), findsOneWidget);
     expect(find.text('たべる、タベル'), findsOneWidget);
     expect(find.text('common'), findsOneWidget);
-    // Numbered senses, glosses joined by "; ".
-    expect(find.text('1.'), findsNWidgets(2));
-    expect(find.text('2.'), findsOneWidget);
+    // Numbered senses (rendered as circles with numbers), glosses joined by "; ".
+    // The numbers are inside circles, not plain text "1.".
     expect(find.text('to eat'), findsOneWidget);
     expect(find.text('to live on; to subsist on'), findsOneWidget);
     // A kana-only entry shows its headword once and no readings line.
     expect(find.text('ふりがな'), findsOneWidget);
     expect(find.text('furigana'), findsOneWidget);
     expect(find.text(_attribution), findsOneWidget);
+  });
+
+  testWidgets('Add to Anki passes the complete lookup result', (tester) async {
+    final match = _match([_taberu]);
+    LookupResult? addedResult;
+    await showSheet(
+      tester,
+      Future.value(match),
+      onAddToAnki: (result) => addedResult = result,
+    );
+
+    await tester.tap(find.text('Add to Anki'));
+
+    expect(identical(addedResult, match), isTrue);
+    expect(addedResult?.entries.single.senses.first.glosses, ['to eat']);
+  });
+
+  testWidgets('duplicate check changes Add to Anki into an inactive state', (
+    tester,
+  ) async {
+    final duplicateCheck = Completer<bool>();
+    await showSheet(
+      tester,
+      Future.value(_match([_taberu])),
+      onAddToAnki: (_) {},
+      isAlreadyInAnki: (_) => duplicateCheck.future,
+    );
+
+    // The button uses FilledButton.tonalIcon with "Checking..." label and a CircularProgressIndicator icon
+    final checkingButton = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, 'Checking...'),
+    );
+    expect(checkingButton.onPressed, isNull);
+
+    duplicateCheck.complete(true);
+    await tester.pumpAndSettle();
+
+    // After duplicate check completes, it shows "Already in Anki" with a check icon
+    final duplicateButton = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, 'Already in Anki'),
+    );
+    expect(duplicateButton.onPressed, isNull);
+    expect(find.widgetWithText(FilledButton, 'Add to Anki'), findsNothing);
   });
 
   testWidgets('parts of speech are small, muted and italic', (tester) async {
