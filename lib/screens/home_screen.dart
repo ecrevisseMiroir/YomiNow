@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:yominow/services/anki_droid_service.dart';
 import 'package:yominow/services/lookup_history.dart';
+import 'package:yominow/services/tts_service.dart';
 import 'package:yominow/widgets/yomi_now_notification.dart';
 
 import '../theme/yomi_now_theme.dart';
@@ -421,12 +422,26 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            r.reading.isNotEmpty ? r.reading : r.gloss,
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(
-                                  color: Theme.of(context).colorScheme.primary,
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  r.reading.isNotEmpty ? r.reading : r.gloss,
+                                  style: Theme.of(context).textTheme.titleMedium
+                                      ?.copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                      ),
                                 ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.volume_up_outlined),
+                                onPressed: () {
+                                  TtsService.instance.speak(r.reading);
+                                },
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 12),
                           Container(

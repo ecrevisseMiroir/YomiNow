@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:yominow/services/tts_service.dart';
 
 import 'services/app_services.dart';
 import 'services/app_appearance.dart';
@@ -20,6 +21,7 @@ Future<void> main() async {
 
   final tokenizer = KuromojiTokenizerService();
   final dictionary = SqliteDictionaryService();
+  await TtsService.instance.init();
 
   final prefs = await SharedPreferences.getInstance();
   final savedLang = prefs.getString('selected_language');

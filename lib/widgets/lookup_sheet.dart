@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yominow/services/tts_service.dart';
 
 import '../models/dictionary_entry.dart';
 import '../models/lookup_result.dart';
@@ -289,6 +290,12 @@ class _ResultView extends StatelessWidget {
                 isAlreadyInAnki: isAlreadyInAnki,
               ),
             ],
+            IconButton(
+              icon: const Icon(Icons.volume_up_outlined),
+              onPressed: () {
+                TtsService.instance.speak(result.pronunciationText);
+              },
+            ),
           ],
         ),
         const SizedBox(height: 16),
